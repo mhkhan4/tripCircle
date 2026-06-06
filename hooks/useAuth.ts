@@ -30,7 +30,13 @@ export function useAuth() {
   }
 
   async function signOut() {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch {
+      // sign out locally even if server call fails
+    }
+    setSession(null);
+    setUser(null);
   }
 
   return { session, user, signOut };
