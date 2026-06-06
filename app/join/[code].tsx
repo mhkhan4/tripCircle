@@ -14,8 +14,10 @@ export default function JoinScreen() {
 
   useEffect(() => {
     if (!code) { router.replace('/(tabs)'); return; }
+    // wait for profile to load before acting — session can be set while user is still null
+    if (session && !user) return;
     handleJoin();
-  }, [session, code]);
+  }, [session, user, code]);
 
   async function handleJoin() {
     if (!session || !user) {
@@ -23,6 +25,9 @@ export default function JoinScreen() {
       router.replace('/(auth)/login');
       return;
     }
+
+    // clear the pending key before the RPC so it doesn't loop on failure
+    await AsyncStorage.removeItem(PENDING_INVITE_KEY);
 
     // security definer RPC bypasses RLS — non-member can join by invite code atomically
     try {
