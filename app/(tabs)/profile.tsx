@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Alert, Image } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, Image, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../hooks/useAuth';
@@ -9,9 +9,14 @@ export default function ProfileScreen() {
   const { user, isGuest, signOutGuest } = useAppStore();
 
   function confirmSignOut() {
+    const action = isGuest ? signOutGuest : signOut;
+    if (Platform.OS === 'web') {
+      if (window.confirm('Are you sure you want to sign out?')) action();
+      return;
+    }
     Alert.alert('Sign out', 'Are you sure?', [
       { text: 'Cancel', style: 'cancel' },
-      { text: 'Sign out', style: 'destructive', onPress: isGuest ? signOutGuest : signOut },
+      { text: 'Sign out', style: 'destructive', onPress: action },
     ]);
   }
 
