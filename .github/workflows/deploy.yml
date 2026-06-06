@@ -21,4 +21,8 @@ jobs:
 
       - name: Deploy to Vercel
         timeout-minutes: 10
-        run: vercel --prod --yes --token=${{ secrets.VERCEL_TOKEN }}
+        run: |
+          unset GITHUB_SHA GITHUB_REF GITHUB_REPOSITORY GITHUB_WORKFLOW \
+                GITHUB_RUN_ID GITHUB_ACTOR GITHUB_EVENT_NAME GITHUB_HEAD_REF \
+                GITHUB_BASE_REF GITHUB_SERVER_URL GITHUB_API_URL GITHUB_GRAPHQL_URL
+          vercel --prod --yes --token=${{ secrets.VERCEL_TOKEN }}
