@@ -50,15 +50,22 @@ export function useCreateGroup() {
 
   return useMutation({
     mutationFn: async (input: { name: string; description?: string }) => {
+      const groupId = crypto.randomUUID();
       const invite_code = Math.random().toString(36).substring(2, 10).toUpperCase();
-      const { data: group, error } = await supabase
+
+      // Insert without .select() — RLS blocks SELECT until user is a member
+      const { error: groupError } = await supabase
         .from('groups')
-        .insert({ ...input, invite_code, created_by: user!.id })
-        .select()
-        .single();
-      if (error) throw error;
-      await supabase.from('group_members').insert({ group_id: group.id, user_id: user!.id, role: 'admin' });
-      return group;
+        .insert({ id: groupId, ...input, invite_code, created_by: user!.id });
+      if (groupError) throw groupError;
+
+      // Now add creator as admin member
+      const { error: memberError } = await supabase
+        .from('group_members')
+        .insert({ group_id: groupId, user_id: user!.id, role: 'admin' });
+      if (memberError) throw memberError;
+
+      return { id: groupId, ...input, invite_code, created_by: user!.id, created_at: new Date().toISOString() };
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['groups'] }),
   });
