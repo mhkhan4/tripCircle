@@ -1,0 +1,84 @@
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '../lib/supabase';
+import { useAppStore } from '../store/useAppStore';
+import { GUEST_GROUP } from '../lib/guestData';
+import type { Group } from '../types';
+
+export function useGroups() {
+  const { user, isGuest } = useAppStore();
+
+  return useQuery({
+    queryKey: ['groups', user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      if (isGuest) return [GUEST_GROUP];
+      const { data, error } = await supabase
+        .from('group_members')
+        .select('group:groups(*)')
+        .eq('user_id', user!.id);
+      if (error) throw error;
+      return data.map((d: any) => d.group) as Group[];
+    },
+  });
+}
+
+export function useGroup(groupId: string) {
+  const { isGuest } = useAppStore();
+
+  return useQuery({
+    queryKey: ['group', groupId],
+    enabled: !!groupId,
+    queryFn: async () => {
+      if (isGuest) return {
+        ...GUEST_GROUP,
+        group_members: [{ id: 'gm-1', group_id: GUEST_GROUP.id, user_id: 'guest-000', role: 'admin', joined_at: new Date().toISOString(), user: { id: 'guest-000', full_name: 'Guest User', email: 'guest@tripcircle.app', avatar_url: null } }],
+      };
+      const { data, error } = await supabase
+        .from('groups')
+        .select('*, group_members(*, user:users(*))')
+        .eq('id', groupId)
+        .single();
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
+export function useCreateGroup() {
+  const queryClient = useQueryClient();
+  const { user } = useAppStore();
+
+  return useMutation({
+    mutationFn: async (input: { name: string; description?: string }) => {
+      const invite_code = Math.random().toString(36).substring(2, 10).toUpperCase();
+      const { data: group, error } = await supabase
+        .from('groups')
+        .insert({ ...input, invite_code, created_by: user!.id })
+        .select()
+        .single();
+      if (error) throw error;
+      await supabase.from('group_members').insert({ group_id: group.id, user_id: user!.id, role: 'admin' });
+      return group;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['groups'] }),
+  });
+}
+
+export function useJoinGroup() {
+  const queryClient = useQueryClient();
+  const { user } = useAppStore();
+
+  return useMutation({
+    mutationFn: async (invite_code: string) => {
+      const { data: group, error } = await supabase
+        .from('groups')
+        .select()
+        .eq('invite_code', invite_code.toUpperCase())
+        .single();
+      if (error) throw new Error('Invalid invite code');
+      await supabase.from('group_members').insert({ group_id: group.id, user_id: user!.id, role: 'member' });
+      return group;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['groups'] }),
+  });
+}

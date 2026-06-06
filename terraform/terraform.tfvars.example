@@ -1,0 +1,13 @@
+# Copy this to terraform.tfvars and fill in your values
+# Never commit terraform.tfvars to git
+
+supabase_access_token = "sbp_your-token-here"
+project_ref           = "ocbognmktqxquvxjvbkl"
+
+# Fill these in once you have Google OAuth credentials
+google_client_id      = ""
+google_client_secret  = ""
+
+# Fill these in once you have Facebook OAuth credentials
+facebook_app_id       = ""
+facebook_app_secret   = ""
