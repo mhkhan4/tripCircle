@@ -22,9 +22,10 @@ export default function GroupScreen() {
 
   function shareInvite() {
     const webUrl = process.env.EXPO_PUBLIC_WEB_URL ?? 'https://tripcircle.vercel.app';
+    const joinUrl = `${webUrl}/join/${group?.invite_code}`;
     Share.share({
-      message: `Join my TripCircle group "${group?.name}"!\nInvite code: ${group?.invite_code}\n\nOpen the app: ${webUrl}`,
-      url: webUrl,
+      message: `Join my TripCircle group "${group?.name}"! Tap the link to join automatically:\n${joinUrl}`,
+      url: joinUrl,
     });
   }
 

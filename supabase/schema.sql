@@ -193,5 +193,33 @@ create policy "messages_insert" on public.messages for insert with check (is_gro
 -- Realtime: enable for messages table
 alter publication supabase_realtime add table public.messages;
 
+-- Invite join RPC: bypasses RLS so an authenticated non-member can join via invite code
+-- Returns the group_id on success, raises on invalid code or unauthenticated
+create or replace function public.join_group_by_invite_code(code text)
+returns uuid
+language plpgsql security definer
+as $$
+declare
+  v_group_id uuid;
+  v_user_id uuid;
+begin
+  v_user_id := auth.uid();
+  if v_user_id is null then
+    raise exception 'Not authenticated';
+  end if;
+
+  select id into v_group_id from public.groups where invite_code = upper(code);
+  if v_group_id is null then
+    raise exception 'Invalid invite code';
+  end if;
+
+  insert into public.group_members (group_id, user_id, role)
+  values (v_group_id, v_user_id, 'member')
+  on conflict (group_id, user_id) do nothing;
+
+  return v_group_id;
+end;
+$$;
+
 -- Storage: create receipts bucket (run in Supabase dashboard or via API)
 -- insert into storage.buckets (id, name, public) values ('receipts', 'receipts', true);
