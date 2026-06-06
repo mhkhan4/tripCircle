@@ -1,5 +1,5 @@
 import { View, Text, FlatList, TouchableOpacity, Share } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { format } from 'date-fns';
@@ -21,8 +21,10 @@ export default function GroupScreen() {
   const { data: trips } = useTrips(id);
 
   function shareInvite() {
+    const webUrl = process.env.EXPO_PUBLIC_WEB_URL ?? 'https://tripcircle.vercel.app';
     Share.share({
-      message: `Join my TripCircle group "${group?.name}"!\nInvite code: ${group?.invite_code}`,
+      message: `Join my TripCircle group "${group?.name}"!\nInvite code: ${group?.invite_code}\n\nOpen the app: ${webUrl}`,
+      url: webUrl,
     });
   }
 
@@ -58,6 +60,7 @@ export default function GroupScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50 dark:bg-gray-950" edges={['bottom']}>
+      <Stack.Screen options={{ title: group?.name ?? 'Group' }} />
       <View className="mx-5 mb-4 rounded-2xl bg-white p-4 shadow-sm dark:bg-gray-800" style={{ shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 }}>
         <View className="flex-row items-center gap-3">
           <View className="h-14 w-14 items-center justify-center rounded-2xl bg-primary">
