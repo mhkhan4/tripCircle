@@ -1,4 +1,4 @@
-import { View, Text, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, RefreshControl, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
@@ -66,21 +66,81 @@ export default function HomeScreen() {
           <Text className="text-gray-400">Loading...</Text>
         </View>
       ) : isEmpty ? (
-        <View className="flex-1 items-center justify-center px-8">
-          <Ionicons name="people-outline" size={64} color="#CBD5E1" />
-          <Text className="mt-4 text-center text-lg font-semibold text-gray-700 dark:text-gray-300">No trips yet</Text>
-          <Text className="mt-1 text-center text-sm text-gray-400">Create a group or plan a solo trip.</Text>
-          <TouchableOpacity onPress={() => router.push('/group/new')} className="mt-6 rounded-2xl bg-primary px-6 py-3">
-            <Text className="font-semibold text-white">Create Group</Text>
+        <ScrollView contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
+          {/* Hero */}
+          <View className="mt-6 items-center">
+            <View
+              className="h-20 w-20 items-center justify-center rounded-3xl bg-primary"
+              style={{ shadowColor: '#2563EB', shadowOpacity: 0.35, shadowRadius: 16, elevation: 8 }}
+            >
+              <Ionicons name="airplane" size={38} color="white" />
+            </View>
+            <Text className="mt-5 text-center text-2xl font-bold text-gray-900 dark:text-white">
+              Plan trips together,{'\n'}effortlessly.
+            </Text>
+            <Text className="mt-2 text-center text-sm leading-5 text-gray-500 dark:text-gray-400">
+              TripCircle helps you organise group adventures and solo getaways — from idea to itinerary.
+            </Text>
+          </View>
+
+          {/* Feature cards */}
+          <View className="mt-8 gap-3">
+            <View className="flex-row items-start gap-4 rounded-2xl bg-white p-4 dark:bg-gray-800"
+              style={{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 }}>
+              <View className="h-10 w-10 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900">
+                <Ionicons name="people" size={20} color="#2563EB" />
+              </View>
+              <View className="flex-1">
+                <Text className="font-semibold text-gray-900 dark:text-white">Group Trips</Text>
+                <Text className="mt-0.5 text-sm leading-5 text-gray-500 dark:text-gray-400">
+                  Create a group, invite friends, and plan together. Everyone stays in the loop.
+                </Text>
+              </View>
+            </View>
+
+            <View className="flex-row items-start gap-4 rounded-2xl bg-white p-4 dark:bg-gray-800"
+              style={{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 }}>
+              <View className="h-10 w-10 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-900">
+                <Ionicons name="wallet" size={20} color="#F59E0B" />
+              </View>
+              <View className="flex-1">
+                <Text className="font-semibold text-gray-900 dark:text-white">Budget & Expenses</Text>
+                <Text className="mt-0.5 text-sm leading-5 text-gray-500 dark:text-gray-400">
+                  Track shared costs, split bills fairly, and know exactly who owes what.
+                </Text>
+              </View>
+            </View>
+
+            <View className="flex-row items-start gap-4 rounded-2xl bg-white p-4 dark:bg-gray-800"
+              style={{ shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 }}>
+              <View className="h-10 w-10 items-center justify-center rounded-xl bg-violet-100 dark:bg-violet-900">
+                <Ionicons name="person" size={20} color="#7C3AED" />
+              </View>
+              <View className="flex-1">
+                <Text className="font-semibold text-gray-900 dark:text-white">Solo Planning</Text>
+                <Text className="mt-0.5 text-sm leading-5 text-gray-500 dark:text-gray-400">
+                  Going it alone? Build your own itinerary and keep everything in one place.
+                </Text>
+              </View>
+            </View>
+          </View>
+
+          {/* CTAs */}
+          <TouchableOpacity
+            onPress={() => router.push('/group/new')}
+            className="mt-8 items-center rounded-2xl bg-primary py-4"
+            style={{ shadowColor: '#2563EB', shadowOpacity: 0.3, shadowRadius: 10, elevation: 4 }}
+          >
+            <Text className="text-base font-bold text-white">Create a Group</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => router.push('/trip/new')}
-            className="mt-3 flex-row items-center gap-2 rounded-2xl border border-gray-200 px-6 py-3 dark:border-gray-700"
+            className="mt-3 flex-row items-center justify-center gap-2 rounded-2xl border border-gray-200 py-4 dark:border-gray-700"
           >
             <Ionicons name="person-outline" size={16} color="#64748B" />
             <Text className="font-semibold text-gray-600 dark:text-gray-300">Plan a Solo Trip</Text>
           </TouchableOpacity>
-        </View>
+        </ScrollView>
       ) : (
         <FlatList
           data={groups ?? []}
