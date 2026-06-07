@@ -9,7 +9,7 @@ const client = new DeepSeekClient({
 
 export async function scanReceipt(base64Image: string): Promise<OcrResult> {
   const response = await client.chat.completions.create({
-    model: 'deepseek-v4-vision',
+    model: 'deepseek-chat',
     max_tokens: 200,
     messages: [
       {
@@ -28,20 +28,18 @@ export async function scanReceipt(base64Image: string): Promise<OcrResult> {
     ],
   });
 
-  const raw = response.choices[0]?.message?.content ?? '{}';
+  const raw = response.choices[0]?.message?.content ?? '';
 
-  try {
-    const jsonStr = raw.replace(/^```(?:json)?\s*\n?/m, '').replace(/\n?```\s*$/m, '').trim();
-    const parsed = JSON.parse(jsonStr);
-    return {
-      amount: parsed.amount ?? null,
-      merchant: parsed.merchant ?? null,
-      date: parsed.date ?? null,
-      currency: parsed.currency ?? null,
-      category: parsed.category ?? null,
-      raw,
-    };
-  } catch {
-    return { amount: null, merchant: null, date: null, currency: null, category: null, raw };
-  }
+  if (!raw) throw new Error('Empty response from vision API');
+
+  const jsonStr = raw.replace(/^```(?:json)?\s*\n?/m, '').replace(/\n?```\s*$/m, '').trim();
+  const parsed = JSON.parse(jsonStr);
+  return {
+    amount: parsed.amount ?? null,
+    merchant: parsed.merchant ?? null,
+    date: parsed.date ?? null,
+    currency: parsed.currency ?? null,
+    category: parsed.category ?? null,
+    raw,
+  };
 }
