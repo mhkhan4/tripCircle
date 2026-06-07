@@ -61,7 +61,7 @@ tripcircle/
 │   └── useBudget.ts              # Budget, contributions, expenses, splits
 ├── lib/
 │   ├── supabase.ts               # Supabase client (AsyncStorage session)
-│   └── openai.ts                 # GPT-4o Vision receipt scanner
+│   └── deepseek.ts               # DeepSeek Vision receipt scanner
 ├── store/
 │   └── useAppStore.ts            # Zustand: session, user, activeGroup
 ├── types/
@@ -92,7 +92,7 @@ Login → OAuth provider → Supabase Auth → trigger creates users row
 ```
 User taps "Add Expense"
   → Optional: Launch camera (expo-image-picker)
-  → base64 image → scanReceipt() → GPT-4o Vision
+  → base64 image → scanReceipt() → DeepSeek Vision
   → OCR result auto-fills amount, description, and category
   → Upload image to Supabase Storage → get public URL
   → User confirms/edits → Submit
@@ -168,7 +168,7 @@ cp .env.example .env
 #    Enable Google + Facebook OAuth providers in Auth settings
 #    Create a "receipts" storage bucket (set to public)
 
-# 3. Get your OpenAI API key at platform.openai.com
+# 3. Get your DeepSeek API key at platform.deepseek.com
 
 # 4. Start the app
 npx expo start

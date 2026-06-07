@@ -8,7 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { supabase } from '../../../../../lib/supabase';
-import { scanReceipt } from '../../../../../lib/openai';
+import { scanReceipt } from '../../../../../lib/deepseek';
 import { useAddExpense } from '../../../../../hooks/useBudget';
 import { useGroup } from '../../../../../hooks/useGroup';
 import { useAppStore } from '../../../../../store/useAppStore';

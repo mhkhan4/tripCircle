@@ -1,7 +1,7 @@
-import OpenAI from 'openai';
+import DeepSeekClient from 'openai';
 import type { OcrResult } from '../types';
 
-const client = new OpenAI({
+const client = new DeepSeekClient({
   apiKey: process.env.EXPO_PUBLIC_DEEPSEEK_API_KEY!,
   baseURL: 'https://api.deepseek.com/v1',
   dangerouslyAllowBrowser: true,
