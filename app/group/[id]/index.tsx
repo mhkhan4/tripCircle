@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { format } from 'date-fns';
 import { useGroup } from '../../../hooks/useGroup';
 import { useTrips, useTripMembers, useJoinTrip } from '../../../hooks/useTrip';
+import { useGroupJoinRequests } from '../../../hooks/useDiscover';
 import { useAppStore } from '../../../store/useAppStore';
 import type { Trip } from '../../../types';
 
@@ -73,8 +74,14 @@ function TripCard({ item, groupId }: { item: Trip; groupId: string }) {
 export default function GroupScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const { user } = useAppStore();
   const { data: group } = useGroup(id);
   const { data: trips } = useTrips(id);
+  const { data: joinRequests } = useGroupJoinRequests(id);
+
+  const members = (group as any)?.group_members ?? [];
+  const isAdmin = members.some((m: any) => m.user_id === user?.id && m.role === 'admin');
+  const pendingCount = joinRequests?.length ?? 0;
 
   function shareInvite() {
     const webUrl = process.env.EXPO_PUBLIC_WEB_URL ?? 'https://tripcircle.vercel.app';
@@ -116,6 +123,20 @@ export default function GroupScreen() {
             <Text className="text-sm font-semibold text-white">Chat</Text>
           </TouchableOpacity>
         </View>
+        {isAdmin && pendingCount > 0 && (
+          <TouchableOpacity
+            onPress={() => router.push(`/group/${id}/join-requests`)}
+            className="mt-2 flex-row items-center justify-between rounded-xl bg-amber-50 px-4 py-2.5 dark:bg-amber-900/20"
+          >
+            <View className="flex-row items-center gap-2">
+              <Ionicons name="person-add-outline" size={16} color="#D97706" />
+              <Text className="text-sm font-semibold text-amber-700 dark:text-amber-400">
+                {pendingCount} join request{pendingCount !== 1 ? 's' : ''} pending
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={14} color="#D97706" />
+          </TouchableOpacity>
+        )}
       </View>
 
       <FlatList

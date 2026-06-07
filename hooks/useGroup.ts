@@ -16,9 +16,28 @@ export function useGroups() {
       const { data, error } = await supabase
         .from('group_members')
         .select('group:groups(*)')
-        .eq('user_id', user!.id);
+        .eq('user_id', user!.id)
+        .eq('group.is_solo', false);
       if (error) throw error;
-      return data.map((d: any) => d.group) as Group[];
+      return data.map((d: any) => d.group).filter(Boolean) as Group[];
+    },
+  });
+}
+
+export function useSoloGroup() {
+  const { user, isGuest } = useAppStore();
+
+  return useQuery({
+    queryKey: ['solo-group', user?.id],
+    enabled: !isGuest && !!user?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('group_members')
+        .select('group:groups!inner(*)')
+        .eq('user_id', user!.id)
+        .eq('group.is_solo', true)
+        .maybeSingle();
+      return data ? ((data as any).group as Group) : null;
     },
   });
 }
@@ -50,7 +69,13 @@ export function useCreateGroup() {
   const { user } = useAppStore();
 
   return useMutation({
-    mutationFn: async (input: { name: string; description?: string }) => {
+    mutationFn: async (input: {
+      name: string;
+      description?: string;
+      is_discoverable?: boolean;
+      latitude?: number;
+      longitude?: number;
+    }) => {
       const groupId = crypto.randomUUID();
       const invite_code = Math.random().toString(36).substring(2, 10).toUpperCase();
 

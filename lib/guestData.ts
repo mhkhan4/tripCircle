@@ -9,6 +9,10 @@ export const GUEST_GROUP: Group = {
   invite_code: 'DEMO01',
   created_by: 'guest-000',
   created_at: new Date().toISOString(),
+  latitude: null,
+  longitude: null,
+  is_discoverable: false,
+  is_solo: false,
 };
 
 export const GUEST_TRIP: Trip = {
@@ -29,6 +33,7 @@ export const GUEST_BUDGET: Budget & { budget_contributions: BudgetContribution[]
   id: 'guest-budget-1',
   trip_id: 'guest-trip-1',
   total_amount: 1200,
+  per_person_amount: null,
   currency: 'USD',
   created_by: 'guest-000',
   created_at: new Date().toISOString(),
