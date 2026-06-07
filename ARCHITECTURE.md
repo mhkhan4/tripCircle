@@ -1,8 +1,8 @@
-# TripCircle — Architecture
+# TripOrbit — Architecture
 
 ## Overview
 
-TripCircle is a mobile-first React Native app for friend groups who travel together. It combines group management, trip planning, shared budgeting, receipt-based expense tracking, and real-time chat into a single cohesive experience.
+TripOrbit is a mobile-first React Native app for friend groups who travel together. It combines group management, trip planning, shared budgeting, receipt-based expense tracking, and real-time chat into a single cohesive experience.
 
 ---
 
@@ -28,7 +28,7 @@ TripCircle is a mobile-first React Native app for friend groups who travel toget
 ## Folder Structure
 
 ```
-tripcircle/
+triporbit/
 ├── app/                          # Expo Router file-based screens
 │   ├── _layout.tsx               # Root layout: providers, auth gate
 │   ├── (auth)/

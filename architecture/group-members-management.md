@@ -1,4 +1,4 @@
-# TripCircle — Group Members Management: Architecture Plan
+# TripOrbit — Group Members Management: Architecture Plan
 
 ## Codebase Findings Summary
 
@@ -156,7 +156,7 @@ Presented as `presentation: 'modal'` via Expo Router stack. `groupId` passed via
 - Users already in the group appear grayed out with "Already a member" badge
 - Tapping "Add" fires the mutation inline — user can add multiple people without closing the modal
 - Empty state (no query): "Type a name or @username to search"
-- Empty state (no results): "No TripCircle users found"
+- Empty state (no results): "No TripOrbit users found"
 
 ### 3d. `MemberRow` Component
 

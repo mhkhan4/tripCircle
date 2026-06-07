@@ -51,7 +51,7 @@ export function useGroup(groupId: string) {
     queryFn: async () => {
       if (isGuest) return {
         ...GUEST_GROUP,
-        group_members: [{ id: 'gm-1', group_id: GUEST_GROUP.id, user_id: 'guest-000', role: 'admin', joined_at: new Date().toISOString(), user: { id: 'guest-000', full_name: 'Guest User', email: 'guest@tripcircle.app', avatar_url: null } }],
+        group_members: [{ id: 'gm-1', group_id: GUEST_GROUP.id, user_id: 'guest-000', role: 'admin', joined_at: new Date().toISOString(), user: { id: 'guest-000', full_name: 'Guest User', email: 'guest@triporbit.app', avatar_url: null } }],
       };
       const { data, error } = await supabase
         .from('groups')

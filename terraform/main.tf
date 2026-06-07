@@ -18,8 +18,8 @@ resource "supabase_settings" "auth" {
   project_ref = var.project_ref
 
   auth = jsonencode({
-    site_url                = "tripcircle://auth/callback"
-    additional_redirect_urls = ["tripcircle://auth/callback"]
+    site_url                = "triporbit://auth/callback"
+    additional_redirect_urls = ["triporbit://auth/callback"]
     disable_signup          = false
     jwt_expiry              = 3600
 

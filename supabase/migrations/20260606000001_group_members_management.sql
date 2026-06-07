@@ -28,7 +28,7 @@ create policy "gm_delete" on public.group_members
     and user_id <> auth.uid()
   );
 
--- RPC: any group member can add an existing TripCircle user directly
+-- RPC: any group member can add an existing TripOrbit user directly
 create or replace function public.add_member_to_group(
   p_group_id uuid,
   p_target_user_id uuid

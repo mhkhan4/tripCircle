@@ -1,9 +1,9 @@
 {
   "expo": {
-    "name": "TripCircle",
-    "slug": "tripcircle",
+    "name": "TripOrbit",
+    "slug": "triporbit",
     "version": "1.0.0",
-    "scheme": "tripcircle",
+    "scheme": "triporbit",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",

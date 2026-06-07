@@ -84,10 +84,10 @@ export default function GroupScreen() {
   const pendingCount = joinRequests?.length ?? 0;
 
   function shareInvite() {
-    const webUrl = process.env.EXPO_PUBLIC_WEB_URL ?? 'https://tripcircle.vercel.app';
+    const webUrl = process.env.EXPO_PUBLIC_WEB_URL ?? 'https://triporbit.app';
     const joinUrl = `${webUrl}/join/${group?.invite_code}`;
     Share.share({
-      message: `Join my TripCircle group "${group?.name}"! Tap the link to join automatically:\n${joinUrl}`,
+      message: `Join my TripOrbit group "${group?.name}"! Tap the link to join automatically:\n${joinUrl}`,
       url: joinUrl,
     });
   }

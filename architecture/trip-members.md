@@ -1,4 +1,4 @@
-# TripCircle — Trip Members: Architecture Plan
+# TripOrbit — Trip Members: Architecture Plan
 
 ## Decision
 

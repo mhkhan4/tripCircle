@@ -2,7 +2,7 @@
 
 ## Overview
 
-Four features to add to TripCircle:
+Four features to add to TripOrbit:
 
 1. **Budget Payment Flow** — admin can mark members as paid; "Pending" resolves to a real paid timestamp
 2. **Discover Nearby Groups** — Join button opens a radius-filtered group discovery + request-to-join flow

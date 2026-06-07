@@ -92,7 +92,7 @@ export default function AddMemberScreen() {
             <Text className="text-sm text-gray-400">
               {debouncedQuery.length < 2
                 ? 'Type a name or @username to search'
-                : 'No TripCircle users found'}
+                : 'No TripOrbit users found'}
             </Text>
           </View>
         }

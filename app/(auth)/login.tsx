@@ -70,7 +70,7 @@ export default function LoginScreen() {
         />
 
         <Text style={{ fontSize: 36, fontWeight: '800', color: '#ffffff', marginBottom: 6, letterSpacing: -0.5 }}>
-          TripCircle
+          TripOrbit
         </Text>
         <Text style={{ fontSize: 15, color: '#94a3b8', textAlign: 'center', marginBottom: 48, lineHeight: 22 }}>
           Plan trips, track budgets, and travel together.
