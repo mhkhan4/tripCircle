@@ -1,26 +1,21 @@
-import DeepSeekClient from 'openai';
+import { GoogleGenAI } from '@google/genai';
 import type { OcrResult } from '../types';
 
-const client = new DeepSeekClient({
-  apiKey: process.env.EXPO_PUBLIC_DEEPSEEK_API_KEY!,
-  baseURL: 'https://api.deepseek.com/v1',
-  dangerouslyAllowBrowser: true,
-});
+const ai = new GoogleGenAI({ apiKey: process.env.EXPO_PUBLIC_GEMINI_API_KEY! });
 
 export async function scanReceipt(base64Image: string): Promise<OcrResult> {
-  const response = await client.chat.completions.create({
-    model: 'deepseek-chat',
-    max_tokens: 200,
-    messages: [
+  const response = await ai.models.generateContent({
+    model: 'gemini-2.5-flash-lite',
+    contents: [
       {
-        role: 'user',
-        content: [
+        parts: [
           {
-            type: 'image_url',
-            image_url: { url: `data:image/jpeg;base64,${base64Image}` },
+            inlineData: {
+              mimeType: 'image/jpeg',
+              data: base64Image,
+            },
           },
           {
-            type: 'text',
             text: 'Extract receipt info. Reply ONLY with valid JSON: {"amount": number or null, "merchant": "string or null", "date": "YYYY-MM-DD or null", "currency": "3-letter code or null", "category": "food|transport|accommodation|activities|shopping|other"}. Pick the category that best matches the receipt type. If you cannot find a value, use null.',
           },
         ],
@@ -28,7 +23,7 @@ export async function scanReceipt(base64Image: string): Promise<OcrResult> {
     ],
   });
 
-  const raw = response.choices[0]?.message?.content ?? '';
+  const raw = response.text ?? '';
 
   if (!raw) throw new Error('Empty response from vision API');
 
