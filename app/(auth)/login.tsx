@@ -50,7 +50,8 @@ export default function LoginScreen() {
       <View className="flex-1 items-center justify-center px-8">
         <Image
           source={require('../../assets/logo.png')}
-          className="mb-2 h-20 w-20"
+          style={{ width: 80, height: 80 }}
+          className="mb-2"
           resizeMode="contain"
         />
         <Text className="mb-2 text-4xl font-bold text-gray-900 dark:text-white">TripCircle</Text>
