@@ -72,9 +72,6 @@ export function useCreateGroup() {
     mutationFn: async (input: {
       name: string;
       description?: string;
-      is_discoverable?: boolean;
-      latitude?: number;
-      longitude?: number;
     }) => {
       const groupId = crypto.randomUUID();
       const invite_code = Math.random().toString(36).substring(2, 10).toUpperCase();

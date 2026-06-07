@@ -1,9 +1,7 @@
-import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator, Switch } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { useState } from 'react';
 import { useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import * as Location from 'expo-location';
-import { Ionicons } from '@expo/vector-icons';
 import { useCreateGroup } from '../../../hooks/useGroup';
 
 export default function NewGroupScreen() {
@@ -11,45 +9,14 @@ export default function NewGroupScreen() {
   const createGroup = useCreateGroup();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [isDiscoverable, setIsDiscoverable] = useState(false);
-  const [locationGranted, setLocationGranted] = useState<boolean | null>(null);
-
-  async function toggleDiscoverable(value: boolean) {
-    if (value && locationGranted === null) {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      const granted = status === 'granted';
-      setLocationGranted(granted);
-      if (!granted) {
-        Alert.alert('Location Required', 'Enable location access so your group can appear in nearby searches.');
-        return;
-      }
-    }
-    setIsDiscoverable(value);
-  }
 
   async function handleCreate() {
     if (!name.trim()) return Alert.alert('Name required', 'Give your group a name.');
-
-    let lat: number | undefined;
-    let lng: number | undefined;
-
-    if (isDiscoverable) {
-      try {
-        const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
-        lat = loc.coords.latitude;
-        lng = loc.coords.longitude;
-      } catch {
-        Alert.alert('Location Error', 'Could not get your location. The group will be created without discoverability.');
-      }
-    }
 
     try {
       const group = await createGroup.mutateAsync({
         name: name.trim(),
         description: description.trim() || undefined,
-        is_discoverable: isDiscoverable && lat !== undefined,
-        latitude: lat,
-        longitude: lng,
       });
       router.replace(`/group/${group.id}`);
     } catch (e: any) {
@@ -87,26 +54,6 @@ export default function NewGroupScreen() {
           style={{ height: 80 }}
           maxLength={200}
         />
-
-        <View className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
-          <View className="flex-row items-center justify-between">
-            <View className="flex-1 mr-3">
-              <View className="flex-row items-center gap-2">
-                <Ionicons name="search-outline" size={16} color="#2563EB" />
-                <Text className="font-semibold text-gray-800 dark:text-white">Make Discoverable</Text>
-              </View>
-              <Text className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-                Allow nearby users to find and request to join this group
-              </Text>
-            </View>
-            <Switch
-              value={isDiscoverable}
-              onValueChange={toggleDiscoverable}
-              trackColor={{ false: '#E2E8F0', true: '#2563EB' }}
-              thumbColor="white"
-            />
-          </View>
-        </View>
       </View>
 
       <View className="px-5 pb-6">

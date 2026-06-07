@@ -9,9 +9,6 @@ export const GUEST_GROUP: Group = {
   invite_code: 'DEMO01',
   created_by: 'guest-000',
   created_at: new Date().toISOString(),
-  latitude: null,
-  longitude: null,
-  is_discoverable: false,
   is_solo: false,
 };
 

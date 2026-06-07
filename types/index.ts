@@ -19,35 +19,7 @@ export type Group = {
   invite_code: string;
   created_by: string;
   created_at: string;
-  latitude: number | null;
-  longitude: number | null;
-  is_discoverable: boolean;
   is_solo: boolean;
-};
-
-export type NearbyGroup = {
-  id: string;
-  name: string;
-  description: string | null;
-  avatar_url: string | null;
-  created_at: string;
-  latitude: number;
-  longitude: number;
-  distance_miles: number;
-  member_count: number;
-};
-
-export type GroupJoinRequest = {
-  id: string;
-  group_id: string;
-  user_id: string;
-  status: 'pending' | 'approved' | 'rejected';
-  message: string | null;
-  reviewed_by: string | null;
-  reviewed_at: string | null;
-  created_at: string;
-  user?: UserProfile;
-  group?: Group;
 };
 
 export type GroupMember = {
