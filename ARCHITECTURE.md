@@ -120,6 +120,7 @@ User opens chat screen
 | groups                | id, name, invite_code, created_by                              |
 | group_members         | group_id, user_id, role (admin/member) — unique(group,user)   |
 | trips                 | id, group_id, title, destination, start/end_date, status       |
+| trip_members          | trip_id, user_id, joined_at — unique(trip,user); creator auto-joined on trip create |
 | budgets               | id, trip_id (unique), total_amount, per_person_amount, currency |
 | budget_contributions  | budget_id, user_id, pledged_amount, paid_amount                |
 | expenses              | id, trip_id, amount, category, paid_by, receipt_url, ocr_raw  |
@@ -153,7 +154,10 @@ DeepSeek Vision (OpenAI-API-compatible) is used for receipt scanning. The prompt
 Budgets can be set as a flat total or per-person. When per-person, `per_person_amount` is stored alongside `total_amount`. A Postgres trigger on `group_members` (INSERT/DELETE) automatically recalculates `total_amount = per_person_amount × current_member_count` for all affected trip budgets in that group.
 
 ### Expense splitting
-Currently equal split among all group members. The `expense_splits` table supports custom splits per user — this can be extended to a manual split screen without changing the schema.
+Splits are computed against `trip_members`, not all `group_members`. This means only people who joined the trip share costs. The `expense_splits` table supports custom splits per user — this can be extended to a manual split screen without changing the schema.
+
+### Trip membership model
+Trips are opt-in within a group. When a trip is created, only the creator is auto-joined via `trip_members`. All other group members see a "Join" CTA on the trip card. Any member can leave; the trip creator can remove any member. This prevents forcing travel plans on group members who don't want to join. See `architecture/trip-members.md` for the full plan.
 
 ---
 
@@ -200,3 +204,6 @@ npx expo start
 | 8     | Date picker UI        | Done        |
 | 8     | Per-person budget     | Done        |
 | 8     | Chat avatar images    | Done        |
+| 9     | Trip membership       | In Progress |
+| 9     | Join/Leave trip       | In Progress |
+| 9     | Trip member management| In Progress |
