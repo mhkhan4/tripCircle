@@ -30,8 +30,8 @@ export function useAuth() {
       setUser(data);
       return;
     }
-    // Profile row doesn't exist — trigger likely failed (e.g. phone auth before migration).
-    // Upsert it from session metadata so the user isn't stuck.
+    // Profile row doesn't exist — trigger likely failed (e.g. accounts created
+    // before the users table migration was applied). Upsert from session metadata.
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.user) return;
     const meta = session.user.user_metadata ?? {};
@@ -39,20 +39,25 @@ export function useAuth() {
       meta.full_name ||
       [meta.first_name, meta.last_name].filter(Boolean).join(' ') ||
       '';
-    const { data: created } = await supabase
+    const { data: created, error: upsertError } = await supabase
       .from('users')
       .upsert({
         id: userId,
         email: session.user.email ?? null,
         phone: session.user.phone ?? null,
-        first_name: meta.first_name ?? null,
-        last_name: meta.last_name ?? null,
+        // first_name / last_name are NOT NULL — fall back to '' if metadata missing
+        first_name: meta.first_name ?? '',
+        last_name: meta.last_name ?? '',
         full_name: fullName || null,
         avatar_url: meta.avatar_url ?? meta.picture ?? null,
         provider: (session.user.app_metadata?.provider as string) ?? 'email',
       })
       .select()
       .single();
+    if (upsertError) {
+      console.error('[fetchProfile] upsert failed:', upsertError.message);
+      return;
+    }
     if (created) setUser(created);
   }
 

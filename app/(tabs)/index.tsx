@@ -22,14 +22,17 @@ export default function HomeScreen() {
   }
 
   async function handleSoloTrip() {
-    if (!user) return;
+    if (!user) {
+      Alert.alert('Not signed in', 'Please sign in to plan a trip.');
+      return;
+    }
     setSoloLoading(true);
     try {
       const firstName = user.full_name?.split(' ')[0] ?? 'My';
       const groupId = await ensureSoloGroup(user.id, firstName);
       router.push(`/group/${groupId}/trip/new`);
     } catch (e: any) {
-      Alert.alert('Error', e.message);
+      Alert.alert('Error', e.message ?? 'Could not start solo trip planning. Please try again.');
     } finally {
       setSoloLoading(false);
     }

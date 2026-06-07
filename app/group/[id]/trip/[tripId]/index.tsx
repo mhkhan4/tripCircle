@@ -53,6 +53,7 @@ export default function TripScreen() {
           onPress: async () => {
             try {
               await leaveTrip.mutateAsync({ tripId, groupId });
+              router.back();
             } catch (e: any) {
               Alert.alert('Error', e.message);
             }

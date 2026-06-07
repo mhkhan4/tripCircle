@@ -111,9 +111,10 @@ export function useJoinTrip() {
   return useMutation({
     mutationFn: async ({ tripId, groupId }: { tripId: string; groupId: string }) => {
       if (isGuest) throw new Error('Sign in to join trips');
+      if (!user) throw new Error('Not signed in');
       const { error } = await supabase
         .from('trip_members')
-        .insert({ trip_id: tripId, user_id: user!.id });
+        .insert({ trip_id: tripId, user_id: user.id });
       if (error) throw error;
       return { tripId, groupId };
     },
@@ -131,17 +132,20 @@ export function useLeaveTrip() {
   return useMutation({
     mutationFn: async ({ tripId, groupId }: { tripId: string; groupId: string }) => {
       if (isGuest) throw new Error('Sign in to manage trips');
-      const { error } = await supabase
+      if (!user) throw new Error('Not signed in');
+      const { error, count } = await supabase
         .from('trip_members')
-        .delete()
+        .delete({ count: 'exact' })
         .eq('trip_id', tripId)
-        .eq('user_id', user!.id);
+        .eq('user_id', user.id);
       if (error) throw error;
+      if (count === 0) throw new Error('Could not leave the trip — you may not be a member, or the action was blocked. Please restart the app and try again.');
       return { tripId, groupId };
     },
     onSuccess: ({ tripId, groupId }) => {
       queryClient.invalidateQueries({ queryKey: ['trip-members', tripId] });
       queryClient.invalidateQueries({ queryKey: ['trips', groupId] });
+      queryClient.invalidateQueries({ queryKey: ['all-trips'] });
     },
   });
 }

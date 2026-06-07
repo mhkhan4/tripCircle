@@ -54,6 +54,16 @@ export default function RootLayout() {
             <Stack.Screen name="(tabs)" />
             <Stack.Screen name="group" />
             <Stack.Screen name="join" options={{ headerShown: true }} />
+            <Stack.Screen
+              name="discover"
+              options={{
+                headerShown: true,
+                headerBackTitle: 'Home',
+                headerTintColor: '#2563EB',
+                headerStyle: { backgroundColor: '#F8FAFC' },
+                headerShadowVisible: false,
+              }}
+            />
           </Stack>
         </View>
       </QueryClientProvider>

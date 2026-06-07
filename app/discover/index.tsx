@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState, useEffect } from 'react';
 import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
-import { useNearbyGroups, useRequestJoinGroup } from '../../hooks/useDiscover';
+import { useNearbyGroups, useRequestJoinGroup, useMyJoinRequests } from '../../hooks/useDiscover';
 import type { NearbyGroup } from '../../types';
 
 const RADIUS_OPTIONS = [25, 50, 100] as const;
@@ -15,9 +15,22 @@ export default function DiscoverScreen() {
   const [radius, setRadius] = useState<RadiusMiles>(25);
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
+  const [requestedIds, setRequestedIds] = useState<Set<string>>(new Set());
 
   const { data: groups, isLoading, refetch } = useNearbyGroups(coords?.lat ?? null, coords?.lng ?? null, radius);
+  const { data: myRequests } = useMyJoinRequests();
   const requestJoin = useRequestJoinGroup();
+
+  // Pre-populate requestedIds from existing pending/approved requests on load
+  useEffect(() => {
+    if (!myRequests) return;
+    const pendingIds = new Set(
+      myRequests
+        .filter((r) => r.status === 'pending' || r.status === 'approved')
+        .map((r) => r.group_id),
+    );
+    setRequestedIds(pendingIds);
+  }, [myRequests]);
 
   useEffect(() => {
     (async () => {
@@ -32,6 +45,7 @@ export default function DiscoverScreen() {
   }, []);
 
   async function handleRequestJoin(group: NearbyGroup) {
+    if (requestedIds.has(group.id)) return;
     Alert.alert(
       `Join "${group.name}"?`,
       'Your request will be sent to the group admin for approval.',
@@ -42,9 +56,11 @@ export default function DiscoverScreen() {
           onPress: async () => {
             try {
               await requestJoin.mutateAsync({ group_id: group.id });
-              Alert.alert('Request Sent', 'The group admin will review your request.');
+              setRequestedIds((prev) => new Set([...prev, group.id]));
+              Alert.alert('Request Sent', `The admin of "${group.name}" will review your request.`);
             } catch (e: any) {
               if (e.message?.includes('duplicate') || e.code === '23505') {
+                setRequestedIds((prev) => new Set([...prev, group.id]));
                 Alert.alert('Already Requested', 'You already have a pending request for this group.');
               } else {
                 Alert.alert('Error', e.message);
@@ -57,6 +73,7 @@ export default function DiscoverScreen() {
   }
 
   function renderGroup({ item }: { item: NearbyGroup }) {
+    const isPending = requestedIds.has(item.id);
     return (
       <View className="mb-3 rounded-2xl bg-white p-4 shadow-sm dark:bg-gray-800" style={{ shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 }}>
         <View className="flex-row items-center gap-3">
@@ -77,13 +94,19 @@ export default function DiscoverScreen() {
               <Text className="mt-1 text-xs text-gray-500 dark:text-gray-400" numberOfLines={2}>{item.description}</Text>
             ) : null}
           </View>
-          <TouchableOpacity
-            onPress={() => handleRequestJoin(item)}
-            disabled={requestJoin.isPending}
-            className="rounded-xl bg-primary px-3 py-2"
-          >
-            <Text className="text-xs font-semibold text-white">Request</Text>
-          </TouchableOpacity>
+          {isPending ? (
+            <View className="rounded-xl border border-gray-300 px-3 py-2 dark:border-gray-600">
+              <Text className="text-xs font-semibold text-gray-400">Requested</Text>
+            </View>
+          ) : (
+            <TouchableOpacity
+              onPress={() => handleRequestJoin(item)}
+              disabled={requestJoin.isPending}
+              className="rounded-xl bg-primary px-3 py-2"
+            >
+              <Text className="text-xs font-semibold text-white">Request</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     );
