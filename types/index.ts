@@ -78,7 +78,8 @@ export type TripMemberWithProfile = TripMember & {
 
 export type Trip = {
   id: string;
-  group_id: string;
+  group_id: string | null;
+  user_id: string | null;
   title: string;
   destination: string;
   description: string | null;

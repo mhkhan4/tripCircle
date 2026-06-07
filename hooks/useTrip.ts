@@ -61,6 +61,46 @@ export function useAllTrips() {
   });
 }
 
+export function useSoloTrips() {
+  const { user, isGuest } = useAppStore();
+  return useQuery({
+    queryKey: ['solo-trips', user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      if (isGuest) return [];
+      const { data, error } = await supabase
+        .from('trips')
+        .select('*')
+        .eq('user_id', user!.id)
+        .is('group_id', null)
+        .order('start_date', { ascending: true });
+      if (error) throw error;
+      return data as Trip[];
+    },
+  });
+}
+
+export function useCreateSoloTrip() {
+  const queryClient = useQueryClient();
+  const { user } = useAppStore();
+  return useMutation({
+    mutationFn: async (input: Pick<Trip, 'title' | 'destination' | 'description' | 'start_date' | 'end_date' | 'status' | 'cover_image'>) => {
+      const { data, error } = await supabase
+        .from('trips')
+        .insert({ ...input, user_id: user!.id, group_id: null, created_by: user!.id })
+        .select()
+        .single();
+      if (error) throw error;
+      await supabase.from('trip_members').insert({ trip_id: data.id, user_id: user!.id });
+      return data as Trip;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['solo-trips'] });
+      queryClient.invalidateQueries({ queryKey: ['all-trips'] });
+    },
+  });
+}
+
 export function useCreateTrip() {
   const queryClient = useQueryClient();
   const { user } = useAppStore();

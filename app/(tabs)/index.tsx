@@ -1,41 +1,25 @@
-import { View, Text, FlatList, TouchableOpacity, RefreshControl, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { format } from 'date-fns';
 import { useGroups } from '../../hooks/useGroup';
+import { useSoloTrips } from '../../hooks/useTrip';
 import { useAppStore } from '../../store/useAppStore';
-import { ensureSoloGroup } from '../../lib/solo';
-import type { Group } from '../../types';
+import type { Group, Trip } from '../../types';
 
 export default function HomeScreen() {
   const router = useRouter();
   const { user } = useAppStore();
-  const { data: groups, isLoading, refetch } = useGroups();
+  const { data: groups, isLoading: groupsLoading, refetch: refetchGroups } = useGroups();
+  const { data: soloTrips, refetch: refetchSolo } = useSoloTrips();
   const [refreshing, setRefreshing] = useState(false);
-  const [soloLoading, setSoloLoading] = useState(false);
 
   async function onRefresh() {
     setRefreshing(true);
-    await refetch();
+    await Promise.all([refetchGroups(), refetchSolo()]);
     setRefreshing(false);
-  }
-
-  async function handleSoloTrip() {
-    if (!user) {
-      Alert.alert('Not signed in', 'Please sign in to plan a trip.');
-      return;
-    }
-    setSoloLoading(true);
-    try {
-      const firstName = user.full_name?.split(' ')[0] ?? 'My';
-      const groupId = await ensureSoloGroup(user.id, firstName);
-      router.push(`/group/${groupId}/trip/new`);
-    } catch (e: any) {
-      Alert.alert('Error', e.message ?? 'Could not start solo trip planning. Please try again.');
-    } finally {
-      setSoloLoading(false);
-    }
   }
 
   function renderGroup({ item }: { item: Group }) {
@@ -61,6 +45,33 @@ export default function HomeScreen() {
     );
   }
 
+  function renderSoloTrip({ item }: { item: Trip }) {
+    return (
+      <TouchableOpacity
+        onPress={() => router.push(`/trip/${item.id}`)}
+        className="mb-3 rounded-2xl bg-white p-4 shadow-sm dark:bg-gray-800"
+        style={{ shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 }}
+      >
+        <View className="flex-row items-center gap-3">
+          <View className="h-12 w-12 items-center justify-center rounded-xl bg-indigo-500">
+            <Ionicons name="person" size={22} color="white" />
+          </View>
+          <View className="flex-1">
+            <Text className="text-base font-bold text-gray-900 dark:text-white">{item.title}</Text>
+            <Text className="text-sm text-gray-500 dark:text-gray-400">
+              {item.destination} · {format(new Date(item.start_date + 'T12:00:00'), 'MMM d')}
+            </Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color="#94A3B8" />
+        </View>
+      </TouchableOpacity>
+    );
+  }
+
+  const hasGroups = !!groups?.length;
+  const hasSoloTrips = !!soloTrips?.length;
+  const isEmpty = !hasGroups && !hasSoloTrips;
+
   return (
     <SafeAreaView className="flex-1 bg-slate-50 dark:bg-gray-950">
       <View className="flex-row items-center justify-between px-5 py-4">
@@ -81,14 +92,14 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      {isLoading ? (
+      {groupsLoading ? (
         <View className="flex-1 items-center justify-center">
-          <Text className="text-gray-400">Loading groups...</Text>
+          <Text className="text-gray-400">Loading...</Text>
         </View>
-      ) : !groups?.length ? (
+      ) : isEmpty ? (
         <View className="flex-1 items-center justify-center px-8">
           <Ionicons name="people-outline" size={64} color="#CBD5E1" />
-          <Text className="mt-4 text-center text-lg font-semibold text-gray-700 dark:text-gray-300">No groups yet</Text>
+          <Text className="mt-4 text-center text-lg font-semibold text-gray-700 dark:text-gray-300">No trips yet</Text>
           <Text className="mt-1 text-center text-sm text-gray-400">Create a group, discover one nearby, or plan a solo trip.</Text>
           <TouchableOpacity onPress={() => router.push('/group/new')} className="mt-6 rounded-2xl bg-primary px-6 py-3">
             <Text className="font-semibold text-white">Create Group</Text>
@@ -97,41 +108,41 @@ export default function HomeScreen() {
             <Text className="font-semibold text-primary">Discover Nearby Groups</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={handleSoloTrip}
-            disabled={soloLoading}
+            onPress={() => router.push('/trip/new')}
             className="mt-3 flex-row items-center gap-2 rounded-2xl border border-gray-200 px-6 py-3 dark:border-gray-700"
           >
-            {soloLoading ? (
-              <ActivityIndicator size="small" color="#64748B" />
-            ) : (
-              <Ionicons name="person-outline" size={16} color="#64748B" />
-            )}
+            <Ionicons name="person-outline" size={16} color="#64748B" />
             <Text className="font-semibold text-gray-600 dark:text-gray-300">Plan a Solo Trip</Text>
           </TouchableOpacity>
         </View>
       ) : (
         <FlatList
-          data={groups}
+          data={groups ?? []}
           keyExtractor={(item) => item.id}
           renderItem={renderGroup}
           contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 20 }}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
           ListHeaderComponent={
-            <Text className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-400">Your Groups</Text>
+            hasGroups ? (
+              <Text className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-400">Your Groups</Text>
+            ) : null
           }
           ListFooterComponent={
-            <TouchableOpacity
-              onPress={handleSoloTrip}
-              disabled={soloLoading}
-              className="mt-2 flex-row items-center justify-center gap-2 rounded-2xl border border-dashed border-gray-300 py-3 dark:border-gray-600"
-            >
-              {soloLoading ? (
-                <ActivityIndicator size="small" color="#64748B" />
-              ) : (
-                <Ionicons name="person-outline" size={16} color="#64748B" />
+            <View>
+              {hasSoloTrips && (
+                <View className="mt-2">
+                  <Text className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-400">Solo Trips</Text>
+                  {soloTrips!.map((trip) => renderSoloTrip({ item: trip }))}
+                </View>
               )}
-              <Text className="text-sm font-semibold text-gray-500 dark:text-gray-400">Plan a Solo Trip</Text>
-            </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => router.push('/trip/new')}
+                className="mt-2 flex-row items-center justify-center gap-2 rounded-2xl border border-dashed border-gray-300 py-3 dark:border-gray-600"
+              >
+                <Ionicons name="person-outline" size={16} color="#64748B" />
+                <Text className="text-sm font-semibold text-gray-500 dark:text-gray-400">Plan a Solo Trip</Text>
+              </TouchableOpacity>
+            </View>
           }
         />
       )}
