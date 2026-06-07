@@ -1,7 +1,6 @@
 import { View, Text, TouchableOpacity, ActivityIndicator, Alert, Platform, Image } from 'react-native';
 import { useState } from 'react';
 import * as WebBrowser from 'expo-web-browser';
-import { useRouter } from 'expo-router';
 import { supabase } from '../../lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -12,7 +11,6 @@ const REDIRECT_URL = `${WEB_URL}/callback`;
 
 export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   async function signInWithGoogle() {
     setLoading(true);
@@ -79,7 +77,7 @@ export default function LoginScreen() {
         {loading ? (
           <ActivityIndicator size="large" color="#2563EB" />
         ) : (
-          <View style={{ width: '100%', gap: 12 }}>
+          <View style={{ width: '100%' }}>
 
             {/* Google */}
             <TouchableOpacity
@@ -96,30 +94,6 @@ export default function LoginScreen() {
             >
               <Ionicons name="logo-google" size={22} color="#EA4335" />
               <Text style={{ fontSize: 16, fontWeight: '600', color: '#1e293b' }}>Continue with Google</Text>
-            </TouchableOpacity>
-
-            {/* Divider */}
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginVertical: 4 }}>
-              <View style={{ flex: 1, height: 1, backgroundColor: '#1e293b' }} />
-              <Text style={{ fontSize: 12, color: '#475569' }}>or</Text>
-              <View style={{ flex: 1, height: 1, backgroundColor: '#1e293b' }} />
-            </View>
-
-            {/* Phone Number */}
-            <TouchableOpacity
-              onPress={() => router.push('/(auth)/phone')}
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 12,
-                backgroundColor: '#2563EB',
-                borderRadius: 16,
-                paddingVertical: 16,
-              }}
-            >
-              <Ionicons name="phone-portrait-outline" size={22} color="#ffffff" />
-              <Text style={{ fontSize: 16, fontWeight: '600', color: '#ffffff' }}>Login with Phone Number</Text>
             </TouchableOpacity>
 
           </View>
