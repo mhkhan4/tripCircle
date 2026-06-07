@@ -7,7 +7,7 @@ import { format } from 'date-fns';
 import { useGroups } from '../../hooks/useGroup';
 import { useSoloTrips } from '../../hooks/useTrip';
 import { useAppStore } from '../../store/useAppStore';
-import type { Group, Trip } from '../../types';
+import type { Group } from '../../types';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -38,29 +38,6 @@ export default function HomeScreen() {
             {item.description ? (
               <Text className="text-sm text-gray-500 dark:text-gray-400" numberOfLines={1}>{item.description}</Text>
             ) : null}
-          </View>
-          <Ionicons name="chevron-forward" size={18} color="#94A3B8" />
-        </View>
-      </TouchableOpacity>
-    );
-  }
-
-  function renderSoloTrip({ item }: { item: Trip }) {
-    return (
-      <TouchableOpacity
-        onPress={() => router.push(`/trip/${item.id}`)}
-        className="mb-3 rounded-2xl bg-white p-4 shadow-sm dark:bg-gray-800"
-        style={{ shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 }}
-      >
-        <View className="flex-row items-center gap-3">
-          <View className="h-12 w-12 items-center justify-center rounded-xl bg-indigo-500">
-            <Ionicons name="person" size={22} color="white" />
-          </View>
-          <View className="flex-1">
-            <Text className="text-base font-bold text-gray-900 dark:text-white">{item.title}</Text>
-            <Text className="text-sm text-gray-500 dark:text-gray-400">
-              {item.destination} · {format(new Date(item.start_date + 'T12:00:00'), 'MMM d')}
-            </Text>
           </View>
           <Ionicons name="chevron-forward" size={18} color="#94A3B8" />
         </View>
@@ -132,7 +109,27 @@ export default function HomeScreen() {
               {hasSoloTrips && (
                 <View className="mt-2">
                   <Text className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-400">Solo Trips</Text>
-                  {soloTrips!.map((trip) => renderSoloTrip({ item: trip }))}
+                  {soloTrips!.map((trip) => (
+                    <TouchableOpacity
+                      key={trip.id}
+                      onPress={() => router.push(`/trip/${trip.id}`)}
+                      className="mb-3 rounded-2xl bg-white p-4 shadow-sm dark:bg-gray-800"
+                      style={{ shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 }}
+                    >
+                      <View className="flex-row items-center gap-3">
+                        <View className="h-12 w-12 items-center justify-center rounded-xl bg-indigo-500">
+                          <Ionicons name="person" size={22} color="white" />
+                        </View>
+                        <View className="flex-1">
+                          <Text className="text-base font-bold text-gray-900 dark:text-white">{trip.title}</Text>
+                          <Text className="text-sm text-gray-500 dark:text-gray-400">
+                            {trip.destination} · {format(new Date(trip.start_date + 'T12:00:00'), 'MMM d')}
+                          </Text>
+                        </View>
+                        <Ionicons name="chevron-forward" size={18} color="#94A3B8" />
+                      </View>
+                    </TouchableOpacity>
+                  ))}
                 </View>
               )}
               <TouchableOpacity
