@@ -50,19 +50,13 @@ export function useAllTrips() {
     enabled: !!user?.id,
     queryFn: async () => {
       if (isGuest) return [GUEST_TRIP];
-      const { data: memberships } = await supabase
-        .from('group_members')
-        .select('group_id')
-        .eq('user_id', user!.id);
-      const groupIds = memberships?.map((m: any) => m.group_id) ?? [];
-      if (!groupIds.length) return [];
       const { data, error } = await supabase
-        .from('trips')
-        .select('*')
-        .in('group_id', groupIds)
-        .order('start_date', { ascending: true });
+        .from('trip_members')
+        .select('trip:trips(*)')
+        .eq('user_id', user!.id);
       if (error) throw error;
-      return data as Trip[];
+      const trips = data.map((d: any) => d.trip).filter(Boolean) as Trip[];
+      return trips.sort((a, b) => a.start_date.localeCompare(b.start_date));
     },
   });
 }
