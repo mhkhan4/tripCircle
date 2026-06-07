@@ -6,7 +6,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '../hooks/useAuth';
-import { useAppStore } from '../store/useAppStore';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { PENDING_INVITE_KEY } from './join/[code]';
 
@@ -16,14 +15,13 @@ const queryClient = new QueryClient({
 
 function AuthGate() {
   const { session } = useAuth();
-  const { isGuest } = useAppStore();
   const router = useRouter();
   const segments = useSegments();
 
   useEffect(() => {
     const inAuth = segments[0] === '(auth)';
     const inJoin = segments[0] === 'join';
-    const isLoggedIn = !!session || isGuest;
+    const isLoggedIn = !!session;
 
     if (!isLoggedIn && !inAuth && !inJoin) {
       router.replace('/(auth)/login');
@@ -36,7 +34,7 @@ function AuthGate() {
         }
       });
     }
-  }, [session, isGuest, segments]);
+  }, [session, segments]);
 
   return null;
 }

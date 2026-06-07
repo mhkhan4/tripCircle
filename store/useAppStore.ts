@@ -4,7 +4,10 @@ import type { UserProfile, Group } from '../types';
 
 export const GUEST_USER: UserProfile = {
   id: 'guest-000',
-  email: 'guest@tripcircle.app',
+  email: null,
+  phone: null,
+  first_name: 'Guest',
+  last_name: 'User',
   full_name: 'Guest User',
   username: null,
   avatar_url: null,
@@ -20,8 +23,6 @@ type AppStore = {
   setSession: (session: Session | null) => void;
   setUser: (user: UserProfile | null) => void;
   setActiveGroup: (group: Group | null) => void;
-  signInAsGuest: () => void;
-  signOutGuest: () => void;
 };
 
 export const useAppStore = create<AppStore>((set) => ({
@@ -32,6 +33,4 @@ export const useAppStore = create<AppStore>((set) => ({
   setSession: (session) => set({ session }),
   setUser: (user) => set({ user }),
   setActiveGroup: (group) => set({ activeGroup: group }),
-  signInAsGuest: () => set({ user: GUEST_USER, isGuest: true }),
-  signOutGuest: () => set({ user: null, isGuest: false }),
 }));

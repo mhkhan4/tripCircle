@@ -1,10 +1,13 @@
 export type UserProfile = {
   id: string;
-  email: string;
+  email: string | null;
+  phone: string | null;
+  first_name: string;
+  last_name: string;
   full_name: string;
   username: string | null;
   avatar_url: string | null;
-  provider: 'google' | 'facebook' | 'email';
+  provider: 'google' | 'facebook' | 'email' | 'phone';
   created_at: string;
 };
 
