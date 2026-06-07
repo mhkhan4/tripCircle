@@ -60,7 +60,7 @@ export default function AddMemberScreen() {
           <Text className="text-gray-400">🔍</Text>
           <TextInput
             className="flex-1 text-sm text-gray-900 dark:text-white"
-            placeholder="Search by name or @username"
+            placeholder="Search by name, @username, or email"
             placeholderTextColor="#94A3B8"
             value={query}
             onChangeText={handleChangeText}
@@ -91,7 +91,7 @@ export default function AddMemberScreen() {
           <View className="items-center py-16">
             <Text className="text-sm text-gray-400">
               {debouncedQuery.length < 2
-                ? 'Type a name or @username to search'
+                ? 'Type a name, @username, or email to search'
                 : 'No TripOrbit users found'}
             </Text>
           </View>

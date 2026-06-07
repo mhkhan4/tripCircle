@@ -154,7 +154,7 @@ export function useSearchUsers(query: string, groupId: string) {
       const { data, error } = await supabase
         .from('users')
         .select('*')
-        .or(`full_name.ilike.%${query}%,username.ilike.%${query}%`)
+        .or(`full_name.ilike.%${query}%,username.ilike.%${query}%,email.ilike.%${query}%`)
         .neq('id', user!.id)
         .limit(20);
       if (error) throw error;

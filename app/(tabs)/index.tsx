@@ -56,17 +56,9 @@ export default function HomeScreen() {
           <Text className="text-sm text-gray-500 dark:text-gray-400">Welcome back,</Text>
           <Text className="text-2xl font-bold text-gray-900 dark:text-white">{user?.full_name?.split(' ')[0] ?? 'Traveler'}</Text>
         </View>
-        <View className="flex-row gap-2">
-          <TouchableOpacity
-            onPress={() => router.push('/discover')}
-            className="rounded-xl border border-gray-200 bg-white px-3 py-2 dark:border-gray-700 dark:bg-gray-800"
-          >
-            <Text className="text-sm font-semibold text-primary">Join</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => router.push('/group/new')} className="rounded-xl bg-primary px-3 py-2">
-            <Ionicons name="add" size={18} color="white" />
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity onPress={() => router.push('/group/new')} className="rounded-xl bg-primary px-3 py-2">
+          <Ionicons name="add" size={18} color="white" />
+        </TouchableOpacity>
       </View>
 
       {groupsLoading ? (
@@ -77,12 +69,9 @@ export default function HomeScreen() {
         <View className="flex-1 items-center justify-center px-8">
           <Ionicons name="people-outline" size={64} color="#CBD5E1" />
           <Text className="mt-4 text-center text-lg font-semibold text-gray-700 dark:text-gray-300">No trips yet</Text>
-          <Text className="mt-1 text-center text-sm text-gray-400">Create a group, discover one nearby, or plan a solo trip.</Text>
+          <Text className="mt-1 text-center text-sm text-gray-400">Create a group or plan a solo trip.</Text>
           <TouchableOpacity onPress={() => router.push('/group/new')} className="mt-6 rounded-2xl bg-primary px-6 py-3">
             <Text className="font-semibold text-white">Create Group</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => router.push('/discover')} className="mt-3 rounded-2xl border border-primary px-6 py-3">
-            <Text className="font-semibold text-primary">Discover Nearby Groups</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => router.push('/trip/new')}
