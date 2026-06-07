@@ -114,18 +114,19 @@ User opens chat screen
 
 ## Database Schema Summary
 
-| Table                 | Key Columns                                                    |
-|-----------------------|----------------------------------------------------------------|
-| users                 | id (auth), email, full_name, avatar_url, provider             |
-| groups                | id, name, invite_code, created_by                              |
-| group_members         | group_id, user_id, role (admin/member) — unique(group,user)   |
-| trips                 | id, group_id, title, destination, start/end_date, status       |
+| Table                 | Key Columns                                                                      |
+|-----------------------|----------------------------------------------------------------------------------|
+| users                 | id (auth), email, full_name, avatar_url, provider                                |
+| groups                | id, name, invite_code, created_by, latitude, longitude, is_discoverable, is_solo |
+| group_members         | group_id, user_id, role (admin/member) — unique(group,user)                      |
+| group_join_requests   | group_id, user_id, status (pending/approved/rejected), reviewed_by               |
+| trips                 | id, group_id, title, destination, start/end_date, status                         |
 | trip_members          | trip_id, user_id, joined_at — unique(trip,user); creator auto-joined on trip create |
-| budgets               | id, trip_id (unique), total_amount, per_person_amount, currency |
-| budget_contributions  | budget_id, user_id, pledged_amount, paid_amount                |
-| expenses              | id, trip_id, amount, category, paid_by, receipt_url, ocr_raw  |
-| expense_splits        | expense_id, user_id, share_amount, is_settled                  |
-| messages              | id, group_id, trip_id (nullable), sender_id, content           |
+| budgets               | id, trip_id (unique), total_amount, per_person_amount, currency                  |
+| budget_contributions  | budget_id, user_id, pledged_amount, paid_amount, paid_at                         |
+| expenses              | id, trip_id, amount, category, paid_by, receipt_url, ocr_raw                     |
+| expense_splits        | expense_id, user_id, share_amount, is_settled                                    |
+| messages              | id, group_id, trip_id (nullable), sender_id, content                             |
 
 ### Row Level Security Model
 - All tables protected by RLS
@@ -182,28 +183,33 @@ npx expo start
 
 ## Build Phases Status
 
-| Phase | Feature               | Status      |
-|-------|-----------------------|-------------|
-| 1     | Project setup         | Done        |
-| 1     | Auth (Google/Facebook)| Done        |
-| 1     | Navigation shell      | Done        |
-| 2     | Create/join groups    | Done        |
-| 2     | Group dashboard       | Done        |
-| 3     | Create trip           | Done        |
-| 3     | Trip detail screen    | Done        |
-| 3     | Calendar view         | Done        |
-| 4     | Set budget            | Done        |
-| 4     | Contribution tracking | Done        |
-| 5     | Manual expense entry  | Done        |
-| 5     | Receipt scanning      | Done        |
-| 5     | Budget dashboard      | Done        |
-| 6     | Group chat            | Done        |
-| 6     | Trip chat             | Done        |
-| 7     | Push notifications    | Pending     |
-| 8     | Offline queue         | Pending     |
-| 8     | Date picker UI        | Done        |
-| 8     | Per-person budget     | Done        |
-| 8     | Chat avatar images    | Done        |
-| 9     | Trip membership       | In Progress |
-| 9     | Join/Leave trip       | In Progress |
-| 9     | Trip member management| In Progress |
+| Phase | Feature                      | Status      |
+|-------|------------------------------|-------------|
+| 1     | Project setup                | Done        |
+| 1     | Auth (Google/Facebook)       | Done        |
+| 1     | Navigation shell             | Done        |
+| 2     | Create/join groups           | Done        |
+| 2     | Group dashboard              | Done        |
+| 3     | Create trip                  | Done        |
+| 3     | Trip detail screen           | Done        |
+| 3     | Calendar view                | Done        |
+| 4     | Set budget                   | Done        |
+| 4     | Contribution tracking        | Done        |
+| 5     | Manual expense entry         | Done        |
+| 5     | Receipt scanning             | Done        |
+| 5     | Budget dashboard             | Done        |
+| 6     | Group chat                   | Done        |
+| 6     | Trip chat                    | Done        |
+| 7     | Push notifications           | Pending     |
+| 8     | Offline queue                | Pending     |
+| 8     | Date picker UI               | Done        |
+| 8     | Per-person budget            | Done        |
+| 8     | Chat avatar images           | Done        |
+| 9     | Trip membership              | Done        |
+| 9     | Join/Leave trip              | Done        |
+| 9     | Trip member management       | Done        |
+| 10    | Admin mark-contribution-paid | Done        |
+| 10    | Discover nearby groups       | Done        |
+| 10    | Request-to-join flow         | Done        |
+| 10    | Admin approve/reject requests| Done        |
+| 10    | Solo trip planning           | Done        |

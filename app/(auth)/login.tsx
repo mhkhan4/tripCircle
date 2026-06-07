@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ActivityIndicator, Alert, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, Alert, Platform, Image } from 'react-native';
 import { useState } from 'react';
 import * as WebBrowser from 'expo-web-browser';
 import { supabase } from '../../lib/supabase';
@@ -48,9 +48,11 @@ export default function LoginScreen() {
   return (
     <View className="flex-1 bg-white dark:bg-gray-950">
       <View className="flex-1 items-center justify-center px-8">
-        <View className="mb-2 h-20 w-20 items-center justify-center rounded-3xl bg-primary">
-          <Ionicons name="airplane" size={40} color="white" />
-        </View>
+        <Image
+          source={require('../../assets/logo.png')}
+          className="mb-2 h-20 w-20"
+          resizeMode="contain"
+        />
         <Text className="mb-2 text-4xl font-bold text-gray-900 dark:text-white">TripCircle</Text>
         <Text className="mb-12 text-center text-base text-gray-500 dark:text-gray-400">
           Plan trips, track budgets, and travel together.

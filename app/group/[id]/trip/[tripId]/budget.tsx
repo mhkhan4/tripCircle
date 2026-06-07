@@ -2,23 +2,28 @@ import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator, Scro
 import { useLocalSearchParams, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
+import { Ionicons } from '@expo/vector-icons';
 import { useGroup } from '../../../../../hooks/useGroup';
-import { useBudget, useCreateBudget, useBudgetSummary } from '../../../../../hooks/useBudget';
+import { useBudget, useCreateBudget, useBudgetSummary, useMarkContributionPaid } from '../../../../../hooks/useBudget';
+import { useAppStore } from '../../../../../store/useAppStore';
 
 type BudgetMode = 'total' | 'per_person';
 
 export default function BudgetScreen() {
   const { id: groupId, tripId } = useLocalSearchParams<{ id: string; tripId: string }>();
+  const { user } = useAppStore();
   const { data: group } = useGroup(groupId);
   const { data: budget } = useBudget(tripId);
   const { totalSpent, totalBudget, remaining, percentUsed } = useBudgetSummary(tripId);
   const createBudget = useCreateBudget();
+  const markPaid = useMarkContributionPaid();
+
+  const members = (group as any)?.group_members ?? [];
+  const isAdmin = members.some((m: any) => m.user_id === user?.id && m.role === 'admin');
+  const memberCount = Math.max(members.length, 1);
 
   const [amount, setAmount] = useState('');
   const [mode, setMode] = useState<BudgetMode>('total');
-
-  const members = (group as any)?.group_members ?? [];
-  const memberCount = Math.max(members.length, 1);
 
   const enteredNum = parseFloat(amount) || 0;
   const computedTotal = mode === 'per_person' ? enteredNum * memberCount : enteredNum;
@@ -134,6 +139,27 @@ export default function BudgetScreen() {
               {members.map((m: any) => {
                 const contribution = budget?.budget_contributions?.find((c: any) => c.user_id === m.user_id);
                 const share = budget.per_person_amount ?? totalBudget / memberCount;
+                const isPaid = contribution && contribution.paid_amount > 0;
+
+                function promptMarkPaid() {
+                  Alert.prompt(
+                    'Mark as Paid',
+                    `How much did ${m.user?.full_name ?? 'this member'} pay? (share: $${share.toFixed(2)})`,
+                    async (input) => {
+                      const num = parseFloat(input);
+                      if (isNaN(num) || num <= 0) return Alert.alert('Invalid amount');
+                      try {
+                        await markPaid.mutateAsync({ budget_id: budget!.id, user_id: m.user_id, paid_amount: num, trip_id: tripId });
+                      } catch (e: any) {
+                        Alert.alert('Error', e.message);
+                      }
+                    },
+                    'plain-text',
+                    share.toFixed(2),
+                    'decimal-pad',
+                  );
+                }
+
                 return (
                   <View key={m.user_id} className="mb-3 flex-row items-center gap-3">
                     <View className="h-9 w-9 items-center justify-center rounded-full bg-primary">
@@ -145,13 +171,26 @@ export default function BudgetScreen() {
                       <Text className="font-semibold text-gray-800 dark:text-white">{m.user?.full_name ?? 'Member'}</Text>
                       <Text className="text-xs text-gray-400">Share: ${share.toFixed(2)}</Text>
                     </View>
-                    {contribution ? (
-                      <View className="items-end">
-                        <Text className="font-semibold text-green-600">Paid ${contribution.paid_amount.toFixed(2)}</Text>
+                    {isPaid ? (
+                      <View className="flex-row items-center gap-1">
+                        <Ionicons name="checkmark-circle" size={16} color="#16a34a" />
+                        <Text className="font-semibold text-green-600">Paid ${contribution!.paid_amount.toFixed(2)}</Text>
+                        {isAdmin && (
+                          <TouchableOpacity onPress={promptMarkPaid} className="ml-1 p-1">
+                            <Ionicons name="pencil" size={13} color="#94A3B8" />
+                          </TouchableOpacity>
+                        )}
                       </View>
                     ) : (
-                      <View className="rounded-full bg-yellow-100 px-2 py-0.5 dark:bg-yellow-900/30">
-                        <Text className="text-xs font-semibold text-yellow-600 dark:text-yellow-400">Pending</Text>
+                      <View className="flex-row items-center gap-2">
+                        <View className="rounded-full bg-yellow-100 px-2 py-0.5 dark:bg-yellow-900/30">
+                          <Text className="text-xs font-semibold text-yellow-600 dark:text-yellow-400">Pending</Text>
+                        </View>
+                        {isAdmin && (
+                          <TouchableOpacity onPress={promptMarkPaid} className="rounded-full bg-green-100 p-1 dark:bg-green-900/30">
+                            <Ionicons name="checkmark" size={14} color="#16a34a" />
+                          </TouchableOpacity>
+                        )}
                       </View>
                     )}
                   </View>

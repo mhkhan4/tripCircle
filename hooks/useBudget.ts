@@ -96,6 +96,36 @@ export function useAddExpense() {
   });
 }
 
+export function useMarkContributionPaid() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (input: { budget_id: string; user_id: string; paid_amount: number; trip_id: string }) => {
+      const { budget_id, user_id, paid_amount } = input;
+      const { data: existing } = await supabase
+        .from('budget_contributions')
+        .select('id')
+        .eq('budget_id', budget_id)
+        .eq('user_id', user_id)
+        .maybeSingle();
+
+      if (existing) {
+        const { error } = await supabase
+          .from('budget_contributions')
+          .update({ paid_amount, paid_at: new Date().toISOString() })
+          .eq('id', existing.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('budget_contributions')
+          .insert({ budget_id, user_id, pledged_amount: paid_amount, paid_amount, paid_at: new Date().toISOString() });
+        if (error) throw error;
+      }
+    },
+    onSuccess: (_data, vars) => queryClient.invalidateQueries({ queryKey: ['budget', vars.trip_id] }),
+  });
+}
+
 export function useBudgetSummary(tripId: string) {
   const { data: budget } = useBudget(tripId);
   const { data: expenses } = useExpenses(tripId);
