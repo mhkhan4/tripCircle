@@ -36,7 +36,7 @@ export function useAuth() {
     if (!session?.user) return;
     const meta = session.user.user_metadata ?? {};
     const fullName: string =
-      meta.full_name ??
+      meta.full_name ||
       [meta.first_name, meta.last_name].filter(Boolean).join(' ') ||
       '';
     const { data: created } = await supabase
