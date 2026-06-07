@@ -6,8 +6,14 @@ import { Ionicons } from '@expo/vector-icons';
 
 WebBrowser.maybeCompleteAuthSession();
 
-const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL ?? 'http://localhost:8081';
-const REDIRECT_URL = `${WEB_URL}/callback`;
+function getRedirectUrl() {
+  if (Platform.OS === 'web' && typeof window !== 'undefined') {
+    return `${window.location.origin}/callback`;
+  }
+  return `${process.env.EXPO_PUBLIC_WEB_URL ?? 'http://localhost:8081'}/callback`;
+}
+
+const REDIRECT_URL = getRedirectUrl();
 
 export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
