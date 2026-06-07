@@ -120,19 +120,27 @@ export default function PhoneScreen() {
     setLoading(true);
     const e164 = buildE164();
 
-    const { error } = await supabase.auth.signInWithOtp({
-      phone: e164,
-      options: {
-        data: {
-          first_name: trimmedFirst,
-          last_name: trimmedLast,
-          full_name: `${trimmedFirst} ${trimmedLast}`,
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        phone: e164,
+        options: {
+          data: {
+            first_name: trimmedFirst,
+            last_name: trimmedLast,
+            full_name: `${trimmedFirst} ${trimmedLast}`,
+          },
         },
-      },
-    });
+      });
 
-    if (error) {
-      Alert.alert('Error', error.message);
+      if (error) {
+        console.error('[sendOtp] Supabase error:', error.message, error);
+        Alert.alert('Error', error.message);
+        setLoading(false);
+        return;
+      }
+    } catch (err) {
+      console.error('[sendOtp] Unexpected error:', err);
+      Alert.alert('Error', 'Something went wrong. Please try again.');
       setLoading(false);
       return;
     }
