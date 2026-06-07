@@ -10,6 +10,8 @@ export default function GroupLayout() {
         headerStyle: { backgroundColor: '#F8FAFC' },
         headerShadowVisible: false,
       }}
-    />
+    >
+      <Stack.Screen name="[id]/add-member" options={{ presentation: 'modal', title: 'Add Member' }} />
+    </Stack>
   );
 }

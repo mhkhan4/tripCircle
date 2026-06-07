@@ -6,6 +6,7 @@ export const GUEST_USER: UserProfile = {
   id: 'guest-000',
   email: 'guest@tripcircle.app',
   full_name: 'Guest User',
+  username: null,
   avatar_url: null,
   provider: 'email',
   created_at: new Date().toISOString(),

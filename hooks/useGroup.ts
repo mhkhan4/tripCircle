@@ -2,7 +2,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import { useAppStore } from '../store/useAppStore';
 import { GUEST_GROUP } from '../lib/guestData';
-import type { Group } from '../types';
+import { GUEST_USER } from '../store/useAppStore';
+import type { Group, GroupMemberWithProfile, UserProfile } from '../types';
 
 export function useGroups() {
   const { user, isGuest } = useAppStore();
@@ -87,5 +88,92 @@ export function useJoinGroup() {
       return group;
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['groups'] }),
+  });
+}
+
+export function useGroupMembers(groupId: string) {
+  const { isGuest } = useAppStore();
+
+  return useQuery({
+    queryKey: ['group-members', groupId],
+    enabled: !!groupId,
+    queryFn: async (): Promise<GroupMemberWithProfile[]> => {
+      if (isGuest) {
+        return [{
+          id: 'gm-1',
+          group_id: GUEST_GROUP.id,
+          user_id: 'guest-000',
+          role: 'admin',
+          joined_at: new Date().toISOString(),
+          user: { ...GUEST_USER, username: null },
+        }];
+      }
+      const { data, error } = await supabase
+        .from('group_members')
+        .select('*, user:users(*)')
+        .eq('group_id', groupId)
+        .order('joined_at', { ascending: true });
+      if (error) throw error;
+      return data as GroupMemberWithProfile[];
+    },
+  });
+}
+
+export function useSearchUsers(query: string, groupId: string) {
+  const { isGuest, user } = useAppStore();
+
+  return useQuery({
+    queryKey: ['user-search', query, groupId],
+    enabled: !isGuest && query.trim().length >= 2,
+    queryFn: async (): Promise<UserProfile[]> => {
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .or(`full_name.ilike.%${query}%,username.ilike.%${query}%`)
+        .neq('id', user!.id)
+        .limit(20);
+      if (error) throw error;
+      return data as UserProfile[];
+    },
+  });
+}
+
+export function useAddMember(groupId: string) {
+  const queryClient = useQueryClient();
+  const { isGuest } = useAppStore();
+
+  return useMutation({
+    mutationFn: async (targetUserId: string) => {
+      if (isGuest) return;
+      const { error } = await supabase.rpc('add_member_to_group', {
+        p_group_id: groupId,
+        p_target_user_id: targetUserId,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['group-members', groupId] });
+      queryClient.invalidateQueries({ queryKey: ['group', groupId] });
+    },
+  });
+}
+
+export function useRemoveMember(groupId: string) {
+  const queryClient = useQueryClient();
+  const { isGuest } = useAppStore();
+
+  return useMutation({
+    mutationFn: async (membershipId: string) => {
+      if (isGuest) return;
+      const { error } = await supabase
+        .from('group_members')
+        .delete()
+        .eq('id', membershipId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['group-members', groupId] });
+      queryClient.invalidateQueries({ queryKey: ['group', groupId] });
+    },
   });
 }

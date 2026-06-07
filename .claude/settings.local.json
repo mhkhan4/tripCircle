@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx supabase *)",
+      "Bash(env)",
+      "Bash(CLAUDE_CODE_TMPDIR=/tmp cat ~/.supabase/access-token)",
+      "Bash(CLAUDE_CODE_TMPDIR=/tmp grep -r \"service_role\\\\|SERVICE_ROLE\\\\|SUPABASE_SERVICE\" /Users/mahmudulkhan/Downloads/projects/tripcircle/.env*)"
+    ],
+    "defaultMode": "bypassPermissions"
+  }
+}

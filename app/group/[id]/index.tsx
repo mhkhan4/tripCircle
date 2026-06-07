@@ -77,6 +77,10 @@ export default function GroupScreen() {
             <Ionicons name="share-outline" size={16} color="#2563EB" />
             <Text className="text-sm font-semibold text-primary">Invite</Text>
           </TouchableOpacity>
+          <TouchableOpacity onPress={() => router.push(`/group/${id}/members`)} className="flex-1 flex-row items-center justify-center gap-2 rounded-xl border border-gray-200 py-2">
+            <Ionicons name="people-outline" size={16} color="#64748B" />
+            <Text className="text-sm font-semibold text-gray-600">Members</Text>
+          </TouchableOpacity>
           <TouchableOpacity onPress={() => router.push(`/group/${id}/chat`)} className="flex-1 flex-row items-center justify-center gap-2 rounded-xl bg-primary py-2">
             <Ionicons name="chatbubbles-outline" size={16} color="white" />
             <Text className="text-sm font-semibold text-white">Chat</Text>
