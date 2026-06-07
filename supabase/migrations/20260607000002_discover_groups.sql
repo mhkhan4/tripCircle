@@ -40,6 +40,10 @@ create policy "jr_update_admin" on public.group_join_requests for update using (
   )
 );
 
+-- is_solo is needed by find_nearby_groups below; added here so the function
+-- compiles even before 20260607000003_solo_trips.sql runs.
+alter table public.groups add column if not exists is_solo boolean not null default false;
+
 -- Haversine nearby groups (no PostGIS required)
 create or replace function public.find_nearby_groups(
   p_lat float8,
