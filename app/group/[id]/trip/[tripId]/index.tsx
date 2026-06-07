@@ -1,10 +1,12 @@
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { format, differenceInDays } from 'date-fns';
-import { useTrip } from '../../../../../hooks/useTrip';
+import { useTrip, useTripMembers, useJoinTrip, useLeaveTrip, useRemoveTripMember } from '../../../../../hooks/useTrip';
 import { useBudgetSummary } from '../../../../../hooks/useBudget';
+import { useAppStore } from '../../../../../store/useAppStore';
+import TripMemberRow from '../../../../../components/TripMemberRow';
 
 const STATUS_COLOR: Record<string, string> = {
   planning: '#F59E0B',
@@ -16,13 +18,57 @@ const STATUS_COLOR: Record<string, string> = {
 export default function TripScreen() {
   const { id: groupId, tripId } = useLocalSearchParams<{ id: string; tripId: string }>();
   const router = useRouter();
+  const { user } = useAppStore();
   const { data: trip } = useTrip(tripId);
+  const { data: tripMembers } = useTripMembers(tripId);
   const { totalSpent, totalBudget, remaining, percentUsed, byCategory } = useBudgetSummary(tripId);
+  const joinTrip = useJoinTrip();
+  const leaveTrip = useLeaveTrip();
+  const removeMember = useRemoveTripMember();
 
   if (!trip) return null;
 
   const days = differenceInDays(new Date(trip.end_date), new Date(trip.start_date)) + 1;
   const color = STATUS_COLOR[trip.status];
+  const isMember = tripMembers?.some((m) => m.user_id === user?.id) ?? false;
+  const isCreator = trip.created_by === user?.id;
+
+  async function handleJoin() {
+    try {
+      await joinTrip.mutateAsync({ tripId, groupId });
+    } catch (e: any) {
+      Alert.alert('Error', e.message);
+    }
+  }
+
+  async function handleLeave() {
+    Alert.alert(
+      'Leave trip',
+      'Are you sure you want to leave this trip?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Leave',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await leaveTrip.mutateAsync({ tripId, groupId });
+            } catch (e: any) {
+              Alert.alert('Error', e.message);
+            }
+          },
+        },
+      ],
+    );
+  }
+
+  async function handleRemoveMember(membershipId: string) {
+    try {
+      await removeMember.mutateAsync({ membershipId, tripId });
+    } catch (e: any) {
+      Alert.alert('Error', e.message);
+    }
+  }
 
   const CATEGORY_ICONS: Record<string, string> = {
     food: 'restaurant-outline',
@@ -125,6 +171,48 @@ export default function TripScreen() {
           </TouchableOpacity>
         </View>
 
+        {/* Members section */}
+        <View className="mb-4 rounded-2xl bg-white p-4 shadow-sm dark:bg-gray-800" style={{ shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 }}>
+          <Text className="mb-1 text-base font-bold text-gray-900 dark:text-white">
+            Members · {tripMembers?.length ?? 0}
+          </Text>
+          {isMember ? (
+            <>
+              {tripMembers?.map((m) => (
+                <TripMemberRow
+                  key={m.id}
+                  member={m}
+                  isCurrentUser={m.user_id === user?.id}
+                  currentUserIsCreator={isCreator}
+                  onRemove={isCreator ? handleRemoveMember : undefined}
+                />
+              ))}
+              {!isCreator && (
+                <TouchableOpacity
+                  onPress={handleLeave}
+                  disabled={leaveTrip.isPending}
+                  className="mt-3 flex-row items-center justify-center gap-2 rounded-xl border border-red-200 py-2"
+                >
+                  <Ionicons name="exit-outline" size={16} color="#EF4444" />
+                  <Text className="text-sm font-semibold text-red-500">Leave Trip</Text>
+                </TouchableOpacity>
+              )}
+            </>
+          ) : (
+            <View className="items-center py-3">
+              <Text className="mb-3 text-sm text-gray-500 dark:text-gray-400">You haven't joined this trip yet.</Text>
+              <TouchableOpacity
+                onPress={handleJoin}
+                disabled={joinTrip.isPending}
+                className="flex-row items-center gap-2 rounded-2xl bg-primary px-6 py-3"
+              >
+                <Ionicons name="airplane-outline" size={18} color="white" />
+                <Text className="font-bold text-white">Join Trip</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+
         {Object.keys(byCategory).length > 0 && (
           <View className="rounded-2xl bg-white p-4 shadow-sm dark:bg-gray-800" style={{ shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 }}>
             <Text className="mb-3 text-base font-bold text-gray-900 dark:text-white">Spending by Category</Text>
@@ -139,16 +227,18 @@ export default function TripScreen() {
         )}
       </ScrollView>
 
-      <View className="absolute bottom-6 right-5">
-        <TouchableOpacity
-          onPress={() => router.push(`/group/${groupId}/trip/${tripId}/add-expense`)}
-          className="flex-row items-center gap-2 rounded-2xl bg-primary px-5 py-3 shadow-lg"
-          style={{ shadowColor: '#2563EB', shadowOpacity: 0.4, shadowRadius: 12, elevation: 6 }}
-        >
-          <Ionicons name="add" size={20} color="white" />
-          <Text className="font-bold text-white">Add Expense</Text>
-        </TouchableOpacity>
-      </View>
+      {isMember && (
+        <View className="absolute bottom-6 right-5">
+          <TouchableOpacity
+            onPress={() => router.push(`/group/${groupId}/trip/${tripId}/add-expense`)}
+            className="flex-row items-center gap-2 rounded-2xl bg-primary px-5 py-3 shadow-lg"
+            style={{ shadowColor: '#2563EB', shadowOpacity: 0.4, shadowRadius: 12, elevation: 6 }}
+          >
+            <Ionicons name="add" size={20} color="white" />
+            <Text className="font-bold text-white">Add Expense</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </SafeAreaView>
   );
 }

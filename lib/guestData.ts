@@ -1,4 +1,4 @@
-import type { Group, Trip, Budget, BudgetContribution, Expense, Message } from '../types';
+import type { Group, Trip, Budget, BudgetContribution, Expense, Message, TripMemberWithProfile } from '../types';
 import { GUEST_USER } from '../store/useAppStore';
 
 export const GUEST_GROUP: Group = {
@@ -89,6 +89,14 @@ export const GUEST_EXPENSES: Expense[] = [
     splits: [],
   },
 ];
+
+export const GUEST_TRIP_MEMBER: TripMemberWithProfile = {
+  id: 'gtm-1',
+  trip_id: 'guest-trip-1',
+  user_id: 'guest-000',
+  joined_at: new Date().toISOString(),
+  user: GUEST_USER,
+};
 
 export const GUEST_MESSAGES: Message[] = [
   {

@@ -1,10 +1,11 @@
-import { View, Text, FlatList, TouchableOpacity, Share } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Share, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { format } from 'date-fns';
 import { useGroup } from '../../../hooks/useGroup';
-import { useTrips } from '../../../hooks/useTrip';
+import { useTrips, useTripMembers, useJoinTrip } from '../../../hooks/useTrip';
+import { useAppStore } from '../../../store/useAppStore';
 import type { Trip } from '../../../types';
 
 const STATUS_COLOR: Record<string, string> = {
@@ -13,6 +14,61 @@ const STATUS_COLOR: Record<string, string> = {
   ongoing: '#10B981',
   completed: '#94A3B8',
 };
+
+function TripCard({ item, groupId }: { item: Trip; groupId: string }) {
+  const router = useRouter();
+  const { user } = useAppStore();
+  const { data: tripMembers } = useTripMembers(item.id);
+  const joinTrip = useJoinTrip();
+  const color = STATUS_COLOR[item.status];
+  const isMember = tripMembers?.some((m) => m.user_id === user?.id) ?? false;
+
+  async function handleJoin() {
+    try {
+      await joinTrip.mutateAsync({ tripId: item.id, groupId });
+    } catch (e: any) {
+      Alert.alert('Error', e.message);
+    }
+  }
+
+  return (
+    <TouchableOpacity
+      onPress={() => router.push(`/group/${groupId}/trip/${item.id}`)}
+      className="mb-3 rounded-2xl bg-white p-4 shadow-sm dark:bg-gray-800"
+      style={{ shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 }}
+    >
+      <View className="flex-row items-start justify-between">
+        <View className="flex-1">
+          <Text className="text-base font-bold text-gray-900 dark:text-white">{item.title}</Text>
+          <View className="mt-1 flex-row items-center gap-1">
+            <Ionicons name="location-outline" size={13} color="#94A3B8" />
+            <Text className="text-sm text-gray-500 dark:text-gray-400">{item.destination}</Text>
+          </View>
+          <View className="mt-1 flex-row items-center gap-1">
+            <Ionicons name="calendar-outline" size={13} color="#94A3B8" />
+            <Text className="text-sm text-gray-500 dark:text-gray-400">
+              {format(new Date(item.start_date), 'MMM d')} – {format(new Date(item.end_date), 'MMM d, yyyy')}
+            </Text>
+          </View>
+        </View>
+        <View className="items-end gap-2">
+          <View className="rounded-full px-2 py-1" style={{ backgroundColor: `${color}20` }}>
+            <Text className="text-xs font-semibold capitalize" style={{ color }}>{item.status}</Text>
+          </View>
+          {!isMember && (
+            <TouchableOpacity
+              onPress={(e) => { e.stopPropagation(); handleJoin(); }}
+              disabled={joinTrip.isPending}
+              className="rounded-full bg-primary px-3 py-1"
+            >
+              <Text className="text-xs font-bold text-white">Join</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+}
 
 export default function GroupScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -30,33 +86,7 @@ export default function GroupScreen() {
   }
 
   function renderTrip({ item }: { item: Trip }) {
-    const color = STATUS_COLOR[item.status];
-    return (
-      <TouchableOpacity
-        onPress={() => router.push(`/group/${id}/trip/${item.id}`)}
-        className="mb-3 rounded-2xl bg-white p-4 shadow-sm dark:bg-gray-800"
-        style={{ shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 }}
-      >
-        <View className="flex-row items-start justify-between">
-          <View className="flex-1">
-            <Text className="text-base font-bold text-gray-900 dark:text-white">{item.title}</Text>
-            <View className="mt-1 flex-row items-center gap-1">
-              <Ionicons name="location-outline" size={13} color="#94A3B8" />
-              <Text className="text-sm text-gray-500 dark:text-gray-400">{item.destination}</Text>
-            </View>
-            <View className="mt-1 flex-row items-center gap-1">
-              <Ionicons name="calendar-outline" size={13} color="#94A3B8" />
-              <Text className="text-sm text-gray-500 dark:text-gray-400">
-                {format(new Date(item.start_date), 'MMM d')} – {format(new Date(item.end_date), 'MMM d, yyyy')}
-              </Text>
-            </View>
-          </View>
-          <View className="rounded-full px-2 py-1" style={{ backgroundColor: `${color}20` }}>
-            <Text className="text-xs font-semibold capitalize" style={{ color }}>{item.status}</Text>
-          </View>
-        </View>
-      </TouchableOpacity>
-    );
+    return <TripCard item={item} groupId={id} />;
   }
 
   return (

@@ -11,6 +11,7 @@ import { supabase } from '../../../../../lib/supabase';
 import { scanReceipt } from '../../../../../lib/gemini';
 import { useAddExpense } from '../../../../../hooks/useBudget';
 import { useGroup } from '../../../../../hooks/useGroup';
+import { useTripMembers } from '../../../../../hooks/useTrip';
 import { useAppStore } from '../../../../../store/useAppStore';
 import type { ExpenseCategory } from '../../../../../types';
 
@@ -30,6 +31,7 @@ export default function AddExpenseScreen() {
   const router = useRouter();
   const { user } = useAppStore();
   const { data: group } = useGroup(groupId);
+  const { data: tripMembersData } = useTripMembers(tripId);
   const addExpense = useAddExpense();
 
   const [amount, setAmount] = useState('');
@@ -41,7 +43,9 @@ export default function AddExpenseScreen() {
   const [scanning, setScanning] = useState(false);
   const [uploading, setUploading] = useState(false);
 
-  const members = (group as any)?.group_members ?? [];
+  // Prefer trip members for splits; fall back to group members for trips created before this feature
+  const groupMembers = (group as any)?.group_members ?? [];
+  const members = (tripMembersData && tripMembersData.length > 0) ? tripMembersData : groupMembers;
 
   async function pickReceipt() {
     const result = await ImagePicker.launchCameraAsync({
@@ -199,7 +203,7 @@ export default function AddExpenseScreen() {
 
         <View className="mb-4 rounded-xl bg-blue-50 p-3 dark:bg-blue-900/20">
           <Text className="text-sm text-blue-700 dark:text-blue-300">
-            Split equally among {members.length} members (${(parseFloat(amount || '0') / Math.max(members.length, 1)).toFixed(2)} each)
+            Split equally among {members.length} trip {members.length === 1 ? 'member' : 'members'} (${(parseFloat(amount || '0') / Math.max(members.length, 1)).toFixed(2)} each)
           </Text>
         </View>
       </ScrollView>

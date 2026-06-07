@@ -33,6 +33,17 @@ export type GroupMemberWithProfile = GroupMember & {
 
 export type TripStatus = 'planning' | 'confirmed' | 'ongoing' | 'completed';
 
+export type TripMember = {
+  id: string;
+  trip_id: string;
+  user_id: string;
+  joined_at: string;
+};
+
+export type TripMemberWithProfile = TripMember & {
+  user: UserProfile;
+};
+
 export type Trip = {
   id: string;
   group_id: string;
