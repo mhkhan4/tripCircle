@@ -1,17 +1,15 @@
 import { supabase } from './supabase';
 
 export async function ensureSoloGroup(userId: string, userFirstName: string): Promise<string> {
-  // Check for an existing solo group the user owns
-  const { data: existing } = await supabase
-    .from('group_members')
-    .select('group:groups!inner(id, is_solo)')
-    .eq('user_id', userId)
-    .eq('group.is_solo', true)
-    .maybeSingle();
+  const { data: existingList, error: readError } = await supabase
+    .from('groups')
+    .select('id')
+    .eq('created_by', userId)
+    .eq('is_solo', true)
+    .limit(1);
 
-  if (existing?.group) {
-    return (existing.group as any).id as string;
-  }
+  if (readError) throw readError;
+  if (existingList && existingList.length > 0) return existingList[0].id;
 
   // Create a new solo group
   const groupId = crypto.randomUUID();
