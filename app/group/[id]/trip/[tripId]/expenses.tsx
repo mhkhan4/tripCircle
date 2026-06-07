@@ -1,5 +1,5 @@
 import { View, Text, FlatList, TouchableOpacity } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { format } from 'date-fns';
@@ -56,6 +56,7 @@ export default function ExpensesScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50 dark:bg-gray-950" edges={['bottom']}>
+      <Stack.Screen options={{ title: 'Expenses' }} />
       <View className="mx-5 mb-4 rounded-2xl bg-primary p-4">
         <Text className="text-sm text-blue-200">Total Spent</Text>
         <Text className="text-3xl font-bold text-white">${total.toFixed(2)}</Text>

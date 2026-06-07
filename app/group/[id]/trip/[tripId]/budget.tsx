@@ -1,5 +1,5 @@
 import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator, ScrollView } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
 import { useGroup } from '../../../../../hooks/useGroup';
@@ -39,6 +39,7 @@ export default function BudgetScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50 dark:bg-gray-950" edges={['bottom']}>
+      <Stack.Screen options={{ title: 'Budget' }} />
       <ScrollView contentContainerStyle={{ padding: 20 }}>
         {!budget ? (
           <View className="rounded-2xl bg-white p-5 shadow-sm dark:bg-gray-800" style={{ shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 }}>

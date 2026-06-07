@@ -3,7 +3,7 @@ import {
   ScrollView, Image,
 } from 'react-native';
 import { useState } from 'react';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
@@ -118,6 +118,7 @@ export default function AddExpenseScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50 dark:bg-gray-950" edges={['bottom']}>
+      <Stack.Screen options={{ title: 'Add Expense' }} />
       <ScrollView className="flex-1 px-5 pt-4" keyboardShouldPersistTaps="handled">
         <Text className="mb-1 text-2xl font-bold text-gray-900 dark:text-white">Add Expense</Text>
         <Text className="mb-5 text-sm text-gray-500 dark:text-gray-400">Scan a receipt or enter manually.</Text>

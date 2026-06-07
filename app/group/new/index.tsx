@@ -1,6 +1,6 @@
 import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { useState } from 'react';
-import { useRouter } from 'expo-router';
+import { useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCreateGroup } from '../../../hooks/useGroup';
 
@@ -22,6 +22,7 @@ export default function NewGroupScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50 dark:bg-gray-950" edges={['bottom']}>
+      <Stack.Screen options={{ title: 'New Group' }} />
       <View className="flex-1 px-5 pt-4">
         <Text className="mb-1 text-2xl font-bold text-gray-900 dark:text-white">Create a Group</Text>
         <Text className="mb-6 text-sm text-gray-500 dark:text-gray-400">Your travel circle starts here.</Text>
