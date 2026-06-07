@@ -21,7 +21,7 @@ export async function scanReceipt(base64Image: string): Promise<OcrResult> {
           },
           {
             type: 'text',
-            text: `Extract receipt info. Reply ONLY with valid JSON: {"amount": number or null, "merchant": "string or null", "date": "YYYY-MM-DD or null", "currency": "USD or relevant 3-letter code or null"}. If you cannot find a value, use null.`,
+            text: `Extract receipt info. Reply ONLY with valid JSON: {"amount": number or null, "merchant": "string or null", "date": "YYYY-MM-DD or null", "currency": "3-letter code or null", "category": "food|transport|accommodation|activities|shopping|other"}. Pick the category that best matches the receipt type. If you cannot find a value, use null.`,
           },
         ],
       },
@@ -38,9 +38,10 @@ export async function scanReceipt(base64Image: string): Promise<OcrResult> {
       merchant: parsed.merchant ?? null,
       date: parsed.date ?? null,
       currency: parsed.currency ?? null,
+      category: parsed.category ?? null,
       raw,
     };
   } catch {
-    return { amount: null, merchant: null, date: null, currency: null, raw };
+    return { amount: null, merchant: null, date: null, currency: null, category: null, raw };
   }
 }

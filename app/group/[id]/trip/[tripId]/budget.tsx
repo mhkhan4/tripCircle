@@ -4,30 +4,38 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
 import { useGroup } from '../../../../../hooks/useGroup';
 import { useBudget, useCreateBudget, useBudgetSummary } from '../../../../../hooks/useBudget';
-import { useAppStore } from '../../../../../store/useAppStore';
+
+type BudgetMode = 'total' | 'per_person';
 
 export default function BudgetScreen() {
   const { id: groupId, tripId } = useLocalSearchParams<{ id: string; tripId: string }>();
-  const { user } = useAppStore();
   const { data: group } = useGroup(groupId);
   const { data: budget } = useBudget(tripId);
   const { totalSpent, totalBudget, remaining, percentUsed } = useBudgetSummary(tripId);
   const createBudget = useCreateBudget();
 
   const [amount, setAmount] = useState('');
+  const [mode, setMode] = useState<BudgetMode>('total');
+
+  const members = (group as any)?.group_members ?? [];
+  const memberCount = Math.max(members.length, 1);
+
+  const enteredNum = parseFloat(amount) || 0;
+  const computedTotal = mode === 'per_person' ? enteredNum * memberCount : enteredNum;
+  const computedPerPerson = mode === 'total' ? enteredNum / memberCount : enteredNum;
 
   async function handleSetBudget() {
     const num = parseFloat(amount);
     if (isNaN(num) || num <= 0) return Alert.alert('Invalid amount', 'Enter a positive number.');
+    const total = mode === 'per_person' ? num * memberCount : num;
+    const perPerson = mode === 'per_person' ? num : undefined;
     try {
-      await createBudget.mutateAsync({ trip_id: tripId, total_amount: num });
+      await createBudget.mutateAsync({ trip_id: tripId, total_amount: total, per_person_amount: perPerson });
       setAmount('');
     } catch (e: any) {
       Alert.alert('Error', e.message);
     }
   }
-
-  const members = (group as any)?.group_members ?? [];
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50 dark:bg-gray-950" edges={['bottom']}>
@@ -35,16 +43,51 @@ export default function BudgetScreen() {
         {!budget ? (
           <View className="rounded-2xl bg-white p-5 shadow-sm dark:bg-gray-800" style={{ shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 }}>
             <Text className="mb-1 text-lg font-bold text-gray-900 dark:text-white">Set Trip Budget</Text>
-            <Text className="mb-4 text-sm text-gray-500 dark:text-gray-400">How much does this trip cost in total?</Text>
-            <Text className="mb-1 text-sm font-semibold text-gray-700 dark:text-gray-300">Total Budget (USD)</Text>
+            <Text className="mb-4 text-sm text-gray-500 dark:text-gray-400">Set a total or per-person budget for this trip.</Text>
+
+            {/* Mode toggle */}
+            <View className="mb-4 flex-row rounded-xl border border-gray-200 p-1 dark:border-gray-700">
+              {(['total', 'per_person'] as BudgetMode[]).map((m) => (
+                <TouchableOpacity
+                  key={m}
+                  onPress={() => setMode(m)}
+                  className="flex-1 items-center rounded-lg py-2"
+                  style={{ backgroundColor: mode === m ? '#2563EB' : 'transparent' }}
+                >
+                  <Text className="text-sm font-semibold" style={{ color: mode === m ? 'white' : '#64748B' }}>
+                    {m === 'total' ? 'Total Budget' : 'Per Person'}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <Text className="mb-1 text-sm font-semibold text-gray-700 dark:text-gray-300">
+              {mode === 'total' ? 'Total Budget (USD)' : 'Amount per Person (USD)'}
+            </Text>
             <TextInput
               value={amount}
               onChangeText={setAmount}
               placeholder="0.00"
               placeholderTextColor="#94A3B8"
               keyboardType="decimal-pad"
-              className="mb-4 rounded-xl border border-gray-200 bg-slate-50 px-4 py-3 text-2xl font-bold text-gray-900 dark:border-gray-700 dark:bg-gray-700 dark:text-white"
+              className="mb-3 rounded-xl border border-gray-200 bg-slate-50 px-4 py-3 text-2xl font-bold text-gray-900 dark:border-gray-700 dark:bg-gray-700 dark:text-white"
             />
+
+            {enteredNum > 0 && (
+              <View className="mb-4 rounded-xl bg-blue-50 p-3 dark:bg-blue-900/20">
+                {mode === 'per_person' ? (
+                  <Text className="text-sm text-blue-700 dark:text-blue-300">
+                    ${enteredNum.toFixed(2)}/person × {memberCount} members = <Text className="font-bold">${computedTotal.toFixed(2)} total</Text>
+                    {'\n'}Budget auto-increases when new members join.
+                  </Text>
+                ) : (
+                  <Text className="text-sm text-blue-700 dark:text-blue-300">
+                    ${computedPerPerson.toFixed(2)}/person split across {memberCount} members
+                  </Text>
+                )}
+              </View>
+            )}
+
             <TouchableOpacity onPress={handleSetBudget} disabled={createBudget.isPending} className="items-center rounded-2xl bg-primary py-4">
               {createBudget.isPending ? <ActivityIndicator color="white" /> : <Text className="font-bold text-white">Set Budget</Text>}
             </TouchableOpacity>
@@ -53,6 +96,15 @@ export default function BudgetScreen() {
           <>
             <View className="mb-4 rounded-2xl bg-white p-5 shadow-sm dark:bg-gray-800" style={{ shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 }}>
               <Text className="mb-3 text-base font-bold text-gray-900 dark:text-white">Budget Overview</Text>
+
+              {budget.per_person_amount && (
+                <View className="mb-3 rounded-xl bg-blue-50 px-3 py-2 dark:bg-blue-900/20">
+                  <Text className="text-xs text-blue-600 dark:text-blue-300">
+                    Per-person budget: ${budget.per_person_amount.toFixed(2)} × {memberCount} members — auto-scales when members join
+                  </Text>
+                </View>
+              )}
+
               <View className="mb-3 h-3 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-700">
                 <View
                   className="h-full rounded-full"
@@ -80,17 +132,17 @@ export default function BudgetScreen() {
               <Text className="mb-3 text-base font-bold text-gray-900 dark:text-white">Member Contributions</Text>
               {members.map((m: any) => {
                 const contribution = budget?.budget_contributions?.find((c: any) => c.user_id === m.user_id);
-                const equal = totalBudget / Math.max(members.length, 1);
+                const share = budget.per_person_amount ?? totalBudget / memberCount;
                 return (
                   <View key={m.user_id} className="mb-3 flex-row items-center gap-3">
                     <View className="h-9 w-9 items-center justify-center rounded-full bg-primary">
                       <Text className="text-sm font-bold text-white">
-                        {m.user?.full_name?.[0]?.toUpperCase() ?? '?'}
+                        {m.user?.full_name?.[0]?.toUpperCase() ?? m.user?.email?.[0]?.toUpperCase() ?? '?'}
                       </Text>
                     </View>
                     <View className="flex-1">
                       <Text className="font-semibold text-gray-800 dark:text-white">{m.user?.full_name ?? 'Member'}</Text>
-                      <Text className="text-xs text-gray-400">Share: ${equal.toFixed(2)}</Text>
+                      <Text className="text-xs text-gray-400">Share: ${share.toFixed(2)}</Text>
                     </View>
                     {contribution ? (
                       <View className="items-end">

@@ -16,7 +16,8 @@ TripCircle is a mobile-first React Native app for friend groups who travel toget
 | Database           | Supabase (PostgreSQL)             | Relational data, row-level security, realtime subscriptions      |
 | Real-time chat     | Supabase Realtime                 | WebSocket subscriptions, no custom server needed                 |
 | File storage       | Supabase Storage                  | Receipt image uploads, public CDN URLs                          |
-| Receipt OCR        | OpenAI GPT-4o Vision              | Extracts amount, merchant, date from receipt photos              |
+| Receipt OCR        | DeepSeek Vision (OpenAI-compat.)  | Extracts amount, merchant, date, category from receipt photos    |
+| Date picker        | react-native-calendars            | Calendar modal for trip date selection                           |
 | Server state       | TanStack Query v5                 | Caching, background sync, stale-while-revalidate                 |
 | Global state       | Zustand v5                        | Lightweight, auth session + active group context                 |
 | Styling            | NativeWind v4 + Tailwind CSS v3   | Tailwind utility classes in React Native                         |
@@ -92,7 +93,7 @@ Login → OAuth provider → Supabase Auth → trigger creates users row
 User taps "Add Expense"
   → Optional: Launch camera (expo-image-picker)
   → base64 image → scanReceipt() → GPT-4o Vision
-  → OCR result auto-fills amount + description
+  → OCR result auto-fills amount, description, and category
   → Upload image to Supabase Storage → get public URL
   → User confirms/edits → Submit
   → Insert expense row + expense_splits rows
@@ -105,7 +106,7 @@ User taps "Add Expense"
 User opens chat screen
   → Load last 100 messages from Supabase
   → Subscribe: supabase.channel().on('postgres_changes', INSERT, messages)
-  → New message arrives → append to local state → FlatList scrolls to end
+  → New message arrives → fetch full row with sender join → append to state → FlatList scrolls to end
   → User sends: insert to messages table → all subscribers receive it
 ```
 
@@ -119,7 +120,7 @@ User opens chat screen
 | groups                | id, name, invite_code, created_by                              |
 | group_members         | group_id, user_id, role (admin/member) — unique(group,user)   |
 | trips                 | id, group_id, title, destination, start/end_date, status       |
-| budgets               | id, trip_id (unique), total_amount, currency                   |
+| budgets               | id, trip_id (unique), total_amount, per_person_amount, currency |
 | budget_contributions  | budget_id, user_id, pledged_amount, paid_amount                |
 | expenses              | id, trip_id, amount, category, paid_by, receipt_url, ocr_raw  |
 | expense_splits        | expense_id, user_id, share_amount, is_settled                  |
@@ -146,7 +147,10 @@ Trip and expense data is read far more than written. TanStack Query handles cach
 Deep linking is essential — sharing a trip link or joining via an invite code requires URL-based navigation. Expo Router also gives type-safe route params with `useLocalSearchParams`.
 
 ### Receipt OCR approach
-GPT-4o Vision is more reliable than Google Cloud Vision or AWS Textract for messy real-world receipts (faded text, unusual layouts, non-English). The prompt constrains the response to a JSON schema, making parsing predictable. The user always reviews before submitting — never auto-commit from OCR alone.
+DeepSeek Vision (OpenAI-API-compatible) is used for receipt scanning. The prompt constrains output to a strict JSON schema — amount, merchant, date, currency, and category — making parsing predictable. Category is auto-applied to the expense form but the user always reviews before submitting. Never auto-commit from OCR alone.
+
+### Per-person budget scaling
+Budgets can be set as a flat total or per-person. When per-person, `per_person_amount` is stored alongside `total_amount`. A Postgres trigger on `group_members` (INSERT/DELETE) automatically recalculates `total_amount = per_person_amount × current_member_count` for all affected trip budgets in that group.
 
 ### Expense splitting
 Currently equal split among all group members. The `expense_splits` table supports custom splits per user — this can be extended to a manual split screen without changing the schema.
@@ -193,4 +197,6 @@ npx expo start
 | 6     | Trip chat             | Done        |
 | 7     | Push notifications    | Pending     |
 | 8     | Offline queue         | Pending     |
-| 8     | Date picker UI        | Pending     |
+| 8     | Date picker UI        | Done        |
+| 8     | Per-person budget     | Done        |
+| 8     | Chat avatar images    | Done        |

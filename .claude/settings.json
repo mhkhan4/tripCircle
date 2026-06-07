@@ -1,1 +1,18 @@
-{"enabledPlugins":{"expo@claude-plugins-official":true},"permissions":{"defaultMode":"default"}}
+{
+  "enabledPlugins": {"expo@claude-plugins-official": true},
+  "permissions": {"defaultMode": "default"},
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd /Users/mahmudulkhan/Downloads/projects/tripcircle && git add -A && git diff --cached --quiet || git commit -m \"chore: auto-sync changes\" && git push 2>/dev/null || true",
+            "timeout": 30,
+            "statusMessage": "Pushing changes to GitHub..."
+          }
+        ]
+      }
+    ]
+  }
+}

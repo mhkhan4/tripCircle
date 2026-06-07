@@ -1,8 +1,18 @@
-import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator, ScrollView, Modal } from 'react-native';
 import { useState } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import { Calendar } from 'react-native-calendars';
+import { format } from 'date-fns';
 import { useCreateTrip } from '../../../../../hooks/useTrip';
+
+type CalendarTarget = 'start' | 'end' | null;
+
+function formatDisplay(dateStr: string) {
+  if (!dateStr) return '';
+  return format(new Date(dateStr + 'T12:00:00'), 'MMM d, yyyy');
+}
 
 export default function NewTripScreen() {
   const { id: groupId } = useLocalSearchParams<{ id: string }>();
@@ -14,16 +24,53 @@ export default function NewTripScreen() {
   const [description, setDescription] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [calendarTarget, setCalendarTarget] = useState<CalendarTarget>(null);
+
+  function openCalendar(target: CalendarTarget) {
+    setCalendarTarget(target);
+  }
+
+  function handleDayPress(day: { dateString: string }) {
+    if (calendarTarget === 'start') {
+      setStartDate(day.dateString);
+      if (endDate && day.dateString > endDate) setEndDate('');
+      setCalendarTarget(null);
+    } else if (calendarTarget === 'end') {
+      if (startDate && day.dateString < startDate) {
+        Alert.alert('Invalid date', 'End date must be after start date.');
+        return;
+      }
+      setEndDate(day.dateString);
+      setCalendarTarget(null);
+    }
+  }
+
+  function getMarkedDates() {
+    const marks: Record<string, any> = {};
+    if (calendarTarget === 'start' && startDate) {
+      marks[startDate] = { selected: true, selectedColor: '#2563EB' };
+    } else if (calendarTarget === 'end') {
+      if (startDate) marks[startDate] = { selected: true, selectedColor: '#2563EB', selectedTextColor: 'white' };
+      if (endDate) marks[endDate] = { selected: true, selectedColor: '#2563EB' };
+      if (startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const cur = new Date(start);
+        cur.setDate(cur.getDate() + 1);
+        while (cur < end) {
+          const key = cur.toISOString().split('T')[0];
+          marks[key] = { color: '#DBEAFE', textColor: '#1D4ED8' };
+          cur.setDate(cur.getDate() + 1);
+        }
+      }
+    }
+    return marks;
+  }
 
   async function handleCreate() {
     if (!title.trim()) return Alert.alert('Required', 'Trip name is required.');
     if (!destination.trim()) return Alert.alert('Required', 'Destination is required.');
-    if (!startDate || !endDate) return Alert.alert('Required', 'Please enter start and end dates.');
-
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    if (isNaN(start.getTime()) || isNaN(end.getTime())) return Alert.alert('Invalid date', 'Use format YYYY-MM-DD');
-    if (end < start) return Alert.alert('Invalid dates', 'End date must be after start date.');
+    if (!startDate || !endDate) return Alert.alert('Required', 'Please choose start and end dates.');
 
     try {
       const trip = await createTrip.mutateAsync({
@@ -67,25 +114,27 @@ export default function NewTripScreen() {
         <View className="mb-4 flex-row gap-3">
           <View className="flex-1">
             <Text className="mb-1 text-sm font-semibold text-gray-700 dark:text-gray-300">Start Date *</Text>
-            <TextInput
-              value={startDate}
-              onChangeText={setStartDate}
-              placeholder="YYYY-MM-DD"
-              placeholderTextColor="#94A3B8"
-              className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-base text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-              keyboardType="numbers-and-punctuation"
-            />
+            <TouchableOpacity
+              onPress={() => openCalendar('start')}
+              className="flex-row items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 dark:border-gray-700 dark:bg-gray-800"
+            >
+              <Ionicons name="calendar-outline" size={16} color="#94A3B8" />
+              <Text className={startDate ? 'text-base text-gray-900 dark:text-white' : 'text-base text-gray-400'}>
+                {startDate ? formatDisplay(startDate) : 'Pick date'}
+              </Text>
+            </TouchableOpacity>
           </View>
           <View className="flex-1">
             <Text className="mb-1 text-sm font-semibold text-gray-700 dark:text-gray-300">End Date *</Text>
-            <TextInput
-              value={endDate}
-              onChangeText={setEndDate}
-              placeholder="YYYY-MM-DD"
-              placeholderTextColor="#94A3B8"
-              className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-base text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-              keyboardType="numbers-and-punctuation"
-            />
+            <TouchableOpacity
+              onPress={() => openCalendar('end')}
+              className="flex-row items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 dark:border-gray-700 dark:bg-gray-800"
+            >
+              <Ionicons name="calendar-outline" size={16} color="#94A3B8" />
+              <Text className={endDate ? 'text-base text-gray-900 dark:text-white' : 'text-base text-gray-400'}>
+                {endDate ? formatDisplay(endDate) : 'Pick date'}
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -116,6 +165,38 @@ export default function NewTripScreen() {
           )}
         </TouchableOpacity>
       </View>
+
+      <Modal
+        visible={calendarTarget !== null}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setCalendarTarget(null)}
+      >
+        <View className="flex-1 justify-end bg-black/40">
+          <View className="rounded-t-3xl bg-white dark:bg-gray-900">
+            <View className="flex-row items-center justify-between px-5 pt-4 pb-2">
+              <Text className="text-base font-bold text-gray-900 dark:text-white">
+                {calendarTarget === 'start' ? 'Select Start Date' : 'Select End Date'}
+              </Text>
+              <TouchableOpacity onPress={() => setCalendarTarget(null)}>
+                <Ionicons name="close" size={22} color="#64748B" />
+              </TouchableOpacity>
+            </View>
+            <Calendar
+              onDayPress={handleDayPress}
+              markedDates={getMarkedDates()}
+              markingType={calendarTarget === 'end' && startDate && endDate ? 'period' : 'simple'}
+              minDate={calendarTarget === 'end' ? startDate : undefined}
+              theme={{
+                selectedDayBackgroundColor: '#2563EB',
+                todayTextColor: '#2563EB',
+                arrowColor: '#2563EB',
+              }}
+            />
+            <View className="h-6" />
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }

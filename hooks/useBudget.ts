@@ -47,7 +47,7 @@ export function useCreateBudget() {
   const { user } = useAppStore();
 
   return useMutation({
-    mutationFn: async (input: { trip_id: string; total_amount: number; currency?: string }) => {
+    mutationFn: async (input: { trip_id: string; total_amount: number; per_person_amount?: number; currency?: string }) => {
       const { data, error } = await supabase
         .from('budgets')
         .insert({ ...input, created_by: user!.id })

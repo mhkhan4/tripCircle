@@ -61,6 +61,7 @@ export default function AddExpenseScreen() {
       setOcrRaw({ ...ocr });
       if (ocr.amount) setAmount(ocr.amount.toString());
       if (ocr.merchant) setDescription(ocr.merchant);
+      if (ocr.category) setCategory(ocr.category);
     } catch {
       Alert.alert('Scan failed', 'Could not read the receipt. Fill in manually.');
     } finally {

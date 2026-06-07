@@ -51,6 +51,7 @@ export type Budget = {
   id: string;
   trip_id: string;
   total_amount: number;
+  per_person_amount: number | null;
   currency: string;
   created_by: string;
   created_at: string;
@@ -114,5 +115,6 @@ export type OcrResult = {
   merchant: string | null;
   date: string | null;
   currency: string | null;
+  category: ExpenseCategory | null;
   raw: string;
 };

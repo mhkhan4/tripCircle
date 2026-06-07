@@ -1,4 +1,4 @@
-import { View, Text, FlatList, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, FlatList, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Image } from 'react-native';
 import { useLocalSearchParams, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState, useEffect, useRef } from 'react';
@@ -25,8 +25,14 @@ export default function GroupChatScreen() {
         schema: 'public',
         table: 'messages',
         filter: `group_id=eq.${id}`,
-      }, (payload) => {
-        setMessages((prev) => [...prev, payload.new as Message]);
+      }, async (payload) => {
+        const { data } = await supabase
+          .from('messages')
+          .select('*, sender:users!sender_id(*)')
+          .eq('id', (payload.new as any).id)
+          .is('trip_id', null)
+          .single();
+        if (data) setMessages((prev) => [...prev, data as Message]);
       })
       .subscribe();
 
@@ -56,17 +62,28 @@ export default function GroupChatScreen() {
     });
   }
 
+  function renderAvatar(sender: any) {
+    if (sender?.avatar_url) {
+      return (
+        <Image
+          source={{ uri: sender.avatar_url }}
+          className="mr-2 h-8 w-8 rounded-full"
+        />
+      );
+    }
+    const initials = sender?.full_name?.[0]?.toUpperCase() ?? sender?.email?.[0]?.toUpperCase() ?? '?';
+    return (
+      <View className="mr-2 h-8 w-8 items-center justify-center rounded-full bg-primary">
+        <Text className="text-xs font-bold text-white">{initials}</Text>
+      </View>
+    );
+  }
+
   function renderMessage({ item }: { item: Message }) {
     const isMe = item.sender_id === user?.id;
     return (
       <View className={`mb-2 flex-row ${isMe ? 'justify-end' : 'justify-start'}`}>
-        {!isMe && (
-          <View className="mr-2 h-8 w-8 items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700">
-            <Text className="text-xs font-bold text-gray-600 dark:text-gray-300">
-              {(item.sender as any)?.full_name?.[0]?.toUpperCase() ?? '?'}
-            </Text>
-          </View>
-        )}
+        {!isMe && renderAvatar((item as any).sender)}
         <View
           className={`max-w-xs rounded-2xl px-3 py-2 ${isMe ? 'rounded-tr-sm bg-primary' : 'rounded-tl-sm bg-white dark:bg-gray-800'}`}
           style={!isMe ? { shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 } : {}}
