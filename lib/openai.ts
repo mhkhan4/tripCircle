@@ -1,22 +1,23 @@
-import Anthropic from '@anthropic-ai/sdk';
+import OpenAI from 'openai';
 import type { OcrResult } from '../types';
 
-const client = new Anthropic({
-  apiKey: process.env.EXPO_PUBLIC_ANTHROPIC_API_KEY!,
+const client = new OpenAI({
+  apiKey: process.env.EXPO_PUBLIC_DEEPSEEK_API_KEY!,
+  baseURL: 'https://api.deepseek.com/v1',
   dangerouslyAllowBrowser: true,
 });
 
 export async function scanReceipt(base64Image: string): Promise<OcrResult> {
-  const response = await client.messages.create({
-    model: 'claude-haiku-4-5',
+  const response = await client.chat.completions.create({
+    model: 'deepseek-v4-vision',
     max_tokens: 200,
     messages: [
       {
         role: 'user',
         content: [
           {
-            type: 'image',
-            source: { type: 'base64', media_type: 'image/jpeg', data: base64Image },
+            type: 'image_url',
+            image_url: { url: `data:image/jpeg;base64,${base64Image}` },
           },
           {
             type: 'text',
@@ -27,8 +28,7 @@ export async function scanReceipt(base64Image: string): Promise<OcrResult> {
     ],
   });
 
-  const textBlock = response.content.find((b): b is Anthropic.TextBlock => b.type === 'text');
-  const raw = textBlock?.text ?? '{}';
+  const raw = response.choices[0]?.message?.content ?? '{}';
 
   try {
     const jsonStr = raw.replace(/^```(?:json)?\s*\n?/m, '').replace(/\n?```\s*$/m, '').trim();
