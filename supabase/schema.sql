@@ -3,28 +3,36 @@
 -- Users (mirrors Supabase auth.users)
 create table public.users (
   id uuid primary key references auth.users on delete cascade,
-  email text unique not null,
-  full_name text not null default '',
+  email text unique,
+  phone text unique,
+  first_name text,
+  last_name text,
+  full_name text,
+  username text unique,
   avatar_url text,
   provider text default 'email',
   created_at timestamptz default now()
 );
 
--- Auto-create user profile on sign up
+-- Auto-create user profile on sign up (handles Google OAuth and phone auth)
 create or replace function public.handle_new_user()
-returns trigger as $$
+returns trigger language plpgsql security definer as $$
 begin
-  insert into public.users (id, email, full_name, avatar_url, provider)
+  insert into public.users (id, email, phone, first_name, last_name, full_name, avatar_url, provider)
   values (
     new.id,
     new.email,
-    coalesce(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name', ''),
-    new.raw_user_meta_data->>'avatar_url',
-    new.raw_app_meta_data->>'provider'
-  );
+    new.phone,
+    new.raw_user_meta_data->>'first_name',
+    new.raw_user_meta_data->>'last_name',
+    coalesce(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name'),
+    coalesce(new.raw_user_meta_data->>'avatar_url', new.raw_user_meta_data->>'picture'),
+    coalesce(new.raw_app_meta_data->>'provider', 'email')
+  )
+  on conflict (id) do nothing;
   return new;
 end;
-$$ language plpgsql security definer;
+$$;
 
 create trigger on_auth_user_created
   after insert on auth.users

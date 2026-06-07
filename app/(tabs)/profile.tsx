@@ -6,10 +6,10 @@ import { useAppStore } from '../../store/useAppStore';
 
 export default function ProfileScreen() {
   const { user: authUser, signOut } = useAuth();
-  const { user, isGuest, signOutGuest } = useAppStore();
+  const { user, isGuest } = useAppStore();
 
   function confirmSignOut() {
-    const action = isGuest ? signOutGuest : signOut;
+    const action = signOut;
     if (Platform.OS === 'web') {
       if (window.confirm('Are you sure you want to sign out?')) action();
       return;
