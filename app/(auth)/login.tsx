@@ -1,10 +1,8 @@
-import { View, Text, TouchableOpacity, ActivityIndicator, Alert, Platform } from 'react-native';
+import { View, Text, Image, TouchableOpacity, ActivityIndicator, Alert, Platform } from 'react-native';
 import { useState } from 'react';
 import * as WebBrowser from 'expo-web-browser';
 import { supabase } from '../../lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
-import { TripOrbitLogo } from '../../components/TripOrbitLogo';
-import { TripOrbitWordmark } from '../../components/TripOrbitWordmark';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -69,13 +67,12 @@ export default function LoginScreen() {
 
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32 }}>
         {/* Logo */}
-        <View style={{ marginBottom: 16 }}>
-          <TripOrbitLogo size={110} />
-        </View>
+        <Image
+          source={require('../../assets/logo.png')}
+          style={{ width: 300, height: 220, marginBottom: 32 }}
+          resizeMode="contain"
+        />
 
-        <View style={{ marginBottom: 12 }}>
-          <TripOrbitWordmark width={240} />
-        </View>
         <Text style={{ fontSize: 15, color: '#94a3b8', textAlign: 'center', marginBottom: 48, lineHeight: 22 }}>
           Plan trips, track budgets, and travel together.
         </Text>
