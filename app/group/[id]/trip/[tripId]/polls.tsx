@@ -106,17 +106,21 @@ export default function PollsScreen() {
     }
   }
 
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+
   function handleDelete(poll: TripPoll) {
-    Alert.alert('Delete poll', 'This will remove the poll and all votes.', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete', style: 'destructive',
-        onPress: async () => {
-          try { await deletePoll.mutateAsync({ poll_id: poll.id, trip_id: tripId }); }
-          catch (e: any) { Alert.alert('Error', e.message); }
-        },
-      },
-    ]);
+    setConfirmDeleteId(poll.id);
+  }
+
+  async function confirmDelete() {
+    const poll = polls?.find((p) => p.id === confirmDeleteId);
+    if (!poll) return;
+    setConfirmDeleteId(null);
+    try {
+      await deletePoll.mutateAsync({ poll_id: poll.id, trip_id: tripId });
+    } catch (e: any) {
+      Alert.alert('Error', e.message);
+    }
   }
 
   return (
@@ -230,6 +234,33 @@ export default function PollsScreen() {
           <Text className="font-bold text-white">New Poll</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Delete confirmation modal */}
+      <Modal visible={!!confirmDeleteId} animationType="fade" transparent>
+        <View className="flex-1 items-center justify-center bg-black/50 px-6">
+          <View className="w-full rounded-2xl bg-white p-6 dark:bg-gray-900">
+            <Text className="mb-2 text-lg font-bold text-gray-900 dark:text-white">Delete poll?</Text>
+            <Text className="mb-6 text-sm text-gray-500 dark:text-gray-400">This will remove the poll and all votes. This cannot be undone.</Text>
+            <View className="flex-row gap-3">
+              <TouchableOpacity
+                onPress={() => setConfirmDeleteId(null)}
+                className="flex-1 rounded-xl border border-gray-200 py-3 items-center dark:border-gray-700"
+              >
+                <Text className="font-semibold text-gray-700 dark:text-gray-300">Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={confirmDelete}
+                disabled={deletePoll.isPending}
+                className="flex-1 rounded-xl bg-red-500 py-3 items-center"
+              >
+                {deletePoll.isPending
+                  ? <ActivityIndicator color="white" size="small" />
+                  : <Text className="font-bold text-white">Delete</Text>}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
 
       {/* Create poll modal */}
       <Modal visible={showCreate} animationType="slide" transparent>
