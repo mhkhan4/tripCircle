@@ -50,21 +50,7 @@ export default function LoginScreen() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#030712' }}>
-      {/* Background gradient feel */}
-      <View
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 350,
-          backgroundColor: '#0f172a',
-          borderBottomLeftRadius: 48,
-          borderBottomRightRadius: 48,
-        }}
-      />
-
+    <View style={{ flex: 1, backgroundColor: '#0f172a' }}>
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32 }}>
         {/* Logo */}
         <Image
