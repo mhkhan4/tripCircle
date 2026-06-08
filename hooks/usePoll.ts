@@ -96,9 +96,16 @@ export function useDeletePoll() {
 
   return useMutation({
     mutationFn: async ({ poll_id, trip_id }: { poll_id: string; trip_id: string }) => {
+      // Delete children manually (before the parent) so the RLS policy check on
+      // child tables can still see the parent row when evaluating permissions.
+      // FK cascade would run after the parent is gone, causing the check to fail.
+      const { error: votesErr } = await supabase.from('trip_poll_votes').delete().eq('poll_id', poll_id);
+      if (votesErr) throw votesErr;
+      const { error: optsErr } = await supabase.from('trip_poll_options').delete().eq('poll_id', poll_id);
+      if (optsErr) throw optsErr;
       const { error, count } = await supabase.from('trip_polls').delete({ count: 'exact' }).eq('id', poll_id);
       if (error) throw error;
-      if (count === 0) throw new Error('Could not delete poll — permission denied or poll not found.');
+      if (count === 0) throw new Error('Could not delete poll — permission denied.');
       return { trip_id };
     },
     onSuccess: (_data, vars) => {
