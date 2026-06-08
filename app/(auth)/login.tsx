@@ -1,8 +1,9 @@
-import { View, Text, TouchableOpacity, ActivityIndicator, Alert, Platform, Image } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, Alert, Platform } from 'react-native';
 import { useState } from 'react';
 import * as WebBrowser from 'expo-web-browser';
 import { supabase } from '../../lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
+import { TripOrbitLogo } from '../../components/TripOrbitLogo';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -67,11 +68,9 @@ export default function LoginScreen() {
 
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32 }}>
         {/* Logo */}
-        <Image
-          source={require('../../assets/logo.png')}
-          style={{ width: 90, height: 90, marginBottom: 16 }}
-          resizeMode="contain"
-        />
+        <View style={{ marginBottom: 16 }}>
+          <TripOrbitLogo size={110} />
+        </View>
 
         <Text style={{ fontSize: 36, fontWeight: '800', color: '#ffffff', marginBottom: 6, letterSpacing: -0.5 }}>
           TripOrbit
