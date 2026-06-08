@@ -1,4 +1,4 @@
-import { View, Text, FlatList, TouchableOpacity, RefreshControl, ScrollView } from 'react-native';
+import { View, Text, Image, FlatList, TouchableOpacity, RefreshControl, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
@@ -69,12 +69,11 @@ export default function HomeScreen() {
         <ScrollView contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
           {/* Hero */}
           <View className="mt-6 items-center">
-            <View
-              className="h-20 w-20 items-center justify-center rounded-3xl bg-primary"
-              style={{ shadowColor: '#2563EB', shadowOpacity: 0.35, shadowRadius: 16, elevation: 8 }}
-            >
-              <Ionicons name="airplane" size={38} color="white" />
-            </View>
+            <Image
+              source={require('../../assets/logo.png')}
+              style={{ width: 260, height: 190 }}
+              resizeMode="contain"
+            />
             <Text className="mt-5 text-center text-2xl font-bold text-gray-900 dark:text-white">
               Plan trips together,{'\n'}effortlessly.
             </Text>
