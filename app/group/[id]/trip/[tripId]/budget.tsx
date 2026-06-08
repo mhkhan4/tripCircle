@@ -32,10 +32,10 @@ export default function BudgetScreen() {
   const computedPerPerson = mode === 'total' ? enteredNum / memberCount : enteredNum;
 
   async function handleSendReminder() {
-    if (!budget) return;
+    if (!budget || !user) return;
     const unpaid = members.filter((m: any) => {
       const c = budget.budget_contributions?.find((c: any) => c.user_id === m.user_id);
-      return !c || c.paid_amount === 0;
+      return !c || !(c.paid_amount > 0);
     });
     if (unpaid.length === 0) return Alert.alert('All paid!', 'Everyone has paid their contribution.');
     const names = unpaid.map((m: any) => m.user?.full_name?.split(' ')[0] ?? 'Member').join(', ');
@@ -44,7 +44,7 @@ export default function BudgetScreen() {
       await supabase.from('messages').insert({
         group_id: groupId,
         trip_id: tripId,
-        sender_id: user!.id,
+        sender_id: user.id,
         content: `Payment reminder: ${names} ${unpaid.length === 1 ? 'hasn\'t' : 'haven\'t'} paid their contribution yet. Please pay before the trip!`,
       });
       Alert.alert('Reminder sent', 'A message was posted in the trip chat.');

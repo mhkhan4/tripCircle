@@ -31,9 +31,10 @@ export function useCreateTask() {
       assigned_to?: string | null;
       due_date?: string | null;
     }) => {
+      if (!user) throw new Error('Not signed in');
       const { data, error } = await supabase
         .from('trip_tasks')
-        .insert({ ...input, created_by: user!.id })
+        .insert({ ...input, created_by: user.id })
         .select()
         .single();
       if (error) throw error;
@@ -51,11 +52,12 @@ export function useCompleteTask() {
 
   return useMutation({
     mutationFn: async ({ task_id, trip_id, completed }: { task_id: string; trip_id: string; completed: boolean }) => {
+      if (!user) throw new Error('Not signed in');
       const { error } = await supabase
         .from('trip_tasks')
         .update({
           completed_at: completed ? new Date().toISOString() : null,
-          completed_by: completed ? user!.id : null,
+          completed_by: completed ? user.id : null,
         })
         .eq('id', task_id);
       if (error) throw error;

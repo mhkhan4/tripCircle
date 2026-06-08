@@ -480,7 +480,20 @@ create policy "poll_votes_read" on public.trip_poll_votes for select using (
 );
 create policy "poll_votes_insert" on public.trip_poll_votes for insert with check (
   auth.uid() = user_id
-  and exists (select 1 from public.trip_polls p where p.id = poll_id and can_access_trip(p.trip_id))
+  and exists (
+    select 1 from public.trip_polls p
+    where p.id = poll_id
+      and can_access_trip(p.trip_id)
+      and p.closes_at > now()   -- DB-level closed-poll enforcement
+  )
+);
+-- upsert on conflict triggers an UPDATE; add an explicit update policy with the same closes_at guard
+create policy "poll_votes_update" on public.trip_poll_votes for update using (
+  auth.uid() = user_id
+  and exists (
+    select 1 from public.trip_polls p
+    where p.id = poll_id and p.closes_at > now()
+  )
 );
 create policy "poll_votes_delete" on public.trip_poll_votes for delete using (auth.uid() = user_id);
 

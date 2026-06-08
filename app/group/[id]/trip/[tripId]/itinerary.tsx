@@ -55,7 +55,8 @@ export default function ItineraryScreen() {
 
   function buildTimestamp(dateStr: string, timeStr: string) {
     if (!dateStr) return null;
-    const t = timeStr.match(/^(\d{1,2}):(\d{2})$/) ? timeStr : '00:00';
+    const match = timeStr.match(/^(\d{1,2}):(\d{1,2})$/);
+    const t = match ? `${match[1].padStart(2, '0')}:${match[2].padStart(2, '0')}` : '00:00';
     return new Date(`${dateStr}T${t}:00`).toISOString();
   }
 

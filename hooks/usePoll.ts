@@ -19,10 +19,11 @@ export function useTripPolls(tripId: string) {
       if (!polls || polls.length === 0) return [] as TripPoll[];
 
       const pollIds = polls.map((p) => p.id);
-      const { data: votes } = await supabase
+      const { data: votes, error: votesError } = await supabase
         .from('trip_poll_votes')
         .select('poll_id, option_id, user_id')
         .in('poll_id', pollIds);
+      if (votesError) throw votesError;
 
       return polls.map((poll) => ({
         ...poll,
@@ -46,10 +47,11 @@ export function useCreatePoll() {
       closes_at: string;
       options: string[];
     }) => {
+      if (!user) throw new Error('Not signed in');
       const { options, ...pollData } = input;
       const { data: poll, error } = await supabase
         .from('trip_polls')
-        .insert({ ...pollData, created_by: user!.id })
+        .insert({ ...pollData, created_by: user.id })
         .select()
         .single();
       if (error) throw error;
@@ -57,7 +59,10 @@ export function useCreatePoll() {
       const { error: optErr } = await supabase
         .from('trip_poll_options')
         .insert(options.map((label) => ({ poll_id: poll.id, label })));
-      if (optErr) throw optErr;
+      if (optErr) {
+        await supabase.from('trip_polls').delete().eq('id', poll.id);
+        throw optErr;
+      }
 
       return poll;
     },
@@ -73,8 +78,9 @@ export function useVote() {
 
   return useMutation({
     mutationFn: async (input: { poll_id: string; option_id: string; trip_id: string }) => {
+      if (!user) throw new Error('Not signed in');
       const { error } = await supabase.from('trip_poll_votes').upsert(
-        { poll_id: input.poll_id, option_id: input.option_id, user_id: user!.id },
+        { poll_id: input.poll_id, option_id: input.option_id, user_id: user.id },
         { onConflict: 'poll_id,user_id' }
       );
       if (error) throw error;

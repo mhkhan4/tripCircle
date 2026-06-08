@@ -31,15 +31,15 @@ function voteCountForOption(poll: TripPoll, optionId: string) {
   return poll.votes.filter((v) => v.option_id === optionId).length;
 }
 
-function winningOptionId(poll: TripPoll) {
-  if (!poll.options.length) return null;
-  let max = -1;
-  let winner = poll.options[0].id;
-  for (const opt of poll.options) {
-    const count = voteCountForOption(poll, opt.id);
-    if (count > max) { max = count; winner = opt.id; }
-  }
-  return max > 0 ? winner : null;
+function winningOptionId(poll: TripPoll): string | null {
+  if (!poll.options.length || !poll.votes.length) return null;
+  const counts = new Map<string, number>();
+  for (const opt of poll.options) counts.set(opt.id, 0);
+  for (const v of poll.votes) counts.set(v.option_id, (counts.get(v.option_id) ?? 0) + 1);
+  const maxCount = Math.max(...counts.values());
+  if (maxCount === 0) return null;
+  const leaders = [...counts.entries()].filter(([, c]) => c === maxCount);
+  return leaders.length === 1 ? leaders[0][0] : null; // null on tie — no false winner
 }
 
 export default function PollsScreen() {
@@ -268,7 +268,7 @@ export default function PollsScreen() {
                     className="mb-2 rounded-xl border border-gray-200 bg-slate-50 px-4 py-3 text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                   />
                 ))}
-                {options.length < 4 && (
+                {options.filter(Boolean).length < 4 && (
                   <TouchableOpacity onPress={() => setOptions([...options, ''])} className="mb-4 flex-row items-center gap-1">
                     <Ionicons name="add-circle-outline" size={18} color="#2563EB" />
                     <Text className="text-sm font-semibold text-primary">Add option</Text>
