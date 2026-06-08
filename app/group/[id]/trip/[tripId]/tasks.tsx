@@ -9,7 +9,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { format } from 'date-fns';
 import { Calendar } from 'react-native-calendars';
 import { useTripTasks, useCreateTask, useCompleteTask, useDeleteTask } from '../../../../../hooks/useTask';
-import { useTripMembers } from '../../../../../hooks/useTrip';
+import { useTrip, useTripMembers } from '../../../../../hooks/useTrip';
 import { useAppStore } from '../../../../../store/useAppStore';
 import type { TaskCategory, TripTask } from '../../../../../types';
 
@@ -30,7 +30,10 @@ export default function TasksScreen() {
   const { id: groupId, tripId } = useLocalSearchParams<{ id: string; tripId: string }>();
   const { user } = useAppStore();
   const { data: tasks, isLoading } = useTripTasks(tripId);
+  const { data: trip } = useTrip(tripId);
   const { data: tripMembers } = useTripMembers(tripId);
+  const myMembership = tripMembers?.find((m) => m.user_id === user?.id);
+  const isTripAdmin = trip?.created_by === user?.id || myMembership?.role === 'admin';
   const createTask = useCreateTask();
   const completeTask = useCompleteTask();
   const deleteTask = useDeleteTask();
@@ -99,7 +102,7 @@ export default function TasksScreen() {
   function TaskRow({ task }: { task: TripTask }) {
     const meta = catMeta(task.category);
     const isComplete = !!task.completed_at;
-    const canDelete = task.created_by === user?.id;
+    const canDelete = task.created_by === user?.id || isTripAdmin;
 
     return (
       <View className={`mb-2 flex-row items-center gap-3 rounded-xl border px-4 py-3 ${isComplete ? 'border-gray-100 bg-gray-50 dark:border-gray-700 dark:bg-gray-800/50' : 'border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800'}`}>

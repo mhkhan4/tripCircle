@@ -91,7 +91,7 @@ export function useCreateSoloTrip() {
         .select()
         .single();
       if (error) throw error;
-      await supabase.from('trip_members').insert({ trip_id: data.id, user_id: user!.id });
+      await supabase.from('trip_members').insert({ trip_id: data.id, user_id: user!.id, role: 'admin' });
       return data as Trip;
     },
     onSuccess: () => {
@@ -113,8 +113,8 @@ export function useCreateTrip() {
         .select()
         .single();
       if (error) throw error;
-      // Auto-join creator into trip_members
-      await supabase.from('trip_members').insert({ trip_id: data.id, user_id: user!.id });
+      // Auto-join creator into trip_members as admin
+      await supabase.from('trip_members').insert({ trip_id: data.id, user_id: user!.id, role: 'admin' });
       return data;
     },
     onSuccess: (data) => {
@@ -198,6 +198,24 @@ export function useRemoveTripMember() {
       const { error } = await supabase
         .from('trip_members')
         .delete()
+        .eq('id', membershipId);
+      if (error) throw error;
+      return { tripId };
+    },
+    onSuccess: ({ tripId }) => {
+      queryClient.invalidateQueries({ queryKey: ['trip-members', tripId] });
+    },
+  });
+}
+
+export function useUpdateTripMemberRole() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ membershipId, tripId, role }: { membershipId: string; tripId: string; role: 'admin' | 'member' }) => {
+      const { error } = await supabase
+        .from('trip_members')
+        .update({ role })
         .eq('id', membershipId);
       if (error) throw error;
       return { tripId };

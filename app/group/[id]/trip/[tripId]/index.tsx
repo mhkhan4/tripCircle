@@ -3,7 +3,7 @@ import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { format, differenceInDays, isPast } from 'date-fns';
-import { useTrip, useTripMembers, useJoinTrip, useLeaveTrip, useRemoveTripMember } from '../../../../../hooks/useTrip';
+import { useTrip, useTripMembers, useJoinTrip, useLeaveTrip, useRemoveTripMember, useUpdateTripMemberRole } from '../../../../../hooks/useTrip';
 import { useBudgetSummary } from '../../../../../hooks/useBudget';
 import { useTripPolls } from '../../../../../hooks/usePoll';
 import { useTripTasks } from '../../../../../hooks/useTask';
@@ -35,6 +35,7 @@ export default function TripScreen() {
   const joinTrip = useJoinTrip();
   const leaveTrip = useLeaveTrip();
   const removeMember = useRemoveTripMember();
+  const updateMemberRole = useUpdateTripMemberRole();
 
   if (!trip) return null;
 
@@ -42,6 +43,8 @@ export default function TripScreen() {
   const color = STATUS_COLOR[trip.status];
   const isMember = tripMembers?.some((m) => m.user_id === user?.id) ?? false;
   const isCreator = trip.created_by === user?.id;
+  const myMembership = tripMembers?.find((m) => m.user_id === user?.id);
+  const isTripAdmin = isCreator || myMembership?.role === 'admin';
 
   async function handleJoin() {
     try {
@@ -71,6 +74,14 @@ export default function TripScreen() {
         },
       ],
     );
+  }
+
+  async function handleToggleAdmin(membershipId: string, currentRole: 'admin' | 'member') {
+    try {
+      await updateMemberRole.mutateAsync({ membershipId, tripId, role: currentRole === 'admin' ? 'member' : 'admin' });
+    } catch (e: any) {
+      Alert.alert('Error', e.message);
+    }
   }
 
   async function handleRemoveMember(membershipId: string) {
@@ -241,8 +252,10 @@ export default function TripScreen() {
                   key={m.id}
                   member={m}
                   isCurrentUser={m.user_id === user?.id}
-                  currentUserIsCreator={isCreator}
-                  onRemove={isCreator ? handleRemoveMember : undefined}
+                  currentUserIsAdmin={isTripAdmin}
+                  isCreator={m.user_id === trip.created_by}
+                  onRemove={isTripAdmin ? handleRemoveMember : undefined}
+                  onToggleAdmin={isTripAdmin ? handleToggleAdmin : undefined}
                 />
               ))}
               {!isCreator && (

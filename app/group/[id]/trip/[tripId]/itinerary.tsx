@@ -9,6 +9,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Calendar } from 'react-native-calendars';
 import { format } from 'date-fns';
 import { useTripItinerary, useAddItineraryEntry, useDeleteItineraryEntry } from '../../../../../hooks/useItinerary';
+import { useTrip, useTripMembers } from '../../../../../hooks/useTrip';
 import { useAppStore } from '../../../../../store/useAppStore';
 import type { ItineraryEntryType, ItineraryEntry } from '../../../../../types';
 
@@ -29,6 +30,10 @@ export default function ItineraryScreen() {
   const { id: groupId, tripId } = useLocalSearchParams<{ id: string; tripId: string }>();
   const { user } = useAppStore();
   const { data: entries, isLoading } = useTripItinerary(tripId);
+  const { data: trip } = useTrip(tripId);
+  const { data: tripMembers } = useTripMembers(tripId);
+  const myMembership = tripMembers?.find((m) => m.user_id === user?.id);
+  const isTripAdmin = trip?.created_by === user?.id || myMembership?.role === 'admin';
   const addEntry = useAddItineraryEntry();
   const deleteEntry = useDeleteItineraryEntry();
 
@@ -110,7 +115,7 @@ export default function ItineraryScreen() {
 
   function EntryCard({ entry }: { entry: ItineraryEntry }) {
     const meta = typeMeta(entry.entry_type);
-    const canDelete = entry.created_by === user?.id;
+    const canDelete = entry.created_by === user?.id || isTripAdmin;
 
     return (
       <View className="mb-3 rounded-2xl bg-white p-4 shadow-sm dark:bg-gray-800" style={{ shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 }}>

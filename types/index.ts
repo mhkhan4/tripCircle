@@ -41,6 +41,7 @@ export type TripMember = {
   id: string;
   trip_id: string;
   user_id: string;
+  role: 'admin' | 'member';
   joined_at: string;
 };
 

@@ -90,6 +90,7 @@ export default function SoloTasksScreen() {
   function TaskRow({ task }: { task: TripTask }) {
     const meta = catMeta(task.category);
     const isComplete = !!task.completed_at;
+    const canDelete = task.created_by === user?.id;
 
     return (
       <View className={`mb-2 flex-row items-center gap-3 rounded-xl border px-4 py-3 ${isComplete ? 'border-gray-100 bg-gray-50 dark:border-gray-700 dark:bg-gray-800/50' : 'border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800'}`}>
@@ -112,9 +113,11 @@ export default function SoloTasksScreen() {
           )}
         </View>
 
-        <TouchableOpacity onPress={() => handleDelete(task)} className="p-1">
-          <Ionicons name="close-circle-outline" size={18} color="#CBD5E1" />
-        </TouchableOpacity>
+        {canDelete && (
+          <TouchableOpacity onPress={() => handleDelete(task)} className="p-1">
+            <Ionicons name="close-circle-outline" size={18} color="#CBD5E1" />
+          </TouchableOpacity>
+        )}
       </View>
     );
   }

@@ -466,7 +466,7 @@ alter table public.trip_poll_votes enable row level security;
 
 create policy "polls_read" on public.trip_polls for select using (can_access_trip(trip_id));
 create policy "polls_insert" on public.trip_polls for insert with check (can_access_trip(trip_id) and auth.uid() = created_by);
-create policy "polls_delete" on public.trip_polls for delete using (auth.uid() = created_by);
+create policy "polls_delete" on public.trip_polls for delete using (auth.uid() = created_by or is_trip_admin(trip_id));
 
 create policy "poll_options_read" on public.trip_poll_options for select using (
   exists (select 1 from public.trip_polls p where p.id = poll_id and can_access_trip(p.trip_id))
@@ -516,7 +516,7 @@ alter table public.trip_tasks enable row level security;
 create policy "tasks_read" on public.trip_tasks for select using (can_access_trip(trip_id));
 create policy "tasks_insert" on public.trip_tasks for insert with check (can_access_trip(trip_id) and auth.uid() = created_by);
 create policy "tasks_update" on public.trip_tasks for update using (can_access_trip(trip_id));
-create policy "tasks_delete" on public.trip_tasks for delete using (auth.uid() = created_by);
+create policy "tasks_delete" on public.trip_tasks for delete using (auth.uid() = created_by or is_trip_admin(trip_id));
 
 -- Trip itinerary
 create table if not exists public.trip_itinerary (
@@ -538,4 +538,4 @@ alter table public.trip_itinerary enable row level security;
 create policy "itinerary_read" on public.trip_itinerary for select using (can_access_trip(trip_id));
 create policy "itinerary_insert" on public.trip_itinerary for insert with check (can_access_trip(trip_id) and auth.uid() = created_by);
 create policy "itinerary_update" on public.trip_itinerary for update using (can_access_trip(trip_id) and auth.uid() = created_by);
-create policy "itinerary_delete" on public.trip_itinerary for delete using (auth.uid() = created_by);
+create policy "itinerary_delete" on public.trip_itinerary for delete using (auth.uid() = created_by or is_trip_admin(trip_id));

@@ -104,6 +104,7 @@ export default function SoloItineraryScreen() {
 
   function EntryCard({ entry }: { entry: ItineraryEntry }) {
     const meta = typeMeta(entry.entry_type);
+    const canDelete = entry.created_by === user?.id;
 
     return (
       <View className="mb-3 rounded-2xl bg-white p-4 shadow-sm dark:bg-gray-800" style={{ shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 }}>
@@ -134,9 +135,11 @@ export default function SoloItineraryScreen() {
               </TouchableOpacity>
             )}
           </View>
-          <TouchableOpacity onPress={() => handleDelete(entry)} className="p-1">
-            <Ionicons name="trash-outline" size={16} color="#CBD5E1" />
-          </TouchableOpacity>
+          {canDelete && (
+            <TouchableOpacity onPress={() => handleDelete(entry)} className="p-1">
+              <Ionicons name="trash-outline" size={16} color="#CBD5E1" />
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     );

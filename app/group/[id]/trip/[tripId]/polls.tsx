@@ -9,6 +9,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Calendar } from 'react-native-calendars';
 import { format, isPast, differenceInHours, differenceInDays } from 'date-fns';
 import { useTripPolls, useCreatePoll, useVote, useDeletePoll } from '../../../../../hooks/usePoll';
+import { useTripMembers, useTrip } from '../../../../../hooks/useTrip';
 import { useAppStore } from '../../../../../store/useAppStore';
 import type { PollType, TripPoll } from '../../../../../types';
 
@@ -46,6 +47,10 @@ export default function PollsScreen() {
   const { id: groupId, tripId } = useLocalSearchParams<{ id: string; tripId: string }>();
   const { user } = useAppStore();
   const { data: polls, isLoading } = useTripPolls(tripId);
+  const { data: trip } = useTrip(tripId);
+  const { data: tripMembers } = useTripMembers(tripId);
+  const myMembership = tripMembers?.find((m) => m.user_id === user?.id);
+  const isTripAdmin = trip?.created_by === user?.id || myMembership?.role === 'admin';
   const createPoll = useCreatePoll();
   const vote = useVote();
   const deletePoll = useDeletePoll();
@@ -151,7 +156,7 @@ export default function PollsScreen() {
                     </View>
                     <Text className="text-base font-bold text-gray-900 dark:text-white">{poll.question}</Text>
                   </View>
-                  {poll.created_by === user?.id && (
+                  {(poll.created_by === user?.id || isTripAdmin) && (
                     <TouchableOpacity onPress={() => handleDelete(poll)} className="ml-2 p-1">
                       <Ionicons name="trash-outline" size={16} color="#EF4444" />
                     </TouchableOpacity>
