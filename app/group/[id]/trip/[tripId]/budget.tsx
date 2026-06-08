@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { useGroup } from '../../../../../hooks/useGroup';
+import { useTrip } from '../../../../../hooks/useTrip';
 import { useBudget, useCreateBudget, useBudgetSummary, useMarkContributionPaid } from '../../../../../hooks/useBudget';
 import { useAppStore } from '../../../../../store/useAppStore';
 import { supabase } from '../../../../../lib/supabase';
@@ -14,13 +15,16 @@ export default function BudgetScreen() {
   const { id: groupId, tripId } = useLocalSearchParams<{ id: string; tripId: string }>();
   const { user } = useAppStore();
   const { data: group } = useGroup(groupId);
+  const { data: trip } = useTrip(tripId);
   const { data: budget } = useBudget(tripId);
   const { totalSpent, totalBudget, remaining, percentUsed } = useBudgetSummary(tripId);
   const createBudget = useCreateBudget();
   const markPaid = useMarkContributionPaid();
 
   const members = (group as any)?.group_members ?? [];
-  const isAdmin = members.some((m: any) => m.user_id === user?.id && m.role === 'admin');
+  const isAdmin =
+    trip?.created_by === user?.id ||
+    members.some((m: any) => m.user_id === user?.id && m.role === 'admin');
   const memberCount = Math.max(members.length, 1);
 
   const [amount, setAmount] = useState('');
