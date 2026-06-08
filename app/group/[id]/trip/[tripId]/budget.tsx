@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator, ScrollView, Modal } from 'react-native';
 import { useLocalSearchParams, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
@@ -26,6 +26,8 @@ export default function BudgetScreen() {
   const [amount, setAmount] = useState('');
   const [mode, setMode] = useState<BudgetMode>('total');
   const [sendingReminder, setSendingReminder] = useState(false);
+  const [markPaidTarget, setMarkPaidTarget] = useState<{ userId: string; name: string; share: number } | null>(null);
+  const [markPaidInput, setMarkPaidInput] = useState('');
 
   const enteredNum = parseFloat(amount) || 0;
   const computedTotal = mode === 'per_person' ? enteredNum * memberCount : enteredNum;
@@ -63,6 +65,19 @@ export default function BudgetScreen() {
     try {
       await createBudget.mutateAsync({ trip_id: tripId, total_amount: total, per_person_amount: perPerson });
       setAmount('');
+    } catch (e: any) {
+      Alert.alert('Error', e.message);
+    }
+  }
+
+  async function confirmMarkPaid() {
+    if (!markPaidTarget || !budget) return;
+    const num = parseFloat(markPaidInput);
+    if (isNaN(num) || num <= 0) return;
+    const { userId } = markPaidTarget;
+    setMarkPaidTarget(null);
+    try {
+      await markPaid.mutateAsync({ budget_id: budget.id, user_id: userId, paid_amount: num, trip_id: tripId });
     } catch (e: any) {
       Alert.alert('Error', e.message);
     }
@@ -181,23 +196,9 @@ export default function BudgetScreen() {
                 const share = budget.per_person_amount ?? totalBudget / memberCount;
                 const isPaid = contribution && contribution.paid_amount > 0;
 
-                function promptMarkPaid() {
-                  Alert.prompt(
-                    'Mark as Paid',
-                    `How much did ${m.user?.full_name ?? 'this member'} pay? (share: $${share.toFixed(2)})`,
-                    async (input) => {
-                      const num = parseFloat(input);
-                      if (isNaN(num) || num <= 0) return Alert.alert('Invalid amount');
-                      try {
-                        await markPaid.mutateAsync({ budget_id: budget!.id, user_id: m.user_id, paid_amount: num, trip_id: tripId });
-                      } catch (e: any) {
-                        Alert.alert('Error', e.message);
-                      }
-                    },
-                    'plain-text',
-                    share.toFixed(2),
-                    'decimal-pad',
-                  );
+                function openMarkPaid() {
+                  setMarkPaidTarget({ userId: m.user_id, name: m.user?.full_name ?? 'Member', share });
+                  setMarkPaidInput(share.toFixed(2));
                 }
 
                 return (
@@ -216,7 +217,7 @@ export default function BudgetScreen() {
                         <Ionicons name="checkmark-circle" size={16} color="#16a34a" />
                         <Text className="font-semibold text-green-600">Paid ${contribution!.paid_amount.toFixed(2)}</Text>
                         {isAdmin && (
-                          <TouchableOpacity onPress={promptMarkPaid} className="ml-1 p-1">
+                          <TouchableOpacity onPress={openMarkPaid} className="ml-1 p-1">
                             <Ionicons name="pencil" size={13} color="#94A3B8" />
                           </TouchableOpacity>
                         )}
@@ -227,7 +228,7 @@ export default function BudgetScreen() {
                           <Text className="text-xs font-semibold text-yellow-600 dark:text-yellow-400">Pending</Text>
                         </View>
                         {isAdmin && (
-                          <TouchableOpacity onPress={promptMarkPaid} className="rounded-full bg-green-100 p-1 dark:bg-green-900/30">
+                          <TouchableOpacity onPress={openMarkPaid} className="rounded-full bg-green-100 p-1 dark:bg-green-900/30">
                             <Ionicons name="checkmark" size={14} color="#16a34a" />
                           </TouchableOpacity>
                         )}
@@ -240,6 +241,40 @@ export default function BudgetScreen() {
           </>
         )}
       </ScrollView>
+
+      <Modal visible={!!markPaidTarget} animationType="fade" transparent>
+        <View className="flex-1 items-center justify-center bg-black/50 px-6">
+          <View className="w-full rounded-2xl bg-white p-6 dark:bg-gray-900">
+            <Text className="mb-1 text-lg font-bold text-gray-900 dark:text-white">Mark as Paid</Text>
+            <Text className="mb-4 text-sm text-gray-500 dark:text-gray-400">
+              How much did {markPaidTarget?.name} pay? (share: ${markPaidTarget?.share.toFixed(2)})
+            </Text>
+            <TextInput
+              value={markPaidInput}
+              onChangeText={setMarkPaidInput}
+              keyboardType="decimal-pad"
+              className="mb-6 rounded-xl border border-gray-200 bg-slate-50 px-4 py-3 text-xl font-bold text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+            />
+            <View className="flex-row gap-3">
+              <TouchableOpacity
+                onPress={() => setMarkPaidTarget(null)}
+                className="flex-1 items-center rounded-xl border border-gray-200 py-3 dark:border-gray-700"
+              >
+                <Text className="font-semibold text-gray-700 dark:text-gray-300">Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={confirmMarkPaid}
+                disabled={markPaid.isPending}
+                className="flex-1 items-center rounded-xl bg-green-500 py-3"
+              >
+                {markPaid.isPending
+                  ? <ActivityIndicator color="white" size="small" />
+                  : <Text className="font-bold text-white">Confirm</Text>}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
