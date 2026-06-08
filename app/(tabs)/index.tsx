@@ -126,7 +126,6 @@ export default function HomeScreen() {
   const isEmpty = !hasGroups && !hasSoloTrips;
 
   const firstName = user?.full_name?.split(' ')[0] ?? 'Traveler';
-  const initial = firstName[0]?.toUpperCase() ?? 'T';
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50 dark:bg-gray-950">
@@ -134,31 +133,20 @@ export default function HomeScreen() {
       {/* ── Header ── */}
       <View
         className="border-b border-slate-100 dark:border-slate-800"
-        style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 13 }}
+        style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 10 }}
       >
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 11 }}>
-          <View
-            style={{
-              width: 42,
-              height: 42,
-              borderRadius: 13,
-              backgroundColor: '#2563eb',
-              alignItems: 'center',
-              justifyContent: 'center',
-              shadowColor: '#2563eb',
-              shadowOpacity: 0.4,
-              shadowOffset: { width: 0, height: 3 },
-              shadowRadius: 8,
-              elevation: 4,
-            }}
-          >
-            <Text style={{ color: 'white', fontWeight: '800', fontSize: 17 }}>{initial}</Text>
-          </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+          <Image
+            source={require('../../assets/logo.png')}
+            style={{ width: 72, height: 52 }}
+            resizeMode="contain"
+          />
+          <View style={{ height: 32, width: 1, backgroundColor: isDark ? '#1e293b' : '#e2e8f0' }} />
           <View>
             <Text className="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
               Welcome back
             </Text>
-            <Text className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">
+            <Text className="text-lg font-extrabold tracking-tight text-slate-900 dark:text-slate-100">
               {firstName}
             </Text>
           </View>
@@ -301,54 +289,14 @@ export default function HomeScreen() {
           contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 32 }}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
           ListHeaderComponent={
-            <View style={{ marginBottom: 8 }}>
-              {/* Logo banner */}
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  backgroundColor: isDark ? '#0d1829' : '#eff6ff',
-                  borderRadius: 20,
-                  paddingVertical: 14,
-                  paddingHorizontal: 16,
-                  marginBottom: 24,
-                  borderWidth: 1,
-                  borderColor: isDark ? '#1a2744' : '#bfdbfe',
-                }}
-              >
-                <Image
-                  source={require('../../assets/logo.png')}
-                  style={{ width: 80, height: 58 }}
-                  resizeMode="contain"
-                />
-                <View style={{ flex: 1, marginLeft: 12 }}>
-                  <Text
-                    style={{
-                      fontWeight: '800',
-                      fontSize: 15,
-                      lineHeight: 22,
-                      color: isDark ? '#e2e8f0' : '#1e3a8a',
-                      letterSpacing: -0.2,
-                    }}
-                  >
-                    Your adventures{'\n'}await.
-                  </Text>
-                  <Text style={{ fontSize: 12, color: isDark ? '#475569' : '#64748b', marginTop: 3 }}>
-                    Keep planning, keep exploring.
-                  </Text>
-                </View>
+            hasGroups ? (
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                <View style={{ width: 3, height: 14, borderRadius: 2, backgroundColor: '#2563eb' }} />
+                <Text className="text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+                  Your Groups
+                </Text>
               </View>
-
-              {/* Section label */}
-              {hasGroups && (
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                  <View style={{ width: 3, height: 14, borderRadius: 2, backgroundColor: '#2563eb' }} />
-                  <Text className="text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
-                    Your Groups
-                  </Text>
-                </View>
-              )}
-            </View>
+            ) : null
           }
           ListFooterComponent={
             <View>
