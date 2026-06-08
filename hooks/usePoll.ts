@@ -96,8 +96,9 @@ export function useDeletePoll() {
 
   return useMutation({
     mutationFn: async ({ poll_id, trip_id }: { poll_id: string; trip_id: string }) => {
-      const { error } = await supabase.from('trip_polls').delete().eq('id', poll_id);
+      const { error, count } = await supabase.from('trip_polls').delete({ count: 'exact' }).eq('id', poll_id);
       if (error) throw error;
+      if (count === 0) throw new Error('Could not delete poll — permission denied or poll not found.');
       return { trip_id };
     },
     onSuccess: (_data, vars) => {
