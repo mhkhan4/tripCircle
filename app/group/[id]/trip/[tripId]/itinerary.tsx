@@ -89,17 +89,21 @@ export default function ItineraryScreen() {
     }
   }
 
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+
   function handleDelete(entry: ItineraryEntry) {
-    Alert.alert('Remove entry', 'Delete this itinerary entry?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete', style: 'destructive',
-        onPress: async () => {
-          try { await deleteEntry.mutateAsync({ entry_id: entry.id, trip_id: tripId }); }
-          catch (e: any) { Alert.alert('Error', e.message); }
-        },
-      },
-    ]);
+    setConfirmDeleteId(entry.id);
+  }
+
+  async function confirmDelete() {
+    const entry = entries?.find((e) => e.id === confirmDeleteId);
+    if (!entry) return;
+    setConfirmDeleteId(null);
+    try {
+      await deleteEntry.mutateAsync({ entry_id: entry.id, trip_id: tripId });
+    } catch (e: any) {
+      Alert.alert('Error', e.message);
+    }
   }
 
   // Group entries by date
@@ -208,6 +212,33 @@ export default function ItineraryScreen() {
           <Text className="font-bold text-white">Add Entry</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Delete confirmation modal */}
+      <Modal visible={!!confirmDeleteId} animationType="fade" transparent>
+        <View className="flex-1 items-center justify-center bg-black/50 px-6">
+          <View className="w-full rounded-2xl bg-white p-6 dark:bg-gray-900">
+            <Text className="mb-2 text-lg font-bold text-gray-900 dark:text-white">Delete entry?</Text>
+            <Text className="mb-6 text-sm text-gray-500 dark:text-gray-400">This itinerary entry will be permanently removed.</Text>
+            <View className="flex-row gap-3">
+              <TouchableOpacity
+                onPress={() => setConfirmDeleteId(null)}
+                className="flex-1 rounded-xl border border-gray-200 py-3 items-center dark:border-gray-700"
+              >
+                <Text className="font-semibold text-gray-700 dark:text-gray-300">Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={confirmDelete}
+                disabled={deleteEntry.isPending}
+                className="flex-1 rounded-xl bg-red-500 py-3 items-center"
+              >
+                {deleteEntry.isPending
+                  ? <ActivityIndicator color="white" size="small" />
+                  : <Text className="font-bold text-white">Delete</Text>}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
 
       {/* Create entry modal */}
       <Modal visible={showCreate} animationType="slide" transparent>

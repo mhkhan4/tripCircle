@@ -86,17 +86,21 @@ export default function TasksScreen() {
     }
   }
 
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+
   function handleDelete(task: TripTask) {
-    Alert.alert('Delete task', 'Remove this task?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete', style: 'destructive',
-        onPress: async () => {
-          try { await deleteTask.mutateAsync({ task_id: task.id, trip_id: tripId }); }
-          catch (e: any) { Alert.alert('Error', e.message); }
-        },
-      },
-    ]);
+    setConfirmDeleteId(task.id);
+  }
+
+  async function confirmDelete() {
+    const task = tasks?.find((t) => t.id === confirmDeleteId);
+    if (!task) return;
+    setConfirmDeleteId(null);
+    try {
+      await deleteTask.mutateAsync({ task_id: task.id, trip_id: tripId });
+    } catch (e: any) {
+      Alert.alert('Error', e.message);
+    }
   }
 
   function TaskRow({ task }: { task: TripTask }) {
@@ -199,6 +203,33 @@ export default function TasksScreen() {
           <Text className="font-bold text-white">Add Task</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Delete confirmation modal */}
+      <Modal visible={!!confirmDeleteId} animationType="fade" transparent>
+        <View className="flex-1 items-center justify-center bg-black/50 px-6">
+          <View className="w-full rounded-2xl bg-white p-6 dark:bg-gray-900">
+            <Text className="mb-2 text-lg font-bold text-gray-900 dark:text-white">Delete task?</Text>
+            <Text className="mb-6 text-sm text-gray-500 dark:text-gray-400">This task will be permanently removed.</Text>
+            <View className="flex-row gap-3">
+              <TouchableOpacity
+                onPress={() => setConfirmDeleteId(null)}
+                className="flex-1 rounded-xl border border-gray-200 py-3 items-center dark:border-gray-700"
+              >
+                <Text className="font-semibold text-gray-700 dark:text-gray-300">Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={confirmDelete}
+                disabled={deleteTask.isPending}
+                className="flex-1 rounded-xl bg-red-500 py-3 items-center"
+              >
+                {deleteTask.isPending
+                  ? <ActivityIndicator color="white" size="small" />
+                  : <Text className="font-bold text-white">Delete</Text>}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
 
       {/* Create task modal */}
       <Modal visible={showCreate} animationType="slide" transparent>
