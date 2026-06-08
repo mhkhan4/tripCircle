@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useGroup } from '../../../../../hooks/useGroup';
 import { useBudget, useCreateBudget, useBudgetSummary, useMarkContributionPaid } from '../../../../../hooks/useBudget';
 import { useAppStore } from '../../../../../store/useAppStore';
+import { supabase } from '../../../../../lib/supabase';
 
 type BudgetMode = 'total' | 'per_person';
 
@@ -24,10 +25,35 @@ export default function BudgetScreen() {
 
   const [amount, setAmount] = useState('');
   const [mode, setMode] = useState<BudgetMode>('total');
+  const [sendingReminder, setSendingReminder] = useState(false);
 
   const enteredNum = parseFloat(amount) || 0;
   const computedTotal = mode === 'per_person' ? enteredNum * memberCount : enteredNum;
   const computedPerPerson = mode === 'total' ? enteredNum / memberCount : enteredNum;
+
+  async function handleSendReminder() {
+    if (!budget) return;
+    const unpaid = members.filter((m: any) => {
+      const c = budget.budget_contributions?.find((c: any) => c.user_id === m.user_id);
+      return !c || c.paid_amount === 0;
+    });
+    if (unpaid.length === 0) return Alert.alert('All paid!', 'Everyone has paid their contribution.');
+    const names = unpaid.map((m: any) => m.user?.full_name?.split(' ')[0] ?? 'Member').join(', ');
+    setSendingReminder(true);
+    try {
+      await supabase.from('messages').insert({
+        group_id: groupId,
+        trip_id: tripId,
+        sender_id: user!.id,
+        content: `Payment reminder: ${names} ${unpaid.length === 1 ? 'hasn\'t' : 'haven\'t'} paid their contribution yet. Please pay before the trip!`,
+      });
+      Alert.alert('Reminder sent', 'A message was posted in the trip chat.');
+    } catch (e: any) {
+      Alert.alert('Error', e.message);
+    } finally {
+      setSendingReminder(false);
+    }
+  }
 
   async function handleSetBudget() {
     const num = parseFloat(amount);
@@ -135,7 +161,21 @@ export default function BudgetScreen() {
             </View>
 
             <View className="rounded-2xl bg-white p-5 shadow-sm dark:bg-gray-800" style={{ shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 }}>
-              <Text className="mb-3 text-base font-bold text-gray-900 dark:text-white">Member Contributions</Text>
+              <View className="mb-3 flex-row items-center justify-between">
+                <Text className="text-base font-bold text-gray-900 dark:text-white">Member Contributions</Text>
+                {isAdmin && (
+                  <TouchableOpacity
+                    onPress={handleSendReminder}
+                    disabled={sendingReminder}
+                    className="flex-row items-center gap-1 rounded-full bg-amber-50 px-3 py-1.5 dark:bg-amber-900/20"
+                  >
+                    {sendingReminder
+                      ? <ActivityIndicator size="small" color="#D97706" />
+                      : <Ionicons name="notifications-outline" size={14} color="#D97706" />}
+                    <Text className="text-xs font-semibold text-amber-600 dark:text-amber-400">Remind</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
               {members.map((m: any) => {
                 const contribution = budget?.budget_contributions?.find((c: any) => c.user_id === m.user_id);
                 const share = budget.per_person_amount ?? totalBudget / memberCount;

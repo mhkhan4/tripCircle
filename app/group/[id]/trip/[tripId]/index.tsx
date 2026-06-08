@@ -2,9 +2,12 @@ import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { format, differenceInDays } from 'date-fns';
+import { format, differenceInDays, isPast } from 'date-fns';
 import { useTrip, useTripMembers, useJoinTrip, useLeaveTrip, useRemoveTripMember } from '../../../../../hooks/useTrip';
 import { useBudgetSummary } from '../../../../../hooks/useBudget';
+import { useTripPolls } from '../../../../../hooks/usePoll';
+import { useTripTasks } from '../../../../../hooks/useTask';
+import { useTripItinerary } from '../../../../../hooks/useItinerary';
 import { useAppStore } from '../../../../../store/useAppStore';
 import TripMemberRow from '../../../../../components/TripMemberRow';
 
@@ -22,6 +25,13 @@ export default function TripScreen() {
   const { data: trip } = useTrip(tripId);
   const { data: tripMembers } = useTripMembers(tripId);
   const { totalSpent, totalBudget, remaining, percentUsed, byCategory } = useBudgetSummary(tripId);
+  const { data: polls } = useTripPolls(tripId);
+  const { data: tasks } = useTripTasks(tripId);
+  const { data: itinerary } = useTripItinerary(tripId);
+
+  const openPollCount = polls?.filter((p) => !isPast(new Date(p.closes_at))).length ?? 0;
+  const pendingTaskCount = tasks?.filter((t) => !t.completed_at).length ?? 0;
+  const itineraryCount = itinerary?.length ?? 0;
   const joinTrip = useJoinTrip();
   const leaveTrip = useLeaveTrip();
   const removeMember = useRemoveTripMember();
@@ -169,6 +179,53 @@ export default function TripScreen() {
             <Ionicons name="chatbubbles-outline" size={24} color="#7C3AED" />
             <Text className="mt-2 font-semibold text-gray-800 dark:text-white">Trip Chat</Text>
             <Text className="text-sm text-gray-400">Discuss this trip</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Polls · Tasks · Itinerary */}
+        <View className="mb-4 flex-row gap-3">
+          <TouchableOpacity
+            onPress={() => router.push(`/group/${groupId}/trip/${tripId}/polls`)}
+            className="flex-1 rounded-2xl bg-white p-4 shadow-sm dark:bg-gray-800"
+            style={{ shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 }}
+          >
+            <View className="flex-row items-center justify-between">
+              <Ionicons name="stats-chart-outline" size={24} color="#F59E0B" />
+              {openPollCount > 0 && (
+                <View className="rounded-full bg-amber-100 px-2 py-0.5">
+                  <Text className="text-xs font-bold text-amber-600">{openPollCount}</Text>
+                </View>
+              )}
+            </View>
+            <Text className="mt-2 font-semibold text-gray-800 dark:text-white">Polls</Text>
+            <Text className="text-sm text-gray-400">{openPollCount > 0 ? `${openPollCount} open` : 'Vote together'}</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => router.push(`/group/${groupId}/trip/${tripId}/tasks`)}
+            className="flex-1 rounded-2xl bg-white p-4 shadow-sm dark:bg-gray-800"
+            style={{ shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 }}
+          >
+            <View className="flex-row items-center justify-between">
+              <Ionicons name="checkbox-outline" size={24} color="#10B981" />
+              {pendingTaskCount > 0 && (
+                <View className="rounded-full bg-green-100 px-2 py-0.5">
+                  <Text className="text-xs font-bold text-green-600">{pendingTaskCount}</Text>
+                </View>
+              )}
+            </View>
+            <Text className="mt-2 font-semibold text-gray-800 dark:text-white">Tasks</Text>
+            <Text className="text-sm text-gray-400">{pendingTaskCount > 0 ? `${pendingTaskCount} to do` : 'Plan together'}</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => router.push(`/group/${groupId}/trip/${tripId}/itinerary`)}
+            className="flex-1 rounded-2xl bg-white p-4 shadow-sm dark:bg-gray-800"
+            style={{ shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 }}
+          >
+            <Ionicons name="map-outline" size={24} color="#EF4444" />
+            <Text className="mt-2 font-semibold text-gray-800 dark:text-white">Itinerary</Text>
+            <Text className="text-sm text-gray-400">{itineraryCount > 0 ? `${itineraryCount} entries` : 'Bookings & plans'}</Text>
           </TouchableOpacity>
         </View>
 

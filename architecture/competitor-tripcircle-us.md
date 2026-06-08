@@ -39,15 +39,14 @@ This document maps their validated research to specific features we should imple
 | Real-time chat (group + trip level) | ✅ Live | ❌ Not mentioned |
 | Trip membership (opt-in per trip) | ✅ Live | ❌ Not mentioned |
 
-### Where They Have an Edge (What We're Missing)
+### Where They Had an Edge (Now Built — Phase 11)
 | Feature | Us | Them |
 |---------|-----|------|
-| Destination/date/budget voting polls | ❌ Missing | ✅ Core feature |
-| **Deadline-driven polls** (auto-resolve) | ❌ Missing | ✅ Core differentiator |
-| Decision history log | ❌ Missing | ✅ Listed |
-| Planning task assignment across members | ❌ Missing | Implied |
-| Automated payment reminders (push) | ❌ Missing (Phase 7) | ✅ Listed |
-| Centralized booking/itinerary repository | ❌ Missing | ✅ Listed |
+| Destination/date/budget voting polls | ✅ Built | ✅ Core feature |
+| **Deadline-driven polls** (auto-close) | ✅ Built | ✅ Core differentiator |
+| Planning task assignment across members | ✅ Built | Implied |
+| Payment reminders (posted to trip chat) | ✅ Built | ✅ Listed |
+| Centralized booking/itinerary repository | ✅ Built | ✅ Listed |
 
 ---
 

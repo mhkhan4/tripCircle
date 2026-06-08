@@ -127,6 +127,11 @@ User opens chat screen
 | expenses              | id, trip_id, amount, category, paid_by, receipt_url, ocr_raw                     |
 | expense_splits        | expense_id, user_id, share_amount, is_settled                                    |
 | messages              | id, group_id, trip_id (nullable), sender_id, content                             |
+| trip_polls            | id, trip_id, created_by, question, poll_type, closes_at, resolved_option_id      |
+| trip_poll_options     | id, poll_id, label                                                                |
+| trip_poll_votes       | poll_id, user_id, option_id — primary key(poll_id, user_id) (one vote per person)|
+| trip_tasks            | id, trip_id, created_by, title, category, assigned_to, due_date, completed_at    |
+| trip_itinerary        | id, trip_id, created_by, entry_type, title, starts_at, ends_at, confirmation_number, link, notes |
 
 ### Row Level Security Model
 - All tables protected by RLS
@@ -213,3 +218,7 @@ npx expo start
 | 10    | Request-to-join flow         | Done        |
 | 10    | Admin approve/reject requests| Done        |
 | 10    | Solo trip planning           | Done        |
+| 11    | Trip polls with deadlines    | Done        |
+| 11    | Trip task assignment         | Done        |
+| 11    | Trip itinerary / bookings    | Done        |
+| 11    | Payment reminders (in-chat)  | Done        |

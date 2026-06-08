@@ -134,3 +134,70 @@ export type OcrResult = {
   category: ExpenseCategory | null;
   raw: string;
 };
+
+// ── Polls ────────────────────────────────────────────────────────────────────
+
+export type PollType = 'destination' | 'date' | 'activity' | 'custom';
+
+export type TripPollOption = {
+  id: string;
+  poll_id: string;
+  label: string;
+};
+
+export type TripPollVote = {
+  poll_id: string;
+  user_id: string;
+  option_id: string;
+  voted_at: string;
+};
+
+export type TripPoll = {
+  id: string;
+  trip_id: string;
+  created_by: string;
+  question: string;
+  poll_type: PollType;
+  closes_at: string;
+  resolved_option_id: string | null;
+  created_at: string;
+  options: TripPollOption[];
+  votes: TripPollVote[];
+  myVote: string | null;
+};
+
+// ── Tasks ────────────────────────────────────────────────────────────────────
+
+export type TaskCategory = 'flights' | 'hotel' | 'activities' | 'transport' | 'packing' | 'other';
+
+export type TripTask = {
+  id: string;
+  trip_id: string;
+  created_by: string;
+  title: string;
+  category: TaskCategory;
+  assigned_to: string | null;
+  due_date: string | null;
+  completed_at: string | null;
+  completed_by: string | null;
+  created_at: string;
+  assignee?: UserProfile;
+};
+
+// ── Itinerary ────────────────────────────────────────────────────────────────
+
+export type ItineraryEntryType = 'flight' | 'hotel' | 'activity' | 'restaurant' | 'transport' | 'other';
+
+export type ItineraryEntry = {
+  id: string;
+  trip_id: string;
+  created_by: string;
+  entry_type: ItineraryEntryType;
+  title: string;
+  starts_at: string | null;
+  ends_at: string | null;
+  confirmation_number: string | null;
+  link: string | null;
+  notes: string | null;
+  created_at: string;
+};
