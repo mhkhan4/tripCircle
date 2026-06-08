@@ -41,6 +41,7 @@ export default function ItineraryScreen() {
   const [link, setLink] = useState('');
   const [notes, setNotes] = useState('');
   const [showCalendar, setShowCalendar] = useState(false);
+  const [errors, setErrors] = useState<{ title?: string; submit?: string }>({});
 
   function resetForm() {
     setEntryType('flight');
@@ -51,6 +52,7 @@ export default function ItineraryScreen() {
     setLink('');
     setNotes('');
     setShowCalendar(false);
+    setErrors({});
   }
 
   function buildTimestamp(dateStr: string, timeStr: string) {
@@ -61,7 +63,10 @@ export default function ItineraryScreen() {
   }
 
   async function handleAdd() {
-    if (!title.trim()) return Alert.alert('Missing title', 'Enter a title for this entry.');
+    const newErrors: typeof errors = {};
+    if (!title.trim()) newErrors.title = 'Title is required.';
+    if (Object.keys(newErrors).length > 0) { setErrors(newErrors); return; }
+    setErrors({});
     try {
       await addEntry.mutateAsync({
         trip_id: tripId,
@@ -75,7 +80,7 @@ export default function ItineraryScreen() {
       setShowCreate(false);
       resetForm();
     } catch (e: any) {
-      Alert.alert('Error', e.message);
+      setErrors({ submit: e.message });
     }
   }
 
@@ -231,11 +236,12 @@ export default function ItineraryScreen() {
                 <Text className="mb-1 text-sm font-semibold text-gray-700 dark:text-gray-300">Title</Text>
                 <TextInput
                   value={title}
-                  onChangeText={setTitle}
+                  onChangeText={(v) => { setTitle(v); if (errors.title) setErrors((e) => ({ ...e, title: undefined })); }}
                   placeholder="e.g. United Airlines UA1234"
                   placeholderTextColor="#94A3B8"
-                  className="mb-4 rounded-xl border border-gray-200 bg-slate-50 px-4 py-3 text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                  className={`rounded-xl border bg-slate-50 px-4 py-3 text-gray-900 dark:bg-gray-800 dark:text-white ${errors.title ? 'mb-1 border-red-500' : 'mb-4 border-gray-200 dark:border-gray-700'}`}
                 />
+                {!!errors.title && <Text className="mb-3 text-xs text-red-500">{errors.title}</Text>}
 
                 <Text className="mb-1 text-sm font-semibold text-gray-700 dark:text-gray-300">Date (optional)</Text>
                 <TouchableOpacity
@@ -246,7 +252,7 @@ export default function ItineraryScreen() {
                   <Text className={date ? 'font-semibold text-gray-900 dark:text-white' : 'text-gray-400'}>
                     {date ? format(new Date(date + 'T12:00:00'), 'MMM d, yyyy') : 'Choose date'}
                   </Text>
-                  {date && (
+                  {!!date && (
                     <TouchableOpacity onPress={() => setDate('')} className="ml-auto">
                       <Ionicons name="close-circle" size={16} color="#94A3B8" />
                     </TouchableOpacity>
@@ -262,7 +268,7 @@ export default function ItineraryScreen() {
                   </View>
                 )}
 
-                {date && (
+                {!!date && (
                   <>
                     <Text className="mb-1 text-sm font-semibold text-gray-700 dark:text-gray-300">Time (optional, e.g. 14:30)</Text>
                     <TextInput
@@ -308,16 +314,18 @@ export default function ItineraryScreen() {
                   className="mb-4 rounded-xl border border-gray-200 bg-slate-50 px-4 py-3 text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                 />
 
-                <TouchableOpacity
-                  onPress={handleAdd}
-                  disabled={addEntry.isPending}
-                  className="mt-2 items-center rounded-2xl bg-primary py-4"
-                >
-                  {addEntry.isPending
-                    ? <ActivityIndicator color="white" />
-                    : <Text className="font-bold text-white">Add to Itinerary</Text>}
-                </TouchableOpacity>
               </ScrollView>
+
+              {!!errors.submit && <Text className="mb-2 text-center text-xs text-red-500">{errors.submit}</Text>}
+              <TouchableOpacity
+                onPress={handleAdd}
+                disabled={addEntry.isPending}
+                className="mt-1 items-center rounded-2xl bg-primary py-4"
+              >
+                {addEntry.isPending
+                  ? <ActivityIndicator color="white" />
+                  : <Text className="font-bold text-white">Add to Itinerary</Text>}
+              </TouchableOpacity>
             </View>
           </View>
         </KeyboardAvoidingView>
