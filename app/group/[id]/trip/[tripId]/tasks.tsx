@@ -263,7 +263,7 @@ export default function TasksScreen() {
                   <Text className={dueDate ? 'font-semibold text-gray-900 dark:text-white' : 'text-gray-400'}>
                     {dueDate ? format(new Date(dueDate + 'T12:00:00'), 'MMM d, yyyy') : 'No due date'}
                   </Text>
-                  {dueDate && (
+                  {!!dueDate && (
                     <TouchableOpacity onPress={() => setDueDate('')} className="ml-auto">
                       <Ionicons name="close-circle" size={16} color="#94A3B8" />
                     </TouchableOpacity>
