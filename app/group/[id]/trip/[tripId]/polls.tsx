@@ -233,7 +233,7 @@ export default function PollsScreen() {
                 </TouchableOpacity>
               </View>
 
-              <ScrollView showsVerticalScrollIndicator={false}>
+              <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 8 }}>
                 <Text className="mb-1 text-sm font-semibold text-gray-700 dark:text-gray-300">Question</Text>
                 <TextInput
                   value={question}
@@ -295,17 +295,17 @@ export default function PollsScreen() {
                     />
                   </View>
                 )}
-
-                <TouchableOpacity
-                  onPress={handleCreate}
-                  disabled={createPoll.isPending}
-                  className="mt-2 rounded-2xl bg-primary py-4 items-center"
-                >
-                  {createPoll.isPending
-                    ? <ActivityIndicator color="white" />
-                    : <Text className="font-bold text-white">Create Poll</Text>}
-                </TouchableOpacity>
               </ScrollView>
+
+              <TouchableOpacity
+                onPress={handleCreate}
+                disabled={createPoll.isPending}
+                className="mt-3 rounded-2xl bg-primary py-4 items-center"
+              >
+                {createPoll.isPending
+                  ? <ActivityIndicator color="white" />
+                  : <Text className="font-bold text-white">Create Poll</Text>}
+              </TouchableOpacity>
             </View>
           </View>
         </KeyboardAvoidingView>
