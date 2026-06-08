@@ -71,18 +71,26 @@ export default function LoginScreen() {
             {/* Google */}
             <TouchableOpacity
               onPress={signInWithGoogle}
+              activeOpacity={0.75}
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: 12,
-                backgroundColor: '#ffffff',
-                borderRadius: 16,
-                paddingVertical: 16,
+                backgroundColor: '#1e293b',
+                borderRadius: 14,
+                paddingVertical: 17,
+                borderWidth: 1,
+                borderColor: '#334155',
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.35,
+                shadowRadius: 10,
+                elevation: 6,
               }}
             >
-              <Ionicons name="logo-google" size={22} color="#EA4335" />
-              <Text style={{ fontSize: 16, fontWeight: '600', color: '#1e293b' }}>Continue with Google</Text>
+              <Ionicons name="logo-google" size={20} color="#EA4335" />
+              <Text style={{ fontSize: 16, fontWeight: '600', color: '#f1f5f9', letterSpacing: 0.3 }}>Continue with Google</Text>
             </TouchableOpacity>
 
           </View>
