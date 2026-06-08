@@ -56,6 +56,7 @@ export default function PollsScreen() {
   const [options, setOptions] = useState(['', '']);
   const [closesDate, setClosesDate] = useState('');
   const [showCalendar, setShowCalendar] = useState(false);
+  const [errors, setErrors] = useState<{ question?: string; options?: string; closesDate?: string; submit?: string }>({});
 
   function resetForm() {
     setQuestion('');
@@ -63,14 +64,18 @@ export default function PollsScreen() {
     setOptions(['', '']);
     setClosesDate('');
     setShowCalendar(false);
+    setErrors({});
   }
 
   async function handleCreate() {
     const trimmed = question.trim();
     const validOptions = options.map((o) => o.trim()).filter(Boolean);
-    if (!trimmed) return Alert.alert('Missing question', 'Enter a poll question.');
-    if (validOptions.length < 2) return Alert.alert('Need options', 'Add at least 2 options.');
-    if (!closesDate) return Alert.alert('Set deadline', 'Choose a closing date for the poll.');
+    const newErrors: typeof errors = {};
+    if (!trimmed) newErrors.question = 'Poll question is required.';
+    if (validOptions.length < 2) newErrors.options = 'Add at least 2 options.';
+    if (!closesDate) newErrors.closesDate = 'Choose a closing date.';
+    if (Object.keys(newErrors).length > 0) { setErrors(newErrors); return; }
+    setErrors({});
 
     try {
       await createPoll.mutateAsync({
@@ -83,7 +88,7 @@ export default function PollsScreen() {
       setShowCreate(false);
       resetForm();
     } catch (e: any) {
-      Alert.alert('Error', e.message);
+      setErrors({ submit: e.message });
     }
   }
 
@@ -237,11 +242,12 @@ export default function PollsScreen() {
                 <Text className="mb-1 text-sm font-semibold text-gray-700 dark:text-gray-300">Question</Text>
                 <TextInput
                   value={question}
-                  onChangeText={setQuestion}
+                  onChangeText={(v) => { setQuestion(v); if (errors.question) setErrors((e) => ({ ...e, question: undefined })); }}
                   placeholder="Where should we go?"
                   placeholderTextColor="#94A3B8"
-                  className="mb-4 rounded-xl border border-gray-200 bg-slate-50 px-4 py-3 text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                  className={`rounded-xl border bg-slate-50 px-4 py-3 text-gray-900 dark:bg-gray-800 dark:text-white ${errors.question ? 'mb-1 border-red-500' : 'mb-4 border-gray-200 dark:border-gray-700'}`}
                 />
+                {!!errors.question && <Text className="mb-3 text-xs text-red-500">{errors.question}</Text>}
 
                 <Text className="mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300">Type</Text>
                 <View className="mb-4 flex-row flex-wrap gap-2">
@@ -262,12 +268,16 @@ export default function PollsScreen() {
                   <TextInput
                     key={i}
                     value={opt}
-                    onChangeText={(v) => { const next = [...options]; next[i] = v; setOptions(next); }}
+                    onChangeText={(v) => {
+                      const next = [...options]; next[i] = v; setOptions(next);
+                      if (errors.options) setErrors((e) => ({ ...e, options: undefined }));
+                    }}
                     placeholder={`Option ${i + 1}`}
                     placeholderTextColor="#94A3B8"
-                    className="mb-2 rounded-xl border border-gray-200 bg-slate-50 px-4 py-3 text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                    className={`mb-2 rounded-xl border bg-slate-50 px-4 py-3 text-gray-900 dark:bg-gray-800 dark:text-white ${errors.options && !opt.trim() ? 'border-red-500' : 'border-gray-200 dark:border-gray-700'}`}
                   />
                 ))}
+                {!!errors.options && <Text className="mb-2 text-xs text-red-500">{errors.options}</Text>}
                 {options.filter(Boolean).length < 4 && (
                   <TouchableOpacity onPress={() => setOptions([...options, ''])} className="mb-4 flex-row items-center gap-1">
                     <Ionicons name="add-circle-outline" size={18} color="#2563EB" />
@@ -277,8 +287,8 @@ export default function PollsScreen() {
 
                 <Text className="mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300">Deadline</Text>
                 <TouchableOpacity
-                  onPress={() => setShowCalendar(!showCalendar)}
-                  className="mb-2 flex-row items-center gap-2 rounded-xl border border-gray-200 bg-slate-50 px-4 py-3 dark:border-gray-700 dark:bg-gray-800"
+                  onPress={() => { setShowCalendar(!showCalendar); if (errors.closesDate) setErrors((e) => ({ ...e, closesDate: undefined })); }}
+                  className={`mb-2 flex-row items-center gap-2 rounded-xl border bg-slate-50 px-4 py-3 dark:bg-gray-800 ${errors.closesDate ? 'border-red-500' : 'border-gray-200 dark:border-gray-700'}`}
                 >
                   <Ionicons name="calendar-outline" size={18} color="#2563EB" />
                   <Text className={closesDate ? 'font-semibold text-gray-900 dark:text-white' : 'text-gray-400'}>
@@ -286,10 +296,12 @@ export default function PollsScreen() {
                   </Text>
                 </TouchableOpacity>
 
+                {!!errors.closesDate && <Text className="mb-2 text-xs text-red-500">{errors.closesDate}</Text>}
+
                 {showCalendar && (
                   <View className="mb-4 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700">
                     <Calendar
-                      onDayPress={(day: { dateString: string }) => { setClosesDate(day.dateString); setShowCalendar(false); }}
+                      onDayPress={(day: { dateString: string }) => { setClosesDate(day.dateString); setShowCalendar(false); if (errors.closesDate) setErrors((e) => ({ ...e, closesDate: undefined })); }}
                       markedDates={closesDate ? { [closesDate]: { selected: true, selectedColor: '#2563EB' } } : {}}
                       minDate={new Date().toISOString().split('T')[0]}
                     />
@@ -297,6 +309,7 @@ export default function PollsScreen() {
                 )}
               </ScrollView>
 
+              {!!errors.submit && <Text className="mb-2 text-center text-xs text-red-500">{errors.submit}</Text>}
               <TouchableOpacity
                 onPress={handleCreate}
                 disabled={createPoll.isPending}

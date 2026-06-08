@@ -41,6 +41,7 @@ export default function TasksScreen() {
   const [assignedTo, setAssignedTo] = useState<string | null>(null);
   const [dueDate, setDueDate] = useState('');
   const [showCalendar, setShowCalendar] = useState(false);
+  const [errors, setErrors] = useState<{ title?: string; submit?: string }>({});
 
   const todo = tasks?.filter((t) => !t.completed_at) ?? [];
   const done = tasks?.filter((t) => !!t.completed_at) ?? [];
@@ -51,10 +52,14 @@ export default function TasksScreen() {
     setAssignedTo(null);
     setDueDate('');
     setShowCalendar(false);
+    setErrors({});
   }
 
   async function handleCreate() {
-    if (!title.trim()) return Alert.alert('Missing title', 'Enter a task title.');
+    const newErrors: typeof errors = {};
+    if (!title.trim()) newErrors.title = 'Task title is required.';
+    if (Object.keys(newErrors).length > 0) { setErrors(newErrors); return; }
+    setErrors({});
     try {
       await createTask.mutateAsync({
         trip_id: tripId,
@@ -66,7 +71,7 @@ export default function TasksScreen() {
       setShowCreate(false);
       resetForm();
     } catch (e: any) {
-      Alert.alert('Error', e.message);
+      setErrors({ submit: e.message });
     }
   }
 
@@ -207,11 +212,12 @@ export default function TasksScreen() {
               <ScrollView showsVerticalScrollIndicator={false}>
                 <TextInput
                   value={title}
-                  onChangeText={setTitle}
+                  onChangeText={(v) => { setTitle(v); if (errors.title) setErrors((e) => ({ ...e, title: undefined })); }}
                   placeholder="Task title"
                   placeholderTextColor="#94A3B8"
-                  className="mb-4 rounded-xl border border-gray-200 bg-slate-50 px-4 py-3 text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                  className={`rounded-xl border bg-slate-50 px-4 py-3 text-gray-900 dark:bg-gray-800 dark:text-white ${errors.title ? 'mb-1 border-red-500' : 'mb-4 border-gray-200 dark:border-gray-700'}`}
                 />
+                {!!errors.title && <Text className="mb-3 text-xs text-red-500">{errors.title}</Text>}
 
                 <Text className="mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300">Category</Text>
                 <View className="mb-4 flex-row flex-wrap gap-2">
@@ -280,16 +286,18 @@ export default function TasksScreen() {
                   </View>
                 )}
 
-                <TouchableOpacity
-                  onPress={handleCreate}
-                  disabled={createTask.isPending}
-                  className="mt-2 items-center rounded-2xl bg-primary py-4"
-                >
-                  {createTask.isPending
-                    ? <ActivityIndicator color="white" />
-                    : <Text className="font-bold text-white">Add Task</Text>}
-                </TouchableOpacity>
               </ScrollView>
+
+              {!!errors.submit && <Text className="mb-2 text-center text-xs text-red-500">{errors.submit}</Text>}
+              <TouchableOpacity
+                onPress={handleCreate}
+                disabled={createTask.isPending}
+                className="mt-1 items-center rounded-2xl bg-primary py-4"
+              >
+                {createTask.isPending
+                  ? <ActivityIndicator color="white" />
+                  : <Text className="font-bold text-white">Add Task</Text>}
+              </TouchableOpacity>
             </View>
           </View>
         </KeyboardAvoidingView>
