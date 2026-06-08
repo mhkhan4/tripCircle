@@ -58,23 +58,64 @@ export default function HomeScreen() {
   }
 
   function renderGroup({ item }: { item: Group }) {
+    const letter = item.name[0].toUpperCase();
+    const hues = ['#2563eb', '#7c3aed', '#0891b2', '#059669', '#d97706', '#dc2626'];
+    const color = hues[item.name.charCodeAt(0) % hues.length];
     return (
       <TouchableOpacity
         onPress={() => router.push(`/group/${item.id}`)}
-        className="mb-3 rounded-2xl bg-white p-4 dark:bg-gray-800"
-        style={{ shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 }}
+        activeOpacity={0.8}
+        className="mb-3 bg-white dark:bg-gray-900"
+        style={{
+          borderRadius: 20,
+          padding: 16,
+          borderWidth: 1,
+          borderColor: isDark ? '#1e293b' : '#f1f5f9',
+          shadowColor: '#000',
+          shadowOpacity: isDark ? 0.25 : 0.07,
+          shadowOffset: { width: 0, height: 4 },
+          shadowRadius: 12,
+          elevation: 3,
+        }}
       >
-        <View className="flex-row items-center gap-3">
-          <View className="h-12 w-12 items-center justify-center rounded-xl bg-primary">
-            <Text className="text-xl font-bold text-white">{item.name[0].toUpperCase()}</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+          <View
+            style={{
+              width: 50,
+              height: 50,
+              borderRadius: 15,
+              backgroundColor: color,
+              alignItems: 'center',
+              justifyContent: 'center',
+              shadowColor: color,
+              shadowOpacity: 0.4,
+              shadowOffset: { width: 0, height: 3 },
+              shadowRadius: 8,
+              elevation: 4,
+            }}
+          >
+            <Text style={{ fontSize: 22, fontWeight: '800', color: 'white' }}>{letter}</Text>
           </View>
-          <View className="flex-1">
-            <Text className="text-base font-bold text-gray-900 dark:text-white">{item.name}</Text>
+          <View style={{ flex: 1 }}>
+            <Text className="text-base font-bold text-slate-900 dark:text-slate-100">{item.name}</Text>
             {item.description ? (
-              <Text className="text-sm text-gray-500 dark:text-gray-400" numberOfLines={1}>{item.description}</Text>
-            ) : null}
+              <Text className="mt-0.5 text-sm text-slate-500 dark:text-slate-400" numberOfLines={1}>{item.description}</Text>
+            ) : (
+              <Text className="mt-0.5 text-sm text-slate-400 dark:text-slate-500">Tap to open</Text>
+            )}
           </View>
-          <Ionicons name="chevron-forward" size={18} color="#94A3B8" />
+          <View
+            style={{
+              width: 30,
+              height: 30,
+              borderRadius: 9,
+              backgroundColor: isDark ? '#1e293b' : '#f1f5f9',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Ionicons name="chevron-forward" size={15} color={isDark ? '#64748b' : '#94a3b8'} />
+          </View>
         </View>
       </TouchableOpacity>
     );
@@ -257,47 +298,147 @@ export default function HomeScreen() {
           data={groups ?? []}
           keyExtractor={(item) => item.id}
           renderItem={renderGroup}
-          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 20 }}
+          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 32 }}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
           ListHeaderComponent={
-            hasGroups ? (
-              <Text className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-400">Your Groups</Text>
-            ) : null
+            <View style={{ marginBottom: 8 }}>
+              {/* Logo banner */}
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  backgroundColor: isDark ? '#0d1829' : '#eff6ff',
+                  borderRadius: 20,
+                  paddingVertical: 14,
+                  paddingHorizontal: 16,
+                  marginBottom: 24,
+                  borderWidth: 1,
+                  borderColor: isDark ? '#1a2744' : '#bfdbfe',
+                }}
+              >
+                <Image
+                  source={require('../../assets/logo.png')}
+                  style={{ width: 80, height: 58 }}
+                  resizeMode="contain"
+                />
+                <View style={{ flex: 1, marginLeft: 12 }}>
+                  <Text
+                    style={{
+                      fontWeight: '800',
+                      fontSize: 15,
+                      lineHeight: 22,
+                      color: isDark ? '#e2e8f0' : '#1e3a8a',
+                      letterSpacing: -0.2,
+                    }}
+                  >
+                    Your adventures{'\n'}await.
+                  </Text>
+                  <Text style={{ fontSize: 12, color: isDark ? '#475569' : '#64748b', marginTop: 3 }}>
+                    Keep planning, keep exploring.
+                  </Text>
+                </View>
+              </View>
+
+              {/* Section label */}
+              {hasGroups && (
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                  <View style={{ width: 3, height: 14, borderRadius: 2, backgroundColor: '#2563eb' }} />
+                  <Text className="text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+                    Your Groups
+                  </Text>
+                </View>
+              )}
+            </View>
           }
           ListFooterComponent={
             <View>
               {hasSoloTrips && (
-                <View className="mt-2">
-                  <Text className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-400">Solo Trips</Text>
+                <View style={{ marginTop: 24 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                    <View style={{ width: 3, height: 14, borderRadius: 2, backgroundColor: '#7c3aed' }} />
+                    <Text className="text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+                      Solo Trips
+                    </Text>
+                  </View>
                   {soloTrips!.map((trip) => (
                     <TouchableOpacity
                       key={trip.id}
+                      activeOpacity={0.8}
                       onPress={() => router.push(`/trip/${trip.id}`)}
-                      className="mb-3 rounded-2xl bg-white p-4 dark:bg-gray-800"
-                      style={{ shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 }}
+                      className="mb-3 bg-white dark:bg-gray-900"
+                      style={{
+                        borderRadius: 20,
+                        padding: 16,
+                        borderWidth: 1,
+                        borderColor: isDark ? '#1e293b' : '#f1f5f9',
+                        shadowColor: '#000',
+                        shadowOpacity: isDark ? 0.25 : 0.07,
+                        shadowOffset: { width: 0, height: 4 },
+                        shadowRadius: 12,
+                        elevation: 3,
+                      }}
                     >
-                      <View className="flex-row items-center gap-3">
-                        <View className="h-12 w-12 items-center justify-center rounded-xl bg-indigo-500">
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+                        <View
+                          style={{
+                            width: 50,
+                            height: 50,
+                            borderRadius: 15,
+                            backgroundColor: '#7c3aed',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            shadowColor: '#7c3aed',
+                            shadowOpacity: 0.4,
+                            shadowOffset: { width: 0, height: 3 },
+                            shadowRadius: 8,
+                            elevation: 4,
+                          }}
+                        >
                           <Ionicons name="person" size={22} color="white" />
                         </View>
-                        <View className="flex-1">
-                          <Text className="text-base font-bold text-gray-900 dark:text-white">{trip.title}</Text>
-                          <Text className="text-sm text-gray-500 dark:text-gray-400">
+                        <View style={{ flex: 1 }}>
+                          <Text className="text-base font-bold text-slate-900 dark:text-slate-100">{trip.title}</Text>
+                          <Text className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
                             {trip.destination} · {format(new Date(trip.start_date + 'T12:00:00'), 'MMM d')}
                           </Text>
                         </View>
-                        <Ionicons name="chevron-forward" size={18} color="#94A3B8" />
+                        <View
+                          style={{
+                            width: 30,
+                            height: 30,
+                            borderRadius: 9,
+                            backgroundColor: isDark ? '#1e293b' : '#f1f5f9',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          <Ionicons name="chevron-forward" size={15} color={isDark ? '#64748b' : '#94a3b8'} />
+                        </View>
                       </View>
                     </TouchableOpacity>
                   ))}
                 </View>
               )}
+
+              {/* Plan solo trip CTA */}
               <TouchableOpacity
                 onPress={() => router.push('/trip/new')}
-                className="mt-2 flex-row items-center justify-center gap-2 rounded-2xl border border-dashed border-gray-300 py-3 dark:border-gray-600"
+                activeOpacity={0.75}
+                style={{
+                  marginTop: 16,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                  borderRadius: 16,
+                  paddingVertical: 15,
+                  backgroundColor: isDark ? '#0d1829' : '#f8fafc',
+                  borderWidth: 1,
+                  borderColor: isDark ? '#1e293b' : '#e2e8f0',
+                }}
               >
-                <Ionicons name="person-outline" size={16} color="#64748B" />
-                <Text className="text-sm font-semibold text-gray-500 dark:text-gray-400">Plan a Solo Trip</Text>
+                <Ionicons name="add-circle-outline" size={18} color={isDark ? '#64748b' : '#94a3b8'} />
+                <Text className="text-sm font-semibold text-slate-500 dark:text-slate-400">Plan a Solo Trip</Text>
               </TouchableOpacity>
             </View>
           }
