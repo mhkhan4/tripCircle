@@ -121,7 +121,7 @@ User opens chat screen
 | group_members         | group_id, user_id, role (admin/member) — unique(group,user)                      |
 | group_join_requests   | group_id, user_id, status (pending/approved/rejected), reviewed_by               |
 | trips                 | id, group_id, title, destination, start/end_date, status                         |
-| trip_members          | trip_id, user_id, joined_at — unique(trip,user); creator auto-joined on trip create |
+| trip_members          | trip_id, user_id, role (admin/member), joined_at — unique(trip,user); creator auto-joined as admin |
 | budgets               | id, trip_id (unique), total_amount, per_person_amount, currency                  |
 | budget_contributions  | budget_id, user_id, pledged_amount, paid_amount, paid_at                         |
 | expenses              | id, trip_id, amount, category, paid_by, receipt_url, ocr_raw                     |
@@ -136,9 +136,11 @@ User opens chat screen
 ### Row Level Security Model
 - All tables protected by RLS
 - `is_group_member(group_id)` helper function drives most policies
+- `is_trip_admin(trip_id)` helper: true if caller is the trip creator or has `trip_members.role = 'admin'`
 - Users can only see groups they belong to
 - Only the paying user can insert an expense (`paid_by = auth.uid()`)
 - Messages writable only by sender, readable by all group members
+- Polls, tasks, and itinerary entries deletable by the item's creator OR any trip admin
 
 ---
 
@@ -163,7 +165,10 @@ Budgets can be set as a flat total or per-person. When per-person, `per_person_a
 Splits are computed against `trip_members`, not all `group_members`. This means only people who joined the trip share costs. The `expense_splits` table supports custom splits per user — this can be extended to a manual split screen without changing the schema.
 
 ### Trip membership model
-Trips are opt-in within a group. When a trip is created, only the creator is auto-joined via `trip_members`. All other group members see a "Join" CTA on the trip card. Any member can leave; the trip creator can remove any member. This prevents forcing travel plans on group members who don't want to join. See `architecture/trip-members.md` for the full plan.
+Trips are opt-in within a group. When a trip is created, only the creator is auto-joined via `trip_members` with `role = 'admin'`. All other group members see a "Join" CTA on the trip card. Any member can leave; the trip creator can remove any member. This prevents forcing travel plans on group members who don't want to join. See `architecture/trip-members.md` for the full plan.
+
+### Trip admin delegation
+`trip_members.role` is `'admin' | 'member'` (default `'member'`). The trip creator is inserted as `'admin'` and can promote any other member to admin via the Members section in the trip detail screen. Admins can delete any poll, task, or itinerary entry (not just their own), and can remove or promote/demote other non-creator members. The trip creator's admin status cannot be removed by anyone — the shield button is hidden for the creator row. `is_trip_admin(trip_id)` is a DB helper function that backs the RLS delete policies.
 
 ---
 
@@ -222,3 +227,5 @@ npx expo start
 | 11    | Trip task assignment         | Done        |
 | 11    | Trip itinerary / bookings    | Done        |
 | 11    | Payment reminders (in-chat)  | Done        |
+| 12    | Trip admin roles & delegation| Done        |
+| 12    | Admin delete for polls/tasks/itinerary | Done |

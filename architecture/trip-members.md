@@ -21,9 +21,28 @@ create table public.trip_members (
   id          uuid primary key default gen_random_uuid(),
   trip_id     uuid references public.trips on delete cascade not null,
   user_id     uuid references public.users on delete cascade not null,
+  role        text not null default 'member' check (role in ('admin', 'member')),
   joined_at   timestamptz default now(),
   unique (trip_id, user_id)
 );
+```
+
+The trip creator is auto-inserted with `role = 'admin'`. Any admin can promote or demote other members (not the trip creator).
+
+### 1b-i. `is_trip_admin` helper
+
+```sql
+create or replace function public.is_trip_admin(p_trip_id uuid)
+returns boolean language sql security definer stable as $$
+  select exists (
+    select 1 from public.trip_members
+    where trip_id = p_trip_id and user_id = auth.uid() and role = 'admin'
+  )
+  or exists (
+    select 1 from public.trips
+    where id = p_trip_id and created_by = auth.uid()
+  )
+$$;
 ```
 
 ### 1b. Helper function: `is_trip_member`
@@ -74,7 +93,7 @@ create policy "tm_delete" on public.trip_members for delete using (
 
 ### 1d. Auto-join creator via app code (not a trigger)
 
-`useCreateTrip` mutation inserts the trip and immediately inserts the creator row into `trip_members` in a sequential call. No DB trigger needed — avoids hidden side-effects.
+`useCreateTrip` mutation inserts the trip and immediately inserts the creator row into `trip_members` with `role = 'admin'` in a sequential call. No DB trigger needed — avoids hidden side-effects.
 
 ### 1e. Budget per-person trigger update
 
@@ -118,6 +137,7 @@ export type TripMember = {
   id: string;
   trip_id: string;
   user_id: string;
+  role: 'admin' | 'member';
   joined_at: string;
 };
 
@@ -170,13 +190,23 @@ mutationFn: supabase
 onSuccess: invalidate ['trip-members', tripId]
 ```
 
-### `useCreateTrip` — auto-join creator
+#### `useUpdateTripMemberRole()`
+```
+mutationFn: supabase
+  .from('trip_members')
+  .update({ role })
+  .eq('id', membershipId)
+onSuccess: invalidate ['trip-members', tripId]
+```
+Only succeeds if the caller is a trip admin (enforced by `tm_update_role` RLS policy). Cannot change role of the trip creator.
 
-After the trip INSERT succeeds, immediately insert the creator into `trip_members`:
+### `useCreateTrip` — auto-join creator as admin
+
+After the trip INSERT succeeds, immediately insert the creator into `trip_members` with `role = 'admin'`:
 
 ```ts
 onSuccess: async (trip) => {
-  await supabase.from('trip_members').insert({ trip_id: trip.id, user_id: user!.id });
+  await supabase.from('trip_members').insert({ trip_id: trip.id, user_id: user!.id, role: 'admin' });
   queryClient.invalidateQueries({ queryKey: ['trips', trip.group_id] });
   queryClient.invalidateQueries({ queryKey: ['all-trips'] });
 }
@@ -213,8 +243,12 @@ Add a "Members" section at the bottom:
 Props:
 - `member: TripMemberWithProfile`
 - `isCurrentUser: boolean`
-- `currentUserIsCreator: boolean`
+- `currentUserIsAdmin: boolean` — whether the viewing user is an admin
+- `isCreator: boolean` — whether this row's member is the trip creator (shield/remove buttons hidden for creator)
 - `onRemove?: (membershipId: string) => void`
+- `onToggleAdmin?: (membershipId: string, currentRole: 'admin' | 'member') => void`
+
+Shows an "Admin" badge on members with `role = 'admin'`. If `currentUserIsAdmin` and the row is not the creator, shows a shield icon to promote/demote and a remove button.
 
 ---
 
@@ -224,14 +258,18 @@ Props:
 |---|---|---|
 | SELECT trip_members | Any group member | `tm_read` RLS policy |
 | INSERT trip_members | Group member, self only | `tm_insert` RLS policy |
+| UPDATE trip_members role | Trip admin (not self, not creator) | `tm_update_role` RLS policy |
 | DELETE trip_members (leave) | The member themselves | `tm_delete` — `user_id = auth.uid()` |
-| DELETE trip_members (kick) | Trip creator | `tm_delete` — `created_by = auth.uid()` |
+| DELETE trip_members (kick) | Trip creator or trip admin | `tm_delete` |
+| DELETE poll / task / itinerary | Item creator OR trip admin | `polls_delete` / `tasks_delete` / `itinerary_delete` RLS policies |
 
 ---
 
 ## 6. Known Constraints
 
 **Trip creator cannot leave.** The `tm_delete` policy allows self-delete, but the UI should block the creator from leaving (show "Delete Trip" instead). Future: allow creator transfer.
+
+**Trip creator's admin status is permanent.** The `tm_update_role` policy blocks callers from updating their own row (`user_id <> auth.uid()`), and the UI hides the shield button on the creator row (`isCreator` prop). Even another admin cannot demote the trip creator.
 
 **Expense splits on old trips.** Trips created before this migration have no `trip_members` rows. The `add-expense.tsx` fallback should use `group_members` when `trip_members` is empty for backward compat.
 
@@ -246,17 +284,23 @@ Props:
 | File | Purpose |
 |---|---|
 | `supabase/migrations/20260607000000_trip_members.sql` | DB migration: trip_members table, RLS, trigger |
+| `supabase/migrations/20260608000001_trip_member_roles.sql` | DB migration: role column, is_trip_admin helper, updated delete policies |
 | `architecture/trip-members.md` | This document |
-| `components/TripMemberRow.tsx` | Reusable trip member row |
+| `components/TripMemberRow.tsx` | Reusable trip member row with admin badge + promote/demote |
 
 ### Files to modify
 
 | File | What changes |
 |---|---|
-| `types/index.ts` | Add `TripMember`, `TripMemberWithProfile` |
-| `hooks/useTrip.ts` | Add `useTripMembers`, `useJoinTrip`, `useLeaveTrip`, `useRemoveTripMember`; update `useCreateTrip` to auto-join creator |
+| `types/index.ts` | Add `TripMember`, `TripMemberWithProfile`; add `role` field |
+| `hooks/useTrip.ts` | Add `useTripMembers`, `useJoinTrip`, `useLeaveTrip`, `useRemoveTripMember`, `useUpdateTripMemberRole`; update `useCreateTrip` to auto-join creator as admin |
 | `app/group/[id]/index.tsx` | Show "Join" CTA on trip cards for non-members |
-| `app/group/[id]/trip/[tripId]/index.tsx` | Add members section, Leave/Join CTA, Remove action for creator |
+| `app/group/[id]/trip/[tripId]/index.tsx` | Members section with promote/demote, Leave/Join CTA |
+| `app/group/[id]/trip/[tripId]/polls.tsx` | Delete button visible to creator OR trip admin |
+| `app/group/[id]/trip/[tripId]/tasks.tsx` | Delete button visible to creator OR trip admin |
+| `app/group/[id]/trip/[tripId]/itinerary.tsx` | Delete button visible to creator OR trip admin |
+| `app/trip/[tripId]/tasks.tsx` | Delete button hidden from non-creator (solo trips) |
+| `app/trip/[tripId]/itinerary.tsx` | Delete button hidden from non-creator (solo trips) |
 | `app/group/[id]/trip/[tripId]/add-expense.tsx` | Compute splits from trip members, not group members |
 | `ARCHITECTURE.md` | Update schema table and build phases |
 
@@ -264,4 +308,4 @@ Props:
 
 ## 8. Build Phase
 
-This is Phase 9 — Trip Membership.
+Phase 9 — Trip Membership. Phase 12 added `role` column, admin delegation, and admin-level delete permissions.
