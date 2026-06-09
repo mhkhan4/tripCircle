@@ -13,8 +13,8 @@ export default function TabsLayout() {
         tabBarInactiveTintColor: '#94A3B8',
         tabBarStyle: {
           borderTopWidth: 1,
-          borderTopColor: isDark ? '#1F2937' : '#F1F5F9',
-          backgroundColor: isDark ? '#111827' : '#FFFFFF',
+          borderTopColor: isDark ? '#1e293b' : '#f1f5f9',
+          backgroundColor: isDark ? '#0f172a' : '#ffffff',
           paddingBottom: 4,
           height: 60,
         },

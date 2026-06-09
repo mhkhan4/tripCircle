@@ -1,4 +1,4 @@
-import { View, Text, Image, FlatList, TouchableOpacity, RefreshControl, ScrollView, useColorScheme } from 'react-native';
+import { View, Text, Image, FlatList, RefreshControl, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,6 +7,9 @@ import { format } from 'date-fns';
 import { useGroups } from '../../hooks/useGroup';
 import { useSoloTrips } from '../../hooks/useTrip';
 import { useAppStore } from '../../store/useAppStore';
+import { useTheme } from '../../hooks/useTheme';
+import { PressableCard } from '../../components/ui/PressableCard';
+import { Skeleton } from '../../components/ui/Skeleton';
 import type { Group } from '../../types';
 
 const FEATURES = [
@@ -42,14 +45,40 @@ const FEATURES = [
   },
 ];
 
+const CARD_SHADOW = { shadowColor: '#000', shadowOpacity: 0.07, shadowOffset: { width: 0, height: 4 }, shadowRadius: 12, elevation: 3 };
+const CARD_SHADOW_DARK = { shadowColor: '#000', shadowOpacity: 0.3, shadowOffset: { width: 0, height: 4 }, shadowRadius: 12, elevation: 3 };
+
+function GroupCardSkeleton({ isDark }: { isDark: boolean }) {
+  return (
+    <View
+      style={{
+        marginBottom: 12,
+        borderRadius: 20,
+        padding: 16,
+        borderWidth: 1,
+        backgroundColor: isDark ? '#1e293b' : '#ffffff',
+        borderColor: isDark ? '#334155' : '#f1f5f9',
+      }}
+    >
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+        <Skeleton width={50} height={50} borderRadius={15} />
+        <View style={{ flex: 1, gap: 8 }}>
+          <Skeleton width="60%" height={14} />
+          <Skeleton width="40%" height={11} />
+        </View>
+        <Skeleton width={30} height={30} borderRadius={9} />
+      </View>
+    </View>
+  );
+}
+
 export default function HomeScreen() {
   const router = useRouter();
   const { user } = useAppStore();
   const { data: groups, isLoading: groupsLoading, refetch: refetchGroups } = useGroups();
   const { data: soloTrips, refetch: refetchSolo } = useSoloTrips();
   const [refreshing, setRefreshing] = useState(false);
-  const scheme = useColorScheme();
-  const isDark = scheme === 'dark';
+  const { isDark } = useTheme();
 
   async function onRefresh() {
     setRefreshing(true);
@@ -62,20 +91,16 @@ export default function HomeScreen() {
     const hues = ['#2563eb', '#7c3aed', '#0891b2', '#059669', '#d97706', '#dc2626'];
     const color = hues[item.name.charCodeAt(0) % hues.length];
     return (
-      <TouchableOpacity
+      <PressableCard
         onPress={() => router.push(`/group/${item.id}`)}
-        activeOpacity={0.8}
-        className="mb-3 bg-white dark:bg-gray-900"
         style={{
+          marginBottom: 12,
           borderRadius: 20,
           padding: 16,
           borderWidth: 1,
-          borderColor: isDark ? '#1e293b' : '#f1f5f9',
-          shadowColor: '#000',
-          shadowOpacity: isDark ? 0.25 : 0.07,
-          shadowOffset: { width: 0, height: 4 },
-          shadowRadius: 12,
-          elevation: 3,
+          backgroundColor: isDark ? '#1e293b' : '#ffffff',
+          borderColor: isDark ? '#334155' : '#f1f5f9',
+          ...(isDark ? CARD_SHADOW_DARK : CARD_SHADOW),
         }}
       >
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
@@ -109,15 +134,15 @@ export default function HomeScreen() {
               width: 30,
               height: 30,
               borderRadius: 9,
-              backgroundColor: isDark ? '#1e293b' : '#f1f5f9',
+              backgroundColor: isDark ? '#334155' : '#f1f5f9',
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <Ionicons name="chevron-forward" size={15} color={isDark ? '#64748b' : '#94a3b8'} />
+            <Ionicons name="chevron-forward" size={15} color={isDark ? '#94a3b8' : '#94a3b8'} />
           </View>
         </View>
-      </TouchableOpacity>
+      </PressableCard>
     );
   }
 
@@ -128,7 +153,7 @@ export default function HomeScreen() {
   const firstName = user?.full_name?.split(' ')[0] ?? 'Traveler';
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50 dark:bg-gray-950">
+    <SafeAreaView className="flex-1 bg-slate-50 dark:bg-slate-950">
 
       {/* ── Header ── */}
       <View
@@ -141,7 +166,7 @@ export default function HomeScreen() {
             style={{ width: 72, height: 52 }}
             resizeMode="contain"
           />
-          <View style={{ height: 32, width: 1, backgroundColor: isDark ? '#1e293b' : '#e2e8f0' }} />
+          <View style={{ height: 32, width: 1, backgroundColor: isDark ? '#334155' : '#e2e8f0' }} />
           <View>
             <Text className="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
               Welcome back
@@ -152,7 +177,7 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        <TouchableOpacity
+        <PressableCard
           onPress={() => router.push('/group/new')}
           style={{
             width: 40,
@@ -169,13 +194,13 @@ export default function HomeScreen() {
           }}
         >
           <Ionicons name="add" size={22} color="white" />
-        </TouchableOpacity>
+        </PressableCard>
       </View>
 
       {/* ── Body ── */}
       {groupsLoading ? (
-        <View className="flex-1 items-center justify-center">
-          <Text className="text-gray-400">Loading...</Text>
+        <View style={{ paddingHorizontal: 20, paddingTop: 16 }}>
+          {[1, 2, 3].map((i) => <GroupCardSkeleton key={i} isDark={isDark} />)}
         </View>
       ) : isEmpty ? (
         <ScrollView
@@ -213,11 +238,11 @@ export default function HomeScreen() {
 
           {/* Section divider */}
           <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 36, gap: 10 }}>
-            <View className="flex-1" style={{ height: 1, backgroundColor: isDark ? '#1e293b' : '#e2e8f0' }} />
+            <View className="flex-1" style={{ height: 1, backgroundColor: isDark ? '#334155' : '#e2e8f0' }} />
             <Text className="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-600">
               Everything you need
             </Text>
-            <View className="flex-1" style={{ height: 1, backgroundColor: isDark ? '#1e293b' : '#e2e8f0' }} />
+            <View className="flex-1" style={{ height: 1, backgroundColor: isDark ? '#334155' : '#e2e8f0' }} />
           </View>
 
           {/* Feature cards */}
@@ -225,9 +250,20 @@ export default function HomeScreen() {
             {FEATURES.map((f) => (
               <View
                 key={f.title}
-                className="rounded-[18px] border border-slate-100 bg-white dark:border-slate-800 dark:bg-gray-900"
-                style={{ flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16,
-                  shadowColor: '#000', shadowOpacity: isDark ? 0.3 : 0.06, shadowRadius: 8, elevation: 2 }}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 14,
+                  padding: 16,
+                  borderRadius: 18,
+                  borderWidth: 1,
+                  backgroundColor: isDark ? '#0f172a' : '#ffffff',
+                  borderColor: isDark ? '#334155' : '#f1f5f9',
+                  shadowColor: '#000',
+                  shadowOpacity: isDark ? 0.2 : 0.05,
+                  shadowRadius: 8,
+                  elevation: 2,
+                }}
               >
                 <View
                   style={{
@@ -252,9 +288,8 @@ export default function HomeScreen() {
           </View>
 
           {/* CTAs */}
-          <TouchableOpacity
+          <PressableCard
             onPress={() => router.push('/group/new')}
-            activeOpacity={0.8}
             style={{
               marginTop: 32,
               alignItems: 'center',
@@ -269,28 +304,37 @@ export default function HomeScreen() {
             }}
           >
             <Text style={{ fontSize: 16, fontWeight: '700', color: 'white', letterSpacing: 0.2 }}>Create a Group</Text>
-          </TouchableOpacity>
+          </PressableCard>
 
-          <TouchableOpacity
+          <PressableCard
             onPress={() => router.push('/trip/new')}
-            activeOpacity={0.75}
-            className="mt-3 flex-row items-center justify-center gap-2 rounded-2xl border border-slate-200 dark:border-slate-700"
-            style={{ paddingVertical: 15 }}
+            style={{
+              marginTop: 12,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+              borderRadius: 16,
+              paddingVertical: 15,
+              borderWidth: 1,
+              backgroundColor: isDark ? '#0f172a' : '#f8fafc',
+              borderColor: isDark ? '#334155' : '#e2e8f0',
+            }}
           >
             <Ionicons name="person-outline" size={16} color={isDark ? '#94a3b8' : '#64748b'} />
             <Text className="text-sm font-semibold text-slate-500 dark:text-slate-400">Plan a Solo Trip</Text>
-          </TouchableOpacity>
+          </PressableCard>
         </ScrollView>
       ) : (
         <FlatList
           data={groups ?? []}
           keyExtractor={(item) => item.id}
           renderItem={renderGroup}
-          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 32 }}
+          contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 4, paddingBottom: 32 }}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
           ListHeaderComponent={
             hasGroups ? (
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12, marginTop: 16 }}>
                 <View style={{ width: 3, height: 14, borderRadius: 2, backgroundColor: '#2563eb' }} />
                 <Text className="text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
                   Your Groups
@@ -309,21 +353,17 @@ export default function HomeScreen() {
                     </Text>
                   </View>
                   {soloTrips!.map((trip) => (
-                    <TouchableOpacity
+                    <PressableCard
                       key={trip.id}
-                      activeOpacity={0.8}
                       onPress={() => router.push(`/trip/${trip.id}`)}
-                      className="mb-3 bg-white dark:bg-gray-900"
                       style={{
+                        marginBottom: 12,
                         borderRadius: 20,
                         padding: 16,
                         borderWidth: 1,
-                        borderColor: isDark ? '#1e293b' : '#f1f5f9',
-                        shadowColor: '#000',
-                        shadowOpacity: isDark ? 0.25 : 0.07,
-                        shadowOffset: { width: 0, height: 4 },
-                        shadowRadius: 12,
-                        elevation: 3,
+                        backgroundColor: isDark ? '#1e293b' : '#ffffff',
+                        borderColor: isDark ? '#334155' : '#f1f5f9',
+                        ...(isDark ? CARD_SHADOW_DARK : CARD_SHADOW),
                       }}
                     >
                       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
@@ -355,23 +395,22 @@ export default function HomeScreen() {
                             width: 30,
                             height: 30,
                             borderRadius: 9,
-                            backgroundColor: isDark ? '#1e293b' : '#f1f5f9',
+                            backgroundColor: isDark ? '#334155' : '#f1f5f9',
                             alignItems: 'center',
                             justifyContent: 'center',
                           }}
                         >
-                          <Ionicons name="chevron-forward" size={15} color={isDark ? '#64748b' : '#94a3b8'} />
+                          <Ionicons name="chevron-forward" size={15} color="#94a3b8" />
                         </View>
                       </View>
-                    </TouchableOpacity>
+                    </PressableCard>
                   ))}
                 </View>
               )}
 
               {/* Plan solo trip CTA */}
-              <TouchableOpacity
+              <PressableCard
                 onPress={() => router.push('/trip/new')}
-                activeOpacity={0.75}
                 style={{
                   marginTop: 16,
                   flexDirection: 'row',
@@ -380,14 +419,14 @@ export default function HomeScreen() {
                   gap: 8,
                   borderRadius: 16,
                   paddingVertical: 15,
-                  backgroundColor: isDark ? '#0d1829' : '#f8fafc',
+                  backgroundColor: isDark ? '#0f172a' : '#f8fafc',
                   borderWidth: 1,
-                  borderColor: isDark ? '#1e293b' : '#e2e8f0',
+                  borderColor: isDark ? '#334155' : '#e2e8f0',
                 }}
               >
                 <Ionicons name="add-circle-outline" size={18} color={isDark ? '#64748b' : '#94a3b8'} />
                 <Text className="text-sm font-semibold text-slate-500 dark:text-slate-400">Plan a Solo Trip</Text>
-              </TouchableOpacity>
+              </PressableCard>
             </View>
           }
         />

@@ -23,12 +23,12 @@ export default function ProfileScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50 dark:bg-gray-950">
+    <SafeAreaView className="flex-1 bg-slate-50 dark:bg-slate-950">
       <View className="px-5 py-4">
         <Text className="text-2xl font-bold text-gray-900 dark:text-white">Profile</Text>
       </View>
 
-      <View className="mx-5 rounded-2xl bg-white p-5 shadow-sm dark:bg-gray-800" style={{ shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 }}>
+      <View className="mx-5 rounded-2xl bg-white p-5 shadow-sm dark:bg-slate-800" style={{ shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 }}>
         <View className="flex-row items-center gap-4">
           {user?.avatar_url ? (
             <Image source={{ uri: user.avatar_url }} className="h-16 w-16 rounded-2xl" />
@@ -46,8 +46,8 @@ export default function ProfileScreen() {
         </View>
       </View>
 
-      <View className="mx-5 mt-4 rounded-2xl bg-white shadow-sm dark:bg-gray-800" style={{ shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 }}>
-        <View className="flex-row items-center gap-3 px-5 py-4" style={{ borderBottomWidth: 1, borderBottomColor: isDark ? '#1F2937' : '#F1F5F9' }}>
+      <View className="mx-5 mt-4 rounded-2xl bg-white shadow-sm dark:bg-slate-800" style={{ shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 }}>
+        <View className="flex-row items-center gap-3 px-5 py-4" style={{ borderBottomWidth: 1, borderBottomColor: isDark ? '#334155' : '#f1f5f9' }}>
           <Ionicons name={isDark ? 'moon' : 'sunny'} size={20} color="#64748B" />
           <Text className="flex-1 text-base text-gray-700 dark:text-gray-200">Dark Mode</Text>
           <Switch
@@ -65,7 +65,7 @@ export default function ProfileScreen() {
           <TouchableOpacity
             key={item.label}
             className="flex-row items-center gap-3 px-5 py-4"
-            style={{ borderBottomWidth: i < arr.length - 1 ? 1 : 0, borderBottomColor: isDark ? '#1F2937' : '#F1F5F9' }}
+            style={{ borderBottomWidth: i < arr.length - 1 ? 1 : 0, borderBottomColor: isDark ? '#334155' : '#f1f5f9' }}
           >
             <Ionicons name={item.icon as any} size={20} color="#64748B" />
             <Text className="flex-1 text-base text-gray-700 dark:text-gray-200">{item.label}</Text>
