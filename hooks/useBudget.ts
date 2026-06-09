@@ -76,9 +76,10 @@ export function useAddExpense() {
         .single();
       if (error) throw error;
       if (splits.length > 0) {
-        await supabase.from('expense_splits').insert(
+        const { error: splitsError } = await supabase.from('expense_splits').insert(
           splits.map((s) => ({ ...s, expense_id: expense.id }))
         );
+        if (splitsError) throw splitsError;
       }
       return expense;
     },
