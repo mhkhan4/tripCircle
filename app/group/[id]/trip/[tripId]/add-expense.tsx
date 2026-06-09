@@ -211,10 +211,10 @@ export default function AddExpenseScreen() {
       <View className="px-5 pb-6">
         <TouchableOpacity
           onPress={handleSubmit}
-          disabled={addExpense.isPending}
+          disabled={addExpense.isPending || uploading}
           className="items-center rounded-2xl bg-primary py-4"
         >
-          {addExpense.isPending ? (
+          {addExpense.isPending || uploading ? (
             <ActivityIndicator color="white" />
           ) : (
             <Text className="text-base font-bold text-white">Save Expense</Text>
