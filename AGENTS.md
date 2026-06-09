@@ -83,3 +83,93 @@ When a new row's INSERT policy needs to verify a parent table (e.g. "is this use
 - Migrations run first (`supabase db push`), deploy runs only if migrations succeed.
 - Pin the Vercel CLI version in `.github/workflows/deploy.yml` — `vercel@latest` has published broken releases before (`@vercel/static-build` 404). Current pin: `vercel@54.10.0`.
 - If the pipeline fails on "Install Vercel CLI", check npm for a bad latest release and bump the pin to the last known good version.
+
+---
+
+# Project Structure & Architecture
+
+## Two parallel screen trees: group trips vs solo trips
+
+The app has two completely separate screen hierarchies for the same features. When a bug is reported or a feature needs adding, you must check **both** paths:
+
+| Feature | Group-trip path | Solo-trip path |
+|---|---|---|
+| Trip home | `app/group/[id]/trip/[tripId]/index.tsx` | `app/trip/[tripId]/index.tsx` |
+| Itinerary | `app/group/[id]/trip/[tripId]/itinerary.tsx` | `app/trip/[tripId]/itinerary.tsx` |
+| Tasks | `app/group/[id]/trip/[tripId]/tasks.tsx` | `app/trip/[tripId]/tasks.tsx` |
+| Budget | `app/group/[id]/trip/[tripId]/budget.tsx` | `app/trip/[tripId]/budget.tsx` |
+| Expenses | `app/group/[id]/trip/[tripId]/expenses.tsx` | `app/trip/[tripId]/expenses.tsx` |
+| Add expense | `app/group/[id]/trip/[tripId]/add-expense.tsx` | `app/trip/[tripId]/add-expense.tsx` |
+| Polls | `app/group/[id]/trip/[tripId]/polls.tsx` | *(no solo equivalent)* |
+| Chat | `app/group/[id]/trip/[tripId]/chat.tsx` | *(no solo equivalent)* |
+
+Solo trips are created under `app/trip/new/` and stored in the `trips` table with `group_id = null` and `user_id` set. Group trips have `group_id` set.
+
+**Known inconsistency:** Several solo-trip screens still use `Alert.alert` for inline validation (tasks, itinerary create form), which is silent on web. The group-trip versions use inline `errors` state. When fixing one path, always fix the other.
+
+---
+
+## Chat screens do not use React Query
+
+**Files:** `app/group/[id]/chat.tsx`, `app/group/[id]/trip/[tripId]/chat.tsx`
+
+Chat is implemented with raw `useState` + `useEffect` + Supabase realtime channel — not React Query. There are no query keys for messages, no cache invalidation, and no stale-time config. If you are debugging message delivery or loading issues, `queryClient` is irrelevant here.
+
+Messages are loaded once on mount (`loadMessages()`) and appended via the Supabase `postgres_changes` subscription. Errors from both `loadMessages` and `send()` are currently unhandled (silent failures).
+
+---
+
+## `Group` type does not include `group_members` — use `(group as any)` workaround
+
+**File:** `types/index.ts` — `Group` type has no `group_members` field.
+
+The `useGroup` hook selects `*, group_members(*, user:users(*))` from Supabase, so the runtime object does contain members — but TypeScript doesn't know. Code that needs member data uses `(group as any)?.group_members ?? []`. This is intentional until the type is fixed.
+
+**Affected files:** `budget.tsx`, `add-expense.tsx` (group-trip variants). Do not be surprised by the cast.
+
+---
+
+## Budget screen uses group members, not trip members
+
+**File:** `app/group/[id]/trip/[tripId]/budget.tsx:24`
+
+```ts
+const members = (group as any)?.group_members ?? [];
+```
+
+The budget contribution list and per-person split calculation are driven by the group's full member list, not the trip's member list. This means:
+- Members who are in the group but have not joined the trip appear in the contributions list.
+- `per_person` budget totals scale with group size, not trip size.
+
+This is a **known data integrity bug** (tracked in ISSUES.md §4.1). Do not write new code that assumes `budget.members` == trip members.
+
+---
+
+## Date parsing: always append `T12:00:00` to `YYYY-MM-DD` strings
+
+`start_date` and `end_date` are stored as `YYYY-MM-DD` strings. `new Date('2024-07-15')` is parsed as UTC midnight, which displays as the **previous day** in any UTC− timezone.
+
+**Rule:** Always parse bare date strings with a noon suffix:
+```ts
+new Date(dateStr + 'T12:00:00')  // safe across all UTC offsets
+```
+
+This fix is applied in some places (e.g. `trip/new/index.tsx:14`) but not everywhere. When adding new date display code, always use this pattern.
+
+---
+
+## `EXPO_PUBLIC_` environment variables are client-side — treat as public
+
+Any variable prefixed `EXPO_PUBLIC_` (e.g. `EXPO_PUBLIC_GEMINI_API_KEY`) is inlined into the JavaScript bundle at build time. It is visible to anyone who inspects the bundle. Do not use this prefix for secrets.
+
+Server-side secrets (API keys, service role keys) must live in Supabase Edge Functions or backend routes — never in `EXPO_PUBLIC_` vars.
+
+---
+
+## `isGuest` in the store has no setter — guest mode is currently broken
+
+**File:** `store/useAppStore.ts`
+
+`isGuest` is declared in the store and initialised to `false`, but there is no `setIsGuest` action. It can never be set to `true` at runtime. All screens that read `isGuest` (profile, add-member, budget hooks) will always see `false`.
+
+Do not add new logic that depends on `isGuest` being `true` until a setter is added to the store.
