@@ -14,8 +14,8 @@ const STATUS_COLOR: Record<string, string> = {
 };
 
 function TripCard({ trip, onPress }: { trip: Trip; onPress: () => void }) {
-  const start = new Date(trip.start_date);
-  const end = new Date(trip.end_date);
+  const start = new Date(trip.start_date + 'T12:00:00');
+  const end = new Date(trip.end_date + 'T12:00:00');
   const color = STATUS_COLOR[trip.status];
 
   return (

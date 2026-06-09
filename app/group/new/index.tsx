@@ -9,10 +9,14 @@ export default function NewGroupScreen() {
   const createGroup = useCreateGroup();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [nameError, setNameError] = useState('');
 
   async function handleCreate() {
-    if (!name.trim()) return Alert.alert('Name required', 'Give your group a name.');
-
+    if (!name.trim()) {
+      setNameError('Give your group a name.');
+      return;
+    }
+    setNameError('');
     try {
       const group = await createGroup.mutateAsync({
         name: name.trim(),
@@ -34,12 +38,13 @@ export default function NewGroupScreen() {
         <Text className="mb-1 text-sm font-semibold text-gray-700 dark:text-gray-300">Group Name *</Text>
         <TextInput
           value={name}
-          onChangeText={setName}
+          onChangeText={(t) => { setName(t); setNameError(''); }}
           placeholder="e.g. Squad Goals, Weekend Warriors"
           placeholderTextColor="#94A3B8"
-          className="mb-4 rounded-xl border border-gray-200 bg-white px-4 py-3 text-base text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+          className={`rounded-xl border bg-white px-4 py-3 text-base text-gray-900 dark:bg-gray-800 dark:text-white ${nameError ? 'border-red-400' : 'border-gray-200 dark:border-gray-700'}`}
           maxLength={50}
         />
+        {nameError ? <Text className="mb-2 mt-1 text-sm text-red-500">{nameError}</Text> : <View className="mb-4" />}
 
         <Text className="mb-1 text-sm font-semibold text-gray-700 dark:text-gray-300">Description (optional)</Text>
         <TextInput

@@ -1,11 +1,13 @@
 import '../global.css';
 import { useEffect } from 'react';
-import { View, useColorScheme } from 'react-native';
+import { View } from 'react-native';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useColorScheme } from 'nativewind';
 import { useAuth } from '../hooks/useAuth';
+import { useAppStore } from '../store/useAppStore';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { PENDING_INVITE_KEY } from './join/[code]';
 
@@ -40,8 +42,14 @@ function AuthGate() {
 }
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
+  const theme = useAppStore((s) => s.theme);
+  const { setColorScheme } = useColorScheme();
+  const isDark = theme === 'dark';
+
+  // Keep NativeWind's internal state in sync for native dark: variant computation.
+  useEffect(() => {
+    setColorScheme(theme);
+  }, [theme]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

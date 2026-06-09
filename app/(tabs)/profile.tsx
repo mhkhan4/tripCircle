@@ -1,12 +1,14 @@
-import { View, Text, TouchableOpacity, Alert, Image, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, Image, Platform, Switch } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../hooks/useAuth';
 import { useAppStore } from '../../store/useAppStore';
+import { useTheme } from '../../hooks/useTheme';
 
 export default function ProfileScreen() {
   const { user: authUser, signOut } = useAuth();
   const { user } = useAppStore();
+  const { isDark, toggleTheme } = useTheme();
 
   function confirmSignOut() {
     const action = signOut;
@@ -45,6 +47,16 @@ export default function ProfileScreen() {
       </View>
 
       <View className="mx-5 mt-4 rounded-2xl bg-white shadow-sm dark:bg-gray-800" style={{ shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 }}>
+        <View className="flex-row items-center gap-3 px-5 py-4" style={{ borderBottomWidth: 1, borderBottomColor: isDark ? '#1F2937' : '#F1F5F9' }}>
+          <Ionicons name={isDark ? 'moon' : 'sunny'} size={20} color="#64748B" />
+          <Text className="flex-1 text-base text-gray-700 dark:text-gray-200">Dark Mode</Text>
+          <Switch
+            value={isDark}
+            onValueChange={toggleTheme}
+            trackColor={{ false: '#CBD5E1', true: '#2563EB' }}
+            thumbColor="#FFFFFF"
+          />
+        </View>
         {[
           { icon: 'notifications-outline', label: 'Notifications' },
           { icon: 'lock-closed-outline', label: 'Privacy' },
@@ -53,7 +65,7 @@ export default function ProfileScreen() {
           <TouchableOpacity
             key={item.label}
             className="flex-row items-center gap-3 px-5 py-4"
-            style={{ borderBottomWidth: i < arr.length - 1 ? 1 : 0, borderBottomColor: '#F1F5F9' }}
+            style={{ borderBottomWidth: i < arr.length - 1 ? 1 : 0, borderBottomColor: isDark ? '#1F2937' : '#F1F5F9' }}
           >
             <Ionicons name={item.icon as any} size={20} color="#64748B" />
             <Text className="flex-1 text-base text-gray-700 dark:text-gray-200">{item.label}</Text>
