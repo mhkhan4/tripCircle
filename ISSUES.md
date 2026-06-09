@@ -23,22 +23,7 @@
 
 ## 1. Critical Bugs
 
-### 1.1 `isGuest` can never be `true` — guest mode is permanently broken
-
-**File:** `store/useAppStore.ts:22-36`
-
-The store declares `isGuest: boolean` and initialises it to `false`, but there is no `setIsGuest` action. Nothing in the app can ever set it to `true`.
-
-Affected call sites that read `isGuest` but will always see `false`:
-- `hooks/useBudget.ts` — guest data never returned
-- `app/group/[id]/add-member.tsx:38` — guest guard never fires
-- `app/(tabs)/profile.tsx:29,52,84` — guest banner and "Exit Guest Mode" button never show
-
-**Fix:** Add `setIsGuest: (v: boolean) => void` to the store, call `setIsGuest(true)` when entering guest mode.
-
----
-
-### 1.2 `expense_splits` insert errors are silently swallowed
+### 1.1 `expense_splits` insert errors are silently swallowed
 
 **File:** `hooks/useBudget.ts:85-88`
 
@@ -520,17 +505,6 @@ These log the raw Gemini API response (including the full base64-encoded receipt
 
 ---
 
-### 10.2 `GUEST_USER.created_at` uses runtime `new Date()` — different on every app launch
-
-**File:** `store/useAppStore.ts:15`
-
-```ts
-created_at: new Date().toISOString(),
-```
-
-The guest user object is recreated on every app launch with the current timestamp, so demo UI that formats this date will show different values every time. Minor demo inconsistency.
-
-**Fix:** Use a fixed ISO date string.
 
 ---
 
@@ -588,5 +562,5 @@ The `react-native-calendars` package exports `MarkedDates` type. Using `any` all
 1. **Fix first (data integrity):** §1.2 expense_splits not checked, §4.1 budget using wrong member list, §1.3 submit during upload
 2. **Fix first (auth / security):** §2.1 Gemini key in client bundle, §3.2 `user!.id` guard, §2.3 profile upsert failure
 3. **Fix before ship (web compatibility):** §6.2 and §6.3 `Alert.alert` in solo trip screens — broken on web per AGENTS.md known issue
-4. **Fix soon:** §1.1 guest mode permanently broken, §3.1 silent chat errors
+4. **Fix soon:** §3.1 silent chat errors
 5. **Polish pass:** UX issues §8.1–§8.6, performance issues §7.1–§7.3

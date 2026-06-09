@@ -6,7 +6,7 @@ import { useAppStore } from '../../store/useAppStore';
 
 export default function ProfileScreen() {
   const { user: authUser, signOut } = useAuth();
-  const { user, isGuest } = useAppStore();
+  const { user } = useAppStore();
 
   function confirmSignOut() {
     const action = signOut;
@@ -26,15 +26,6 @@ export default function ProfileScreen() {
         <Text className="text-2xl font-bold text-gray-900 dark:text-white">Profile</Text>
       </View>
 
-      {isGuest && (
-        <View className="mx-5 mb-3 flex-row items-center gap-2 rounded-2xl bg-amber-50 px-4 py-3 dark:bg-amber-900/20">
-          <Ionicons name="information-circle-outline" size={18} color="#D97706" />
-          <Text className="flex-1 text-sm text-amber-700 dark:text-amber-400">
-            You're browsing as a guest. Sign in to save your data.
-          </Text>
-        </View>
-      )}
-
       <View className="mx-5 rounded-2xl bg-white p-5 shadow-sm dark:bg-gray-800" style={{ shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 }}>
         <View className="flex-row items-center gap-4">
           {user?.avatar_url ? (
@@ -49,11 +40,6 @@ export default function ProfileScreen() {
           <View>
             <Text className="text-lg font-bold text-gray-900 dark:text-white">{user?.full_name ?? 'Traveler'}</Text>
             <Text className="text-sm text-gray-500 dark:text-gray-400">{user?.email}</Text>
-            {isGuest && (
-              <View className="mt-1 self-start rounded-full bg-amber-100 px-2 py-0.5 dark:bg-amber-900/30">
-                <Text className="text-xs font-semibold text-amber-600 dark:text-amber-400">Guest</Text>
-              </View>
-            )}
           </View>
         </View>
       </View>
@@ -81,7 +67,7 @@ export default function ProfileScreen() {
         className="mx-5 mt-4 flex-row items-center justify-center gap-2 rounded-2xl bg-red-50 py-4 dark:bg-red-900/20"
       >
         <Ionicons name="log-out-outline" size={20} color="#EF4444" />
-        <Text className="font-semibold text-red-500">{isGuest ? 'Exit Guest Mode' : 'Sign Out'}</Text>
+        <Text className="font-semibold text-red-500">Sign Out</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );

@@ -1,17 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import { useAppStore } from '../store/useAppStore';
-import { GUEST_BUDGET, GUEST_EXPENSES } from '../lib/guestData';
 import type { Budget, BudgetContribution, Expense } from '../types';
 
 export function useBudget(tripId: string) {
-  const { isGuest } = useAppStore();
-
   return useQuery({
     queryKey: ['budget', tripId],
     enabled: !!tripId,
     queryFn: async () => {
-      if (isGuest) return GUEST_BUDGET;
       const { data, error } = await supabase
         .from('budgets')
         .select('*, budget_contributions(*, user:users(*))')
@@ -24,13 +20,10 @@ export function useBudget(tripId: string) {
 }
 
 export function useExpenses(tripId: string) {
-  const { isGuest } = useAppStore();
-
   return useQuery({
     queryKey: ['expenses', tripId],
     enabled: !!tripId,
     queryFn: async () => {
-      if (isGuest) return GUEST_EXPENSES;
       const { data, error } = await supabase
         .from('expenses')
         .select('*, payer:users!paid_by(*), splits:expense_splits(*, user:users(*))')

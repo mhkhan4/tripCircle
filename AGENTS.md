@@ -164,12 +164,3 @@ Any variable prefixed `EXPO_PUBLIC_` (e.g. `EXPO_PUBLIC_GEMINI_API_KEY`) is inli
 
 Server-side secrets (API keys, service role keys) must live in Supabase Edge Functions or backend routes — never in `EXPO_PUBLIC_` vars.
 
----
-
-## `isGuest` in the store has no setter — guest mode is currently broken
-
-**File:** `store/useAppStore.ts`
-
-`isGuest` is declared in the store and initialised to `false`, but there is no `setIsGuest` action. It can never be set to `true` at runtime. All screens that read `isGuest` (profile, add-member, budget hooks) will always see `false`.
-
-Do not add new logic that depends on `isGuest` being `true` until a setter is added to the store.

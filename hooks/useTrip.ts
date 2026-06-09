@@ -1,17 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import { useAppStore } from '../store/useAppStore';
-import { GUEST_TRIP, GUEST_TRIP_MEMBER } from '../lib/guestData';
 import type { Trip, TripStatus, TripMemberWithProfile } from '../types';
 
 export function useTrips(groupId: string) {
-  const { isGuest } = useAppStore();
-
   return useQuery({
     queryKey: ['trips', groupId],
     enabled: !!groupId,
     queryFn: async () => {
-      if (isGuest) return [GUEST_TRIP];
       const { data, error } = await supabase
         .from('trips')
         .select('*')
@@ -24,13 +20,10 @@ export function useTrips(groupId: string) {
 }
 
 export function useTrip(tripId: string) {
-  const { isGuest } = useAppStore();
-
   return useQuery({
     queryKey: ['trip', tripId],
     enabled: !!tripId,
     queryFn: async () => {
-      if (isGuest) return GUEST_TRIP;
       const { data, error } = await supabase
         .from('trips')
         .select('*')
@@ -43,13 +36,12 @@ export function useTrip(tripId: string) {
 }
 
 export function useAllTrips() {
-  const { user, isGuest } = useAppStore();
+  const { user } = useAppStore();
 
   return useQuery({
     queryKey: ['all-trips', user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
-      if (isGuest) return [GUEST_TRIP];
       const { data, error } = await supabase
         .from('trip_members')
         .select('trip:trips(*)')
@@ -62,12 +54,11 @@ export function useAllTrips() {
 }
 
 export function useSoloTrips() {
-  const { user, isGuest } = useAppStore();
+  const { user } = useAppStore();
   return useQuery({
     queryKey: ['solo-trips', user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
-      if (isGuest) return [];
       const { data, error } = await supabase
         .from('trips')
         .select('*')
@@ -126,13 +117,10 @@ export function useCreateTrip() {
 }
 
 export function useTripMembers(tripId: string) {
-  const { isGuest } = useAppStore();
-
   return useQuery({
     queryKey: ['trip-members', tripId],
     enabled: !!tripId,
     queryFn: async () => {
-      if (isGuest) return [GUEST_TRIP_MEMBER] as TripMemberWithProfile[];
       const { data, error } = await supabase
         .from('trip_members')
         .select('*, user:users(*)')
@@ -146,11 +134,10 @@ export function useTripMembers(tripId: string) {
 
 export function useJoinTrip() {
   const queryClient = useQueryClient();
-  const { user, isGuest } = useAppStore();
+  const { user } = useAppStore();
 
   return useMutation({
     mutationFn: async ({ tripId, groupId }: { tripId: string; groupId: string }) => {
-      if (isGuest) throw new Error('Sign in to join trips');
       if (!user) throw new Error('Not signed in');
       const { error } = await supabase
         .from('trip_members')
@@ -167,11 +154,10 @@ export function useJoinTrip() {
 
 export function useLeaveTrip() {
   const queryClient = useQueryClient();
-  const { user, isGuest } = useAppStore();
+  const { user } = useAppStore();
 
   return useMutation({
     mutationFn: async ({ tripId, groupId }: { tripId: string; groupId: string }) => {
-      if (isGuest) throw new Error('Sign in to manage trips');
       if (!user) throw new Error('Not signed in');
       const { error, count } = await supabase
         .from('trip_members')

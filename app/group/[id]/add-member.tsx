@@ -3,13 +3,11 @@ import { useLocalSearchParams, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState, useCallback } from 'react';
 import { useGroupMembers, useSearchUsers, useAddMember } from '../../../hooks/useGroup';
-import { useAppStore } from '../../../store/useAppStore';
 import UserSearchRow from '../../../components/UserSearchRow';
 import type { UserProfile } from '../../../types';
 
 export default function AddMemberScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { isGuest } = useAppStore();
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [addingId, setAddingId] = useState<string | null>(null);
@@ -35,10 +33,6 @@ export default function AddMemberScreen() {
   }
 
   async function handleAdd(userId: string) {
-    if (isGuest) {
-      Alert.alert('Sign in required', 'Sign in to add members to the group.');
-      return;
-    }
     setAddingId(userId);
     try {
       await addMember.mutateAsync(userId);

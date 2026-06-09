@@ -16,8 +16,6 @@
 
 **TanStack Query is the data layer.** All hooks follow a consistent pattern: `useQuery` for reads, `useMutation` with `queryClient.invalidateQueries` for writes.
 
-**Guest mode must be handled.** Every hook checks `isGuest` and returns static data. The members feature must follow this same pattern.
-
 ---
 
 ## 1. Database Changes
@@ -193,8 +191,6 @@ queryFn: supabase
   .order('joined_at', { ascending: true })
 ```
 
-Guest mode: return a single-element array with the guest admin member.
-
 ### `useSearchUsers(query: string, groupId: string)`
 
 ```
@@ -287,15 +283,7 @@ const isAdmin = currentMembership?.role === 'admin'
 
 ---
 
-## 8. Guest Mode Handling
-
-- `useGroupMembers` in guest mode: return the single guest-admin member
-- `useSearchUsers` in guest mode: return `[]`
-- `useAddMember` / `useRemoveMember` in guest mode: short-circuit with an Alert ("Sign in to manage members")
-
----
-
-## 9. Complete File Inventory
+## 8. Complete File Inventory
 
 ### New files
 
