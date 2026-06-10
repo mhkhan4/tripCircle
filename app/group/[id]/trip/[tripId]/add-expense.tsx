@@ -13,6 +13,7 @@ import { useAddExpense } from '../../../../../hooks/useBudget';
 import { useGroup } from '../../../../../hooks/useGroup';
 import { useTripMembers } from '../../../../../hooks/useTrip';
 import { useAppStore } from '../../../../../store/useAppStore';
+import { useTheme } from '../../../../../hooks/useTheme';
 import type { ExpenseCategory } from '../../../../../types';
 
 const CATEGORIES: ExpenseCategory[] = ['food', 'transport', 'accommodation', 'activities', 'shopping', 'other'];
@@ -33,6 +34,7 @@ export default function AddExpenseScreen() {
   const { data: group } = useGroup(groupId);
   const { data: tripMembersData } = useTripMembers(tripId);
   const addExpense = useAddExpense();
+  const { isDark } = useTheme();
 
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
@@ -57,6 +59,19 @@ export default function AddExpenseScreen() {
     if (result.canceled || !result.assets[0]) return;
 
     const asset = result.assets[0];
+    
+    // File Type & Size Validation
+    const ext = asset.uri.split('.').pop()?.toLowerCase() ?? 'jpg';
+    if (!['jpg', 'jpeg', 'png', 'webp'].includes(ext)) {
+      Alert.alert('Unsupported format', 'Please upload a JPG, JPEG, PNG, or WEBP image.');
+      return;
+    }
+
+    if (asset.fileSize && asset.fileSize > 10 * 1024 * 1024) {
+      Alert.alert('File too large', 'Receipt image size must be smaller than 10MB.');
+      return;
+    }
+
     setReceiptUri(asset.uri);
     setScanning(true);
 
@@ -74,7 +89,6 @@ export default function AddExpenseScreen() {
 
     setUploading(true);
     try {
-      const ext = asset.uri.split('.').pop() ?? 'jpg';
       const path = `receipts/${tripId}/${Date.now()}.${ext}`;
       const base64Data = asset.base64!;
       const byteArray = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0));
@@ -83,11 +97,14 @@ export default function AddExpenseScreen() {
         contentType: `image/${ext}`,
       });
 
-      if (!error) {
-        const { data } = supabase.storage.from('receipts').getPublicUrl(path);
-        setReceiptUrl(data.publicUrl);
-      }
-    } catch {
+      if (error) throw error;
+
+      const { data } = supabase.storage.from('receipts').getPublicUrl(path);
+      setReceiptUrl(data.publicUrl);
+    } catch (e) {
+      Alert.alert('Upload failed', 'Receipt upload failed. You can still save the expense without it.');
+      setReceiptUri(null);
+      setReceiptUrl(null);
     } finally {
       setUploading(false);
     }
@@ -121,79 +138,82 @@ export default function AddExpenseScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50 dark:bg-gray-950" edges={['bottom']}>
+    <SafeAreaView className="flex-1 bg-slate-50/60 dark:bg-slate-950/60" edges={['bottom']}>
       <Stack.Screen options={{ title: 'Add Expense' }} />
-      <ScrollView className="flex-1 px-5 pt-4" keyboardShouldPersistTaps="handled">
-        <Text className="mb-1 text-2xl font-bold text-gray-900 dark:text-white">Add Expense</Text>
-        <Text className="mb-5 text-sm text-gray-500 dark:text-gray-400">Scan a receipt or enter manually.</Text>
+      <ScrollView className="flex-1 px-5 pt-6" keyboardShouldPersistTaps="handled">
+        <Text className="text-slate-900 text-2xl font-bold dark:text-white">Add Expense</Text>
+        <Text className="mb-6 text-sm text-slate-500">Scan a receipt or enter manually.</Text>
 
         <TouchableOpacity
           onPress={pickReceipt}
           disabled={scanning || uploading}
-          className="mb-5 flex-row items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-primary/40 bg-primary/5 py-5 dark:border-primary/30 dark:bg-primary/10"
+          activeOpacity={0.8}
+          className="mb-8 flex-row items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-200 bg-white py-6 shadow-sm transition-all duration-200 active:scale-98 dark:border-slate-800 dark:bg-slate-900"
         >
           {scanning ? (
             <>
-              <ActivityIndicator color="#2563EB" />
-              <Text className="text-sm font-semibold text-primary">Scanning receipt...</Text>
+              <ActivityIndicator color="#0f172a" />
+              <Text className="text-sm font-semibold text-slate-900 dark:text-white">Scanning receipt...</Text>
             </>
           ) : uploading ? (
             <>
-              <ActivityIndicator color="#2563EB" />
-              <Text className="text-sm font-semibold text-primary">Uploading...</Text>
+              <ActivityIndicator color="#0f172a" />
+              <Text className="text-sm font-semibold text-slate-900 dark:text-white">Uploading...</Text>
             </>
           ) : receiptUri ? (
             <View className="items-center">
               <Image source={{ uri: receiptUri }} className="h-24 w-40 rounded-xl" resizeMode="cover" />
-              <Text className="mt-2 text-xs text-green-600 font-semibold">Receipt scanned</Text>
+              <Text className="mt-2 text-xs text-green-600 font-semibold uppercase tracking-wider">Receipt scanned</Text>
             </View>
           ) : (
             <>
-              <Ionicons name="camera-outline" size={22} color="#2563EB" />
-              <Text className="text-sm font-semibold text-primary">Scan Receipt</Text>
+              <Ionicons name="camera-outline" size={22} color="#64748b" />
+              <Text className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Scan Receipt</Text>
             </>
           )}
         </TouchableOpacity>
 
-        <Text className="mb-1 text-sm font-semibold text-gray-700 dark:text-gray-300">Amount (USD) *</Text>
+        <Text className="mb-2 text-slate-400 text-xs font-semibold tracking-wider uppercase">Amount (USD) *</Text>
         <TextInput
           value={amount}
           onChangeText={setAmount}
           placeholder="0.00"
           placeholderTextColor="#94A3B8"
           keyboardType="decimal-pad"
-          className="mb-4 rounded-xl border border-gray-200 bg-white px-4 py-3 text-2xl font-bold text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+          className="mb-6 rounded-xl border border-slate-200 bg-white px-4 py-4 text-3xl font-extrabold text-slate-900 dark:border-slate-800 dark:bg-slate-900 dark:text-white"
         />
 
-        <Text className="mb-1 text-sm font-semibold text-gray-700 dark:text-gray-300">Description *</Text>
+        <Text className="mb-2 text-slate-400 text-xs font-semibold tracking-wider uppercase">Description *</Text>
         <TextInput
           value={description}
           onChangeText={setDescription}
           placeholder="e.g. Dinner at beach restaurant"
           placeholderTextColor="#94A3B8"
-          className="mb-4 rounded-xl border border-gray-200 bg-white px-4 py-3 text-base text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+          className="mb-6 rounded-xl border border-slate-200 bg-white px-4 py-4 text-base text-slate-900 dark:border-slate-800 dark:bg-slate-900 dark:text-white"
         />
 
-        <Text className="mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300">Category</Text>
-        <View className="mb-6 flex-row flex-wrap gap-2">
+        <Text className="mb-3 text-slate-400 text-xs font-semibold tracking-wider uppercase">Category</Text>
+        <View className="mb-8 flex-row flex-wrap gap-2">
           {CATEGORIES.map((cat) => (
             <TouchableOpacity
               key={cat}
               onPress={() => setCategory(cat)}
-              className="flex-row items-center gap-1 rounded-xl border px-3 py-2"
+              className="flex-row items-center gap-1.5 rounded-full border px-4 py-2.5 transition-all duration-150 active:scale-95"
               style={{
-                backgroundColor: category === cat ? '#2563EB' : 'transparent',
-                borderColor: category === cat ? '#2563EB' : '#E2E8F0',
+                backgroundColor: category === cat ? (isDark ? 'white' : '#0f172a') : 'transparent',
+                borderColor: category === cat ? (isDark ? 'white' : '#0f172a') : (isDark ? '#334155' : '#e2e8f0'),
               }}
             >
               <Ionicons
                 name={CATEGORY_ICONS[cat] as any}
                 size={14}
-                color={category === cat ? 'white' : '#64748B'}
+                color={category === cat ? (isDark ? '#0f172a' : 'white') : '#64748B'}
               />
               <Text
-                className="text-sm capitalize"
-                style={{ color: category === cat ? 'white' : '#374151', fontWeight: category === cat ? '600' : '400' }}
+                className="text-sm capitalize font-semibold"
+                style={{
+                  color: category === cat ? (isDark ? '#0f172a' : 'white') : (isDark ? '#cbd5e1' : '#334155'),
+                }}
               >
                 {cat}
               </Text>
@@ -201,8 +221,8 @@ export default function AddExpenseScreen() {
           ))}
         </View>
 
-        <View className="mb-4 rounded-xl bg-blue-50 p-3 dark:bg-blue-900/20">
-          <Text className="text-sm text-blue-700 dark:text-blue-300">
+        <View className="mb-8 rounded-xl border border-blue-100 bg-blue-50/50 p-4 dark:border-blue-900/30 dark:bg-blue-950/20">
+          <Text className="text-sm font-semibold text-blue-700 dark:text-blue-300">
             Split equally among {members.length} trip {members.length === 1 ? 'member' : 'members'} (${(parseFloat(amount || '0') / Math.max(members.length, 1)).toFixed(2)} each)
           </Text>
         </View>
@@ -212,12 +232,13 @@ export default function AddExpenseScreen() {
         <TouchableOpacity
           onPress={handleSubmit}
           disabled={addExpense.isPending || uploading}
-          className="items-center rounded-2xl bg-primary py-4"
+          activeOpacity={0.9}
+          className="items-center justify-center rounded-xl bg-slate-900 py-4 shadow-sm transition-all duration-200 active:scale-95 dark:bg-white"
         >
           {addExpense.isPending || uploading ? (
-            <ActivityIndicator color="white" />
+            <ActivityIndicator color={isDark ? '#0f172a' : 'white'} />
           ) : (
-            <Text className="text-base font-bold text-white">Save Expense</Text>
+            <Text className="text-base font-bold text-white dark:text-slate-900">Save Expense</Text>
           )}
         </TouchableOpacity>
       </View>

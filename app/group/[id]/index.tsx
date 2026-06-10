@@ -37,45 +37,34 @@ function TripCard({ item, groupId }: { item: Trip; groupId: string }) {
   return (
     <PressableCard
       onPress={() => router.push(`/group/${groupId}/trip/${item.id}`)}
-      style={{
-        marginBottom: 12,
-        borderRadius: 16,
-        padding: 16,
-        backgroundColor: isDark ? '#1e293b' : '#ffffff',
-        borderWidth: 1,
-        borderColor: isDark ? '#334155' : '#f1f5f9',
-        shadowColor: '#000',
-        shadowOpacity: isDark ? 0.25 : 0.07,
-        shadowOffset: { width: 0, height: 4 },
-        shadowRadius: 10,
-        elevation: 2,
-      }}
+      className="mb-4 rounded-xl border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800/80 dark:bg-slate-900/50"
     >
-      <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-        <View style={{ flex: 1 }}>
-          <Text className="text-base font-bold text-slate-900 dark:text-white">{item.title}</Text>
-          <View style={{ marginTop: 4, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+      <View className="flex-row items-start justify-between gap-4">
+        <View className="flex-1">
+          <Text className="text-base font-bold text-slate-900 dark:text-slate-100">{item.title}</Text>
+          <View className="mt-2 flex-row items-center gap-1.5">
             <Ionicons name="location-outline" size={13} color="#94A3B8" />
-            <Text className="text-sm text-slate-500 dark:text-slate-400">{item.destination}</Text>
+            <Text className="text-xs font-semibold tracking-wider uppercase text-slate-400">{item.destination}</Text>
           </View>
-          <View style={{ marginTop: 2, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+          <View className="mt-1 flex-row items-center gap-1.5">
             <Ionicons name="calendar-outline" size={13} color="#94A3B8" />
-            <Text className="text-sm text-slate-500 dark:text-slate-400">
+            <Text className="text-xs font-semibold tracking-wider uppercase text-slate-400">
               {format(new Date(item.start_date + 'T12:00:00'), 'MMM d')} – {format(new Date(item.end_date + 'T12:00:00'), 'MMM d, yyyy')}
             </Text>
           </View>
         </View>
-        <View style={{ alignItems: 'flex-end', gap: 8 }}>
-          <View style={{ borderRadius: 999, paddingHorizontal: 8, paddingVertical: 4, backgroundColor: `${color}20` }}>
-            <Text style={{ fontSize: 11, fontWeight: '600', textTransform: 'capitalize', color }}>{item.status}</Text>
+        <View className="items-end gap-3">
+          <View className="rounded-full px-2.5 py-1" style={{ backgroundColor: `${color}15` }}>
+            <Text className="text-xs font-bold capitalize" style={{ color }}>{item.status}</Text>
           </View>
           {!isMember && (
             <TouchableOpacity
               onPress={(e) => { e.stopPropagation(); handleJoin(); }}
               disabled={joinTrip.isPending}
-              className="rounded-full bg-primary px-3 py-1"
+              activeOpacity={0.9}
+              className="rounded-full bg-slate-900 dark:bg-white px-4 py-1.5 transition-all duration-200 active:scale-95"
             >
-              <Text className="text-xs font-bold text-white">Join</Text>
+              <Text className="text-xs font-bold text-white dark:text-slate-900">Join</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -105,70 +94,57 @@ export default function GroupScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50 dark:bg-slate-950" edges={['bottom']}>
+    <SafeAreaView className="flex-1 bg-slate-50/60 dark:bg-slate-950/60" edges={['bottom']}>
       <Stack.Screen options={{ title: group?.name ?? 'Group' }} />
 
       {/* Group header card */}
-      <View
-        style={{
-          marginHorizontal: 20,
-          marginBottom: 16,
-          borderRadius: 20,
-          padding: 16,
-          backgroundColor: isDark ? '#1e293b' : '#ffffff',
-          shadowColor: '#000',
-          shadowOpacity: isDark ? 0.25 : 0.07,
-          shadowOffset: { width: 0, height: 4 },
-          shadowRadius: 12,
-          elevation: 3,
-        }}
-      >
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+      <View className="mx-5 mb-8 rounded-xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-800/80 dark:bg-slate-900">
+        <View className="flex-row items-center gap-4">
           <View
             style={{
               width: 56,
               height: 56,
               borderRadius: 16,
-              backgroundColor: '#2563eb',
+              backgroundColor: '#0f172a',
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
             <Text style={{ fontSize: 24, fontWeight: '800', color: 'white' }}>
-              {group?.name?.[0]?.toUpperCase()}
+              {group?.name?.[0]?.toUpperCase() ?? '?'}
             </Text>
           </View>
-          <View style={{ flex: 1 }}>
+          <View className="flex-1">
             <Text className="text-xl font-bold text-slate-900 dark:text-white">{group?.name}</Text>
             {group?.description ? (
-              <Text className="text-sm text-slate-500 dark:text-slate-400">{group.description}</Text>
+              <Text className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">{group.description}</Text>
             ) : null}
           </View>
         </View>
-        <View style={{ marginTop: 14, flexDirection: 'row', gap: 8 }}>
+        <View className="mt-6 flex-row gap-3">
           <TouchableOpacity
             onPress={shareInvite}
-            style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, borderRadius: 12, borderWidth: 1, borderColor: '#2563eb', paddingVertical: 10 }}
+            activeOpacity={0.9}
+            className="flex-1 flex-row items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-3 transition-all duration-200 active:scale-95 dark:border-slate-800 dark:bg-slate-900/50"
           >
-            <Ionicons name="share-outline" size={16} color="#2563EB" />
-            <Text className="text-sm font-semibold text-primary">Invite</Text>
+            <Ionicons name="share-outline" size={16} color={isDark ? '#cbd5e1' : '#334155'} />
+            <Text className="text-sm font-bold text-slate-700 dark:text-slate-300">Invite</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => router.push(`/group/${id}/members`)}
-            style={{
-              flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
-              borderRadius: 12, borderWidth: 1, borderColor: isDark ? '#334155' : '#e2e8f0', paddingVertical: 10,
-            }}
+            activeOpacity={0.9}
+            className="flex-1 flex-row items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-3 transition-all duration-200 active:scale-95 dark:border-slate-800 dark:bg-slate-900/50"
           >
-            <Ionicons name="people-outline" size={16} color="#64748B" />
-            <Text className="text-sm font-semibold text-slate-600 dark:text-slate-400">Members</Text>
+            <Ionicons name="people-outline" size={16} color={isDark ? '#cbd5e1' : '#334155'} />
+            <Text className="text-sm font-bold text-slate-700 dark:text-slate-300">Members</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => router.push(`/group/${id}/chat`)}
-            style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, borderRadius: 12, backgroundColor: '#2563eb', paddingVertical: 10 }}
+            activeOpacity={0.9}
+            className="flex-1 flex-row items-center justify-center gap-2 rounded-xl bg-slate-900 py-3 transition-all duration-200 active:scale-95 dark:bg-white"
           >
-            <Ionicons name="chatbubbles-outline" size={16} color="white" />
-            <Text style={{ fontSize: 14, fontWeight: '600', color: 'white' }}>Chat</Text>
+            <Ionicons name="chatbubbles-outline" size={16} color={isDark ? '#0f172a' : 'white'} />
+            <Text className="text-sm font-bold text-white dark:text-slate-900">Chat</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -179,17 +155,18 @@ export default function GroupScreen() {
         renderItem={renderTrip}
         contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 100 }}
         ListHeaderComponent={
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <View style={{ width: 3, height: 14, borderRadius: 2, backgroundColor: '#2563eb' }} />
-              <Text className="text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">Trips</Text>
+          <View className="mb-4 flex-row items-center justify-between">
+            <View className="flex-row items-center gap-1.5">
+              <View style={{ width: 3, height: 12, borderRadius: 2, backgroundColor: isDark ? '#ffffff' : '#0f172a' }} />
+              <Text className="text-slate-400 text-xs font-semibold tracking-wider uppercase">Trips</Text>
             </View>
             <TouchableOpacity
               onPress={() => router.push(`/group/${id}/trip/new`)}
-              style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}
+              activeOpacity={0.9}
+              className="flex-row items-center gap-1 transition-all duration-200 active:scale-95"
             >
-              <Ionicons name="add-circle" size={18} color="#2563EB" />
-              <Text className="text-sm font-semibold text-primary">New Trip</Text>
+              <Ionicons name="add-circle" size={18} color={isDark ? '#ffffff' : '#0f172a'} />
+              <Text className="text-sm font-bold text-slate-900 dark:text-white">New Trip</Text>
             </TouchableOpacity>
           </View>
         }
@@ -206,15 +183,16 @@ export default function GroupScreen() {
                 marginBottom: 16,
               }}
             >
-              <Ionicons name="map-outline" size={36} color={isDark ? '#475569' : '#CBD5E1'} />
+              <Ionicons name="map-outline" size={36} color={isDark ? '#cbd5e1' : '#64748b'} />
             </View>
-            <Text className="text-base font-bold text-slate-700 dark:text-slate-300">No trips yet</Text>
-            <Text className="mt-1 text-sm text-slate-400 dark:text-slate-500">Plan your first adventure together.</Text>
+            <Text className="text-base font-bold text-slate-900 dark:text-white">No trips yet</Text>
+            <Text className="mt-1 text-sm text-slate-500">Plan your first adventure together.</Text>
             <TouchableOpacity
               onPress={() => router.push(`/group/${id}/trip/new`)}
-              style={{ marginTop: 20, borderRadius: 14, backgroundColor: '#2563eb', paddingHorizontal: 24, paddingVertical: 12 }}
+              activeOpacity={0.9}
+              className="mt-6 rounded-xl bg-slate-900 dark:bg-white px-6 py-3.5 transition-all duration-200 active:scale-95 shadow-sm"
             >
-              <Text style={{ fontSize: 15, fontWeight: '700', color: 'white' }}>Plan a Trip</Text>
+              <Text className="font-bold text-white dark:text-slate-900">Plan a Trip</Text>
             </TouchableOpacity>
           </View>
         }

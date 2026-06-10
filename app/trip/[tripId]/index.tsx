@@ -1,4 +1,4 @@
-import { View, Text, ScrollView } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -43,73 +43,66 @@ export default function SoloTripScreen() {
   const days = differenceInDays(new Date(trip.end_date), new Date(trip.start_date)) + 1;
   const color = STATUS_COLOR[trip.status];
 
-  const card = {
-    backgroundColor: isDark ? '#1e293b' : '#ffffff',
-    borderWidth: 1,
-    borderColor: isDark ? '#334155' : '#f1f5f9',
-    shadowColor: '#000' as const,
-    shadowOpacity: isDark ? 0.25 : 0.07,
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 10,
-    elevation: 2,
-  };
-
   return (
-    <SafeAreaView className="flex-1 bg-slate-50 dark:bg-slate-950" edges={['bottom']}>
+    <SafeAreaView className="flex-1 bg-slate-50/60 dark:bg-slate-950/60" edges={['bottom']}>
       <Stack.Screen options={{ title: trip.title }} />
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 100 }}>
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 24, paddingBottom: 100 }}>
 
         {/* Trip header */}
-        <View style={{ ...card, marginBottom: 16, borderRadius: 20, padding: 16 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 14 }}>
-            <View style={{ flex: 1 }}>
+        <View className="mb-6 rounded-xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-800/80 dark:bg-slate-900">
+          <View className="flex-row items-start justify-between gap-4 mb-5">
+            <View className="flex-1">
               <Text className="text-xl font-bold text-slate-900 dark:text-white">{trip.title}</Text>
-              <View style={{ marginTop: 4, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+              <View className="mt-2 flex-row items-center gap-1.5">
                 <Ionicons name="location-outline" size={14} color="#94A3B8" />
-                <Text className="text-sm text-slate-500 dark:text-slate-400">{trip.destination}</Text>
+                <Text className="text-xs font-semibold tracking-wider uppercase text-slate-400">{trip.destination}</Text>
               </View>
             </View>
-            <View style={{ borderRadius: 999, paddingHorizontal: 12, paddingVertical: 4, backgroundColor: `${color}20` }}>
-              <Text style={{ fontSize: 13, fontWeight: '600', textTransform: 'capitalize', color }}>{trip.status}</Text>
+            <View className="rounded-full px-3 py-1" style={{ backgroundColor: `${color}15` }}>
+              <Text className="text-xs font-bold capitalize" style={{ color }}>{trip.status}</Text>
             </View>
           </View>
 
-          <View style={{ flexDirection: 'row', gap: 10 }}>
-            <View style={{ flex: 1, borderRadius: 12, padding: 12, backgroundColor: isDark ? '#0f172a' : '#f8fafc' }}>
-              <Text className="text-xs text-slate-400">Start</Text>
-              <Text className="mt-0.5 font-semibold text-slate-800 dark:text-slate-200">
+          <View className="flex-row gap-3">
+            <View className="flex-1 rounded-xl border border-slate-100 bg-slate-50/50 p-4 dark:border-slate-800/60 dark:bg-slate-950/20">
+              <Text className="text-slate-400 text-xs font-semibold tracking-wider uppercase">Start</Text>
+              <Text className="mt-1 font-bold text-slate-800 dark:text-slate-200 text-sm">
                 {format(new Date(trip.start_date + 'T12:00:00'), 'MMM d, yyyy')}
               </Text>
             </View>
-            <View style={{ flex: 1, borderRadius: 12, padding: 12, backgroundColor: isDark ? '#0f172a' : '#f8fafc' }}>
-              <Text className="text-xs text-slate-400">End</Text>
-              <Text className="mt-0.5 font-semibold text-slate-800 dark:text-slate-200">
+            <View className="flex-1 rounded-xl border border-slate-100 bg-slate-50/50 p-4 dark:border-slate-800/60 dark:bg-slate-950/20">
+              <Text className="text-slate-400 text-xs font-semibold tracking-wider uppercase">End</Text>
+              <Text className="mt-1 font-bold text-slate-800 dark:text-slate-200 text-sm">
                 {format(new Date(trip.end_date + 'T12:00:00'), 'MMM d, yyyy')}
               </Text>
             </View>
-            <View style={{ alignItems: 'center', justifyContent: 'center', borderRadius: 12, paddingHorizontal: 14, backgroundColor: '#2563eb14' }}>
-              <Text style={{ fontSize: 20, fontWeight: '800', color: '#2563eb' }}>{days}</Text>
-              <Text style={{ fontSize: 11, color: '#2563eb' }}>days</Text>
+            <View className="items-center justify-center rounded-xl px-4 bg-slate-900 dark:bg-white">
+              <Text className="text-lg font-bold text-white dark:text-slate-900">{days}</Text>
+              <Text className="text-slate-400 dark:text-slate-500 text-[10px] font-semibold tracking-wider uppercase">days</Text>
             </View>
           </View>
 
           {trip.description ? (
-            <Text className="mt-3 text-sm leading-relaxed text-slate-500 dark:text-slate-400">{trip.description}</Text>
+            <Text className="mt-4 text-sm leading-relaxed text-slate-500">{trip.description}</Text>
           ) : null}
         </View>
 
         {/* Budget */}
-        <View style={{ ...card, marginBottom: 16, borderRadius: 20, padding: 16 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-            <Text className="text-base font-bold text-slate-900 dark:text-white">Budget</Text>
-            <PressableCard onPress={() => router.push(`/trip/${tripId}/budget`)}>
-              <Text className="text-sm font-semibold text-primary">{totalBudget > 0 ? 'Details' : 'Set Budget'}</Text>
-            </PressableCard>
+        <View className="mb-6 rounded-xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-800/80 dark:bg-slate-900">
+          <View className="flex-row items-center justify-between mb-4">
+            <Text className="text-slate-400 text-xs font-semibold tracking-wider uppercase">Budget</Text>
+            <TouchableOpacity
+              onPress={() => router.push(`/trip/${tripId}/budget`)}
+              activeOpacity={0.9}
+              className="transition-all duration-200 active:scale-95"
+            >
+              <Text className="text-sm font-bold text-primary">{totalBudget > 0 ? 'Details' : 'Set Budget'}</Text>
+            </TouchableOpacity>
           </View>
 
           {totalBudget > 0 ? (
             <>
-              <View style={{ marginBottom: 8, height: 8, overflow: 'hidden', borderRadius: 999, backgroundColor: isDark ? '#334155' : '#f1f5f9' }}>
+              <View className="mb-4 h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
                 <View
                   style={{
                     height: '100%',
@@ -119,87 +112,87 @@ export default function SoloTripScreen() {
                   }}
                 />
               </View>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <Text className="text-sm text-slate-500 dark:text-slate-400">
-                  Spent: <Text className="font-semibold text-slate-800 dark:text-white">${totalSpent.toFixed(2)}</Text>
+              <View className="flex-row justify-between">
+                <Text className="text-sm text-slate-500">
+                  Spent: <Text className="font-bold text-slate-850 dark:text-slate-200">${totalSpent.toFixed(2)}</Text>
                 </Text>
-                <Text className="text-sm text-slate-500 dark:text-slate-400">
-                  Budget: <Text className="font-semibold text-slate-800 dark:text-white">${totalBudget.toFixed(2)}</Text>
+                <Text className="text-sm text-slate-500">
+                  Budget: <Text className="font-bold text-slate-850 dark:text-slate-200">${totalBudget.toFixed(2)}</Text>
                 </Text>
               </View>
-              <Text className={`mt-1 text-sm font-semibold ${remaining >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+              <Text className={`mt-2 text-sm font-semibold ${remaining >= 0 ? 'text-green-600' : 'text-red-500'}`}>
                 {remaining >= 0 ? `$${remaining.toFixed(2)} remaining` : `$${Math.abs(remaining).toFixed(2)} over budget`}
               </Text>
             </>
           ) : (
-            <Text className="text-sm text-slate-400">No budget set yet. Tap "Set Budget" to add one.</Text>
+            <Text className="text-sm text-slate-500">No budget set yet. Tap "Set Budget" to add one.</Text>
           )}
         </View>
 
         {/* Expenses */}
         <PressableCard
           onPress={() => router.push(`/trip/${tripId}/expenses`)}
-          style={{ ...card, marginBottom: 16, borderRadius: 20, padding: 16 }}
+          className="mb-6 rounded-xl border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800/80 dark:bg-slate-900/50"
         >
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
-            <View style={{ width: 44, height: 44, borderRadius: 13, backgroundColor: '#2563eb14', alignItems: 'center', justifyContent: 'center' }}>
-              <Ionicons name="receipt-outline" size={22} color="#2563EB" />
+          <View className="flex-row items-center gap-4">
+            <View className="h-10 w-10 items-center justify-center rounded-xl bg-slate-50 dark:bg-slate-800/60">
+              <Ionicons name="receipt-outline" size={20} color={isDark ? '#ffffff' : '#0f172a'} />
             </View>
-            <View style={{ flex: 1 }}>
-              <Text className="font-bold text-slate-800 dark:text-white">Expenses</Text>
-              <Text className="text-sm text-slate-400 dark:text-slate-500">Track your spending</Text>
+            <View className="flex-1">
+              <Text className="font-bold text-slate-900 dark:text-slate-100 text-sm">Expenses</Text>
+              <Text className="text-slate-400 text-xs font-semibold tracking-wider uppercase mt-1">Track Spent</Text>
             </View>
             <Ionicons name="chevron-forward" size={18} color={isDark ? '#475569' : '#CBD5E1'} />
           </View>
         </PressableCard>
 
         {/* Tasks & Itinerary */}
-        <View style={{ flexDirection: 'row', gap: 12, marginBottom: 16 }}>
+        <View className="flex-row gap-4 mb-6">
           <PressableCard
             onPress={() => router.push(`/trip/${tripId}/tasks`)}
-            style={{ ...card, flex: 1, borderRadius: 20, padding: 16 }}
+            className="flex-1 rounded-xl border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800/80 dark:bg-slate-900/50"
           >
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-              <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: '#10b98114', alignItems: 'center', justifyContent: 'center' }}>
-                <Ionicons name="checkbox-outline" size={22} color="#10B981" />
+            <View className="flex-row items-center justify-between">
+              <View className="h-10 w-10 items-center justify-center rounded-xl bg-slate-50 dark:bg-slate-800/60">
+                <Ionicons name="checkbox-outline" size={20} color={isDark ? '#ffffff' : '#0f172a'} />
               </View>
               {pendingTaskCount > 0 && (
-                <View style={{ borderRadius: 999, backgroundColor: '#dcfce7', paddingHorizontal: 8, paddingVertical: 2 }}>
-                  <Text style={{ fontSize: 12, fontWeight: '700', color: '#16a34a' }}>{pendingTaskCount}</Text>
+                <View className="rounded-full bg-emerald-500/10 px-2 py-0.5">
+                  <Text className="text-xs font-bold text-emerald-600">{pendingTaskCount}</Text>
                 </View>
               )}
             </View>
-            <Text className="mt-2 font-bold text-slate-800 dark:text-white">Tasks</Text>
-            <Text className="mt-0.5 text-sm text-slate-400 dark:text-slate-500">
-              {pendingTaskCount > 0 ? `${pendingTaskCount} to do` : 'Checklist'}
+            <Text className="mt-3 font-bold text-slate-900 dark:text-slate-100 text-sm">Tasks</Text>
+            <Text className="mt-1 text-slate-400 text-xs font-semibold tracking-wider uppercase">
+              {pendingTaskCount > 0 ? `${pendingTaskCount} left` : 'Checklist'}
             </Text>
           </PressableCard>
 
           <PressableCard
             onPress={() => router.push(`/trip/${tripId}/itinerary`)}
-            style={{ ...card, flex: 1, borderRadius: 20, padding: 16 }}
+            className="flex-1 rounded-xl border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800/80 dark:bg-slate-900/50"
           >
-            <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: '#ef444414', alignItems: 'center', justifyContent: 'center' }}>
-              <Ionicons name="map-outline" size={22} color="#EF4444" />
+            <View className="h-10 w-10 items-center justify-center rounded-xl bg-slate-50 dark:bg-slate-800/60">
+              <Ionicons name="map-outline" size={20} color={isDark ? '#ffffff' : '#0f172a'} />
             </View>
-            <Text className="mt-2 font-bold text-slate-800 dark:text-white">Itinerary</Text>
-            <Text className="mt-0.5 text-sm text-slate-400 dark:text-slate-500">
-              {itineraryCount > 0 ? `${itineraryCount} entries` : 'Bookings & plans'}
+            <Text className="mt-3 font-bold text-slate-900 dark:text-slate-100 text-sm">Itinerary</Text>
+            <Text className="mt-1 text-slate-400 text-xs font-semibold tracking-wider uppercase">
+              {itineraryCount > 0 ? `${itineraryCount} plans` : 'Empty'}
             </Text>
           </PressableCard>
         </View>
 
         {/* Spending by category */}
         {Object.keys(byCategory).length > 0 && (
-          <View style={{ ...card, borderRadius: 20, padding: 16 }}>
-            <Text className="mb-3 text-base font-bold text-slate-900 dark:text-white">Spending by Category</Text>
+          <View className="mb-6 rounded-xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-800/80 dark:bg-slate-900">
+            <Text className="mb-4 text-slate-400 text-xs font-semibold tracking-wider uppercase">Spending by Category</Text>
             {Object.entries(byCategory).map(([cat, amount]) => (
               <View key={cat} style={{ marginBottom: 10, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                <View style={{ width: 32, height: 32, borderRadius: 9, backgroundColor: isDark ? '#334155' : '#f1f5f9', alignItems: 'center', justifyContent: 'center' }}>
+                <View className="h-8 w-8 items-center justify-center rounded-lg bg-slate-50 dark:bg-slate-800/60">
                   <Ionicons name={CATEGORY_ICONS[cat] as any ?? 'ellipsis-horizontal-outline'} size={15} color="#64748B" />
                 </View>
-                <Text className="flex-1 capitalize text-slate-700 dark:text-slate-300">{cat}</Text>
-                <Text className="font-semibold text-slate-800 dark:text-white">${(amount as number).toFixed(2)}</Text>
+                <Text className="flex-1 capitalize text-slate-700 dark:text-slate-350">{cat}</Text>
+                <Text className="font-bold text-slate-900 dark:text-white">${(amount as number).toFixed(2)}</Text>
               </View>
             ))}
           </View>
@@ -207,27 +200,15 @@ export default function SoloTripScreen() {
       </ScrollView>
 
       {/* FAB */}
-      <View style={{ position: 'absolute', bottom: 24, right: 20 }}>
-        <PressableCard
+      <View className="absolute bottom-6 right-5">
+        <TouchableOpacity
           onPress={() => router.push(`/trip/${tripId}/add-expense`)}
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 8,
-            borderRadius: 16,
-            backgroundColor: '#2563eb',
-            paddingHorizontal: 20,
-            paddingVertical: 14,
-            shadowColor: '#2563EB',
-            shadowOpacity: 0.4,
-            shadowOffset: { width: 0, height: 6 },
-            shadowRadius: 14,
-            elevation: 8,
-          }}
+          activeOpacity={0.9}
+          className="flex-row items-center gap-2 rounded-full bg-slate-900 px-6 py-4 shadow-md transition-all duration-200 active:scale-95 dark:bg-white"
         >
-          <Ionicons name="add" size={20} color="white" />
-          <Text style={{ fontSize: 15, fontWeight: '700', color: 'white' }}>Add Expense</Text>
-        </PressableCard>
+          <Ionicons name="add" size={20} color={isDark ? '#0f172a' : 'white'} />
+          <Text className="font-bold text-white dark:text-slate-900">Add Expense</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );

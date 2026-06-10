@@ -1,4 +1,4 @@
-import { View, Text, Image, FlatList, RefreshControl, ScrollView } from 'react-native';
+import { View, Text, Image, FlatList, RefreshControl, ScrollView, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
@@ -15,58 +15,46 @@ import type { Group } from '../../types';
 const FEATURES = [
   {
     icon: 'people' as const,
-    color: '#3b82f6',
-    darkBg: '#1e3a8a22',
-    lightBg: '#dbeafe',
-    darkBorder: '#1e3a8a',
-    lightBorder: '#bfdbfe',
+    color: '#0f172a',
+    darkBg: '#1e293b',
+    lightBg: '#f8fafc',
+    darkBorder: '#334155',
+    lightBorder: '#f1f5f9',
     title: 'Group Trips',
     desc: 'Create a group, invite friends, and plan together. Everyone stays in the loop.',
   },
   {
     icon: 'wallet' as const,
-    color: '#f59e0b',
-    darkBg: '#78350f22',
-    lightBg: '#fef3c7',
-    darkBorder: '#92400e',
-    lightBorder: '#fde68a',
+    color: '#0f172a',
+    darkBg: '#1e293b',
+    lightBg: '#f8fafc',
+    darkBorder: '#334155',
+    lightBorder: '#f1f5f9',
     title: 'Budget & Expenses',
     desc: 'Track shared costs, split bills fairly, and know exactly who owes what.',
   },
   {
     icon: 'compass' as const,
-    color: '#10b981',
-    darkBg: '#064e3b22',
-    lightBg: '#d1fae5',
-    darkBorder: '#065f46',
-    lightBorder: '#a7f3d0',
+    color: '#0f172a',
+    darkBg: '#1e293b',
+    lightBg: '#f8fafc',
+    darkBorder: '#334155',
+    lightBorder: '#f1f5f9',
     title: 'Solo Planning',
     desc: 'Build your own itinerary and keep everything organised in one place.',
   },
 ];
 
-const CARD_SHADOW = { shadowColor: '#000', shadowOpacity: 0.07, shadowOffset: { width: 0, height: 4 }, shadowRadius: 12, elevation: 3 };
-const CARD_SHADOW_DARK = { shadowColor: '#000', shadowOpacity: 0.3, shadowOffset: { width: 0, height: 4 }, shadowRadius: 12, elevation: 3 };
-
 function GroupCardSkeleton({ isDark }: { isDark: boolean }) {
   return (
-    <View
-      style={{
-        marginBottom: 12,
-        borderRadius: 20,
-        padding: 16,
-        borderWidth: 1,
-        backgroundColor: isDark ? '#1e293b' : '#ffffff',
-        borderColor: isDark ? '#334155' : '#f1f5f9',
-      }}
-    >
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
-        <Skeleton width={50} height={50} borderRadius={15} />
+    <View className="mb-4 rounded-xl border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800/80 dark:bg-slate-900">
+      <View className="flex-row items-center gap-4">
+        <Skeleton width={44} height={44} borderRadius={12} />
         <View style={{ flex: 1, gap: 8 }}>
           <Skeleton width="60%" height={14} />
           <Skeleton width="40%" height={11} />
         </View>
-        <Skeleton width={30} height={30} borderRadius={9} />
+        <Skeleton width={30} height={30} borderRadius={8} />
       </View>
     </View>
   );
@@ -87,59 +75,37 @@ export default function HomeScreen() {
   }
 
   function renderGroup({ item }: { item: Group }) {
-    const letter = item.name[0].toUpperCase();
-    const hues = ['#2563eb', '#7c3aed', '#0891b2', '#059669', '#d97706', '#dc2626'];
+    const letter = item.name[0]?.toUpperCase() ?? '?';
+    const hues = ['#0f172a', '#334155', '#475569', '#1e293b'];
     const color = hues[item.name.charCodeAt(0) % hues.length];
     return (
       <PressableCard
         onPress={() => router.push(`/group/${item.id}`)}
-        style={{
-          marginBottom: 12,
-          borderRadius: 20,
-          padding: 16,
-          borderWidth: 1,
-          backgroundColor: isDark ? '#1e293b' : '#ffffff',
-          borderColor: isDark ? '#334155' : '#f1f5f9',
-          ...(isDark ? CARD_SHADOW_DARK : CARD_SHADOW),
-        }}
+        className="mb-4 rounded-xl border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800/80 dark:bg-slate-900/50"
       >
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+        <View className="flex-row items-center gap-4">
           <View
             style={{
-              width: 50,
-              height: 50,
-              borderRadius: 15,
+              width: 44,
+              height: 44,
+              borderRadius: 12,
               backgroundColor: color,
               alignItems: 'center',
               justifyContent: 'center',
-              shadowColor: color,
-              shadowOpacity: 0.4,
-              shadowOffset: { width: 0, height: 3 },
-              shadowRadius: 8,
-              elevation: 4,
             }}
           >
-            <Text style={{ fontSize: 22, fontWeight: '800', color: 'white' }}>{letter}</Text>
+            <Text style={{ fontSize: 18, fontWeight: '800', color: 'white' }}>{letter}</Text>
           </View>
-          <View style={{ flex: 1 }}>
+          <View className="flex-1">
             <Text className="text-base font-bold text-slate-900 dark:text-slate-100">{item.name}</Text>
             {item.description ? (
-              <Text className="mt-0.5 text-sm text-slate-500 dark:text-slate-400" numberOfLines={1}>{item.description}</Text>
+              <Text className="mt-1 text-sm text-slate-500 dark:text-slate-400" numberOfLines={1}>{item.description}</Text>
             ) : (
-              <Text className="mt-0.5 text-sm text-slate-400 dark:text-slate-500">Tap to open</Text>
+              <Text className="mt-1 text-xs font-semibold tracking-wider uppercase text-slate-400 dark:text-slate-500">Tap to open</Text>
             )}
           </View>
-          <View
-            style={{
-              width: 30,
-              height: 30,
-              borderRadius: 9,
-              backgroundColor: isDark ? '#334155' : '#f1f5f9',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Ionicons name="chevron-forward" size={15} color={isDark ? '#94a3b8' : '#94a3b8'} />
+          <View className="h-8 w-8 items-center justify-center rounded-lg bg-slate-50 dark:bg-slate-800/60">
+            <Ionicons name="chevron-forward" size={15} color={isDark ? '#94a3b8' : '#64748b'} />
           </View>
         </View>
       </PressableCard>
@@ -153,48 +119,37 @@ export default function HomeScreen() {
   const firstName = user?.full_name?.split(' ')[0] ?? 'Traveler';
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50 dark:bg-slate-950">
+    <SafeAreaView className="flex-1 bg-slate-50/60 dark:bg-slate-950/60">
 
       {/* ── Header ── */}
       <View
-        className="border-b border-slate-100 dark:border-slate-800"
-        style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 10 }}
+        className="border-b border-slate-100 dark:border-slate-900 px-5 py-4"
+        style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
       >
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
           <Image
             source={require('../../assets/logo.png')}
-            style={{ width: 72, height: 52 }}
+            style={{ width: 64, height: 44 }}
             resizeMode="contain"
           />
-          <View style={{ height: 32, width: 1, backgroundColor: isDark ? '#334155' : '#e2e8f0' }} />
+          <View style={{ height: 24, width: 1, backgroundColor: isDark ? '#334155' : '#e2e8f0' }} />
           <View>
-            <Text className="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+            <Text className="text-slate-400 text-xs font-semibold tracking-wider uppercase">
               Welcome back
             </Text>
-            <Text className="text-lg font-extrabold tracking-tight text-slate-900 dark:text-slate-100">
+            <Text className="text-base font-bold text-slate-900 dark:text-slate-100">
               {firstName}
             </Text>
           </View>
         </View>
 
-        <PressableCard
+        <TouchableOpacity
           onPress={() => router.push('/group/new')}
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: 12,
-            backgroundColor: '#2563eb',
-            alignItems: 'center',
-            justifyContent: 'center',
-            shadowColor: '#2563eb',
-            shadowOpacity: 0.45,
-            shadowOffset: { width: 0, height: 4 },
-            shadowRadius: 10,
-            elevation: 5,
-          }}
+          activeOpacity={0.9}
+          className="w-10 h-10 rounded-full bg-slate-900 dark:bg-white items-center justify-center transition-all duration-200 active:scale-95 shadow-sm"
         >
-          <Ionicons name="add" size={22} color="white" />
-        </PressableCard>
+          <Ionicons name="add" size={20} color={isDark ? '#0f172a' : 'white'} />
+        </TouchableOpacity>
       </View>
 
       {/* ── Body ── */}
@@ -211,65 +166,51 @@ export default function HomeScreen() {
           {/* Ambient glow blobs — dark mode only */}
           {isDark && (
             <>
-              <View style={{ position: 'absolute', top: 10, right: -70, width: 240, height: 240, borderRadius: 120, backgroundColor: '#2563eb', opacity: 0.08 }} />
-              <View style={{ position: 'absolute', top: 270, left: -80, width: 200, height: 200, borderRadius: 100, backgroundColor: '#7c3aed', opacity: 0.07 }} />
-              <View style={{ position: 'absolute', top: 560, right: -50, width: 180, height: 180, borderRadius: 90, backgroundColor: '#0891b2', opacity: 0.06 }} />
+              <View style={{ position: 'absolute', top: 10, right: -70, width: 240, height: 240, borderRadius: 120, backgroundColor: '#0f172a', opacity: 0.1 }} />
+              <View style={{ position: 'absolute', top: 270, left: -80, width: 200, height: 200, borderRadius: 100, backgroundColor: '#1e293b', opacity: 0.08 }} />
             </>
           )}
 
           {/* Logo */}
-          <View style={{ alignItems: 'center', marginTop: 28 }}>
+          <View style={{ alignItems: 'center', marginTop: 32 }}>
             <Image
               source={require('../../assets/logo.png')}
-              style={{ width: 250, height: 182 }}
+              style={{ width: 200, height: 140 }}
               resizeMode="contain"
             />
           </View>
 
           {/* Tagline */}
-          <View style={{ alignItems: 'center', marginTop: 6 }}>
-            <Text className="text-center text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-50" style={{ lineHeight: 40 }}>
+          <View style={{ alignItems: 'center', marginTop: 12 }}>
+            <Text className="text-center text-2xl font-extrabold tracking-tight text-slate-900 dark:text-slate-50" style={{ lineHeight: 34 }}>
               Plan trips together,{'\n'}effortlessly.
             </Text>
-            <Text className="mt-2.5 text-center text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+            <Text className="mt-3 text-center text-sm leading-relaxed text-slate-500">
               From idea to itinerary — group adventures{'\n'}and solo getaways, all in one place.
             </Text>
           </View>
 
           {/* Section divider */}
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 36, gap: 10 }}>
-            <View className="flex-1" style={{ height: 1, backgroundColor: isDark ? '#334155' : '#e2e8f0' }} />
-            <Text className="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-600">
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 40, gap: 10 }}>
+            <View className="flex-1" style={{ height: 1, backgroundColor: isDark ? '#1e293b' : '#e2e8f0' }} />
+            <Text className="text-slate-400 text-xs font-semibold tracking-wider uppercase">
               Everything you need
             </Text>
-            <View className="flex-1" style={{ height: 1, backgroundColor: isDark ? '#334155' : '#e2e8f0' }} />
+            <View className="flex-1" style={{ height: 1, backgroundColor: isDark ? '#1e293b' : '#e2e8f0' }} />
           </View>
 
           {/* Feature cards */}
-          <View style={{ marginTop: 16, gap: 10 }}>
+          <View className="mt-6 gap-4">
             {FEATURES.map((f) => (
               <View
                 key={f.title}
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: 14,
-                  padding: 16,
-                  borderRadius: 18,
-                  borderWidth: 1,
-                  backgroundColor: isDark ? '#0f172a' : '#ffffff',
-                  borderColor: isDark ? '#334155' : '#f1f5f9',
-                  shadowColor: '#000',
-                  shadowOpacity: isDark ? 0.2 : 0.05,
-                  shadowRadius: 8,
-                  elevation: 2,
-                }}
+                className="flex-row items-center gap-4 rounded-xl border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/50"
               >
                 <View
                   style={{
-                    width: 46,
-                    height: 46,
-                    borderRadius: 14,
+                    width: 44,
+                    height: 44,
+                    borderRadius: 12,
                     backgroundColor: isDark ? f.darkBg : f.lightBg,
                     borderWidth: 1,
                     borderColor: isDark ? f.darkBorder : f.lightBorder,
@@ -277,11 +218,11 @@ export default function HomeScreen() {
                     justifyContent: 'center',
                   }}
                 >
-                  <Ionicons name={f.icon} size={21} color={f.color} />
+                  <Ionicons name={f.icon} size={20} color={isDark ? '#cbd5e1' : f.color} />
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text className="text-sm font-bold text-slate-900 dark:text-slate-100">{f.title}</Text>
-                  <Text className="mt-0.5 text-xs leading-5 text-slate-500 dark:text-slate-400">{f.desc}</Text>
+                  <Text className="mt-1 text-xs leading-relaxed text-slate-500">{f.desc}</Text>
                 </View>
               </View>
             ))}
@@ -290,39 +231,17 @@ export default function HomeScreen() {
           {/* CTAs */}
           <PressableCard
             onPress={() => router.push('/group/new')}
-            style={{
-              marginTop: 32,
-              alignItems: 'center',
-              borderRadius: 16,
-              backgroundColor: '#2563eb',
-              paddingVertical: 17,
-              shadowColor: '#2563eb',
-              shadowOpacity: 0.45,
-              shadowOffset: { width: 0, height: 6 },
-              shadowRadius: 16,
-              elevation: 7,
-            }}
+            className="mt-8 items-center justify-center rounded-xl bg-slate-900 py-4.5 shadow-sm transition-all duration-200 active:scale-95 dark:bg-white"
           >
-            <Text style={{ fontSize: 16, fontWeight: '700', color: 'white', letterSpacing: 0.2 }}>Create a Group</Text>
+            <Text className="text-base font-bold text-white dark:text-slate-900">Create a Group</Text>
           </PressableCard>
 
           <PressableCard
             onPress={() => router.push('/trip/new')}
-            style={{
-              marginTop: 12,
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 8,
-              borderRadius: 16,
-              paddingVertical: 15,
-              borderWidth: 1,
-              backgroundColor: isDark ? '#0f172a' : '#f8fafc',
-              borderColor: isDark ? '#334155' : '#e2e8f0',
-            }}
+            className="mt-4 flex-row items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-4 shadow-sm transition-all duration-200 active:scale-95 dark:border-slate-850 dark:bg-slate-900/40"
           >
-            <Ionicons name="person-outline" size={16} color={isDark ? '#94a3b8' : '#64748b'} />
-            <Text className="text-sm font-semibold text-slate-500 dark:text-slate-400">Plan a Solo Trip</Text>
+            <Ionicons name="person-outline" size={16} color={isDark ? '#cbd5e1' : '#475569'} />
+            <Text className="text-sm font-semibold text-slate-600 dark:text-slate-300">Plan a Solo Trip</Text>
           </PressableCard>
         </ScrollView>
       ) : (
@@ -330,13 +249,13 @@ export default function HomeScreen() {
           data={groups ?? []}
           keyExtractor={(item) => item.id}
           renderItem={renderGroup}
-          contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 4, paddingBottom: 32 }}
+          contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: 100 }}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
           ListHeaderComponent={
             hasGroups ? (
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12, marginTop: 16 }}>
-                <View style={{ width: 3, height: 14, borderRadius: 2, backgroundColor: '#2563eb' }} />
-                <Text className="text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12, marginTop: 16 }}>
+                <View style={{ width: 3, height: 12, borderRadius: 2, backgroundColor: '#0f172a' }} />
+                <Text className="text-slate-400 text-xs font-semibold tracking-wider uppercase">
                   Your Groups
                 </Text>
               </View>
@@ -345,10 +264,10 @@ export default function HomeScreen() {
           ListFooterComponent={
             <View>
               {hasSoloTrips && (
-                <View style={{ marginTop: 24 }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                    <View style={{ width: 3, height: 14, borderRadius: 2, backgroundColor: '#7c3aed' }} />
-                    <Text className="text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+                <View className="mt-8">
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+                    <View style={{ width: 3, height: 12, borderRadius: 2, backgroundColor: '#475569' }} />
+                    <Text className="text-slate-400 text-xs font-semibold tracking-wider uppercase">
                       Solo Trips
                     </Text>
                   </View>
@@ -356,50 +275,28 @@ export default function HomeScreen() {
                     <PressableCard
                       key={trip.id}
                       onPress={() => router.push(`/trip/${trip.id}`)}
-                      style={{
-                        marginBottom: 12,
-                        borderRadius: 20,
-                        padding: 16,
-                        borderWidth: 1,
-                        backgroundColor: isDark ? '#1e293b' : '#ffffff',
-                        borderColor: isDark ? '#334155' : '#f1f5f9',
-                        ...(isDark ? CARD_SHADOW_DARK : CARD_SHADOW),
-                      }}
+                      className="mb-4 rounded-xl border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800/80 dark:bg-slate-900/50"
                     >
                       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
                         <View
                           style={{
-                            width: 50,
-                            height: 50,
-                            borderRadius: 15,
-                            backgroundColor: '#7c3aed',
+                            width: 44,
+                            height: 44,
+                            borderRadius: 12,
+                            backgroundColor: '#475569',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            shadowColor: '#7c3aed',
-                            shadowOpacity: 0.4,
-                            shadowOffset: { width: 0, height: 3 },
-                            shadowRadius: 8,
-                            elevation: 4,
                           }}
                         >
-                          <Ionicons name="person" size={22} color="white" />
+                          <Ionicons name="person" size={20} color="white" />
                         </View>
                         <View style={{ flex: 1 }}>
                           <Text className="text-base font-bold text-slate-900 dark:text-slate-100">{trip.title}</Text>
-                          <Text className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
+                          <Text className="text-slate-400 text-xs font-semibold tracking-wider uppercase mt-1">
                             {trip.destination} · {format(new Date(trip.start_date + 'T12:00:00'), 'MMM d')}
                           </Text>
                         </View>
-                        <View
-                          style={{
-                            width: 30,
-                            height: 30,
-                            borderRadius: 9,
-                            backgroundColor: isDark ? '#334155' : '#f1f5f9',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                          }}
-                        >
+                        <View className="h-8 w-8 items-center justify-center rounded-lg bg-slate-50 dark:bg-slate-800/60">
                           <Ionicons name="chevron-forward" size={15} color="#94a3b8" />
                         </View>
                       </View>
@@ -411,21 +308,10 @@ export default function HomeScreen() {
               {/* Plan solo trip CTA */}
               <PressableCard
                 onPress={() => router.push('/trip/new')}
-                style={{
-                  marginTop: 16,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 8,
-                  borderRadius: 16,
-                  paddingVertical: 15,
-                  backgroundColor: isDark ? '#0f172a' : '#f8fafc',
-                  borderWidth: 1,
-                  borderColor: isDark ? '#334155' : '#e2e8f0',
-                }}
+                className="mt-6 flex-row items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-4 shadow-sm transition-all duration-200 active:scale-95 dark:border-slate-800 dark:bg-slate-900/40"
               >
                 <Ionicons name="add-circle-outline" size={18} color={isDark ? '#64748b' : '#94a3b8'} />
-                <Text className="text-sm font-semibold text-slate-500 dark:text-slate-400">Plan a Solo Trip</Text>
+                <Text className="text-sm font-semibold text-slate-600 dark:text-slate-350">Plan a Solo Trip</Text>
               </PressableCard>
             </View>
           }

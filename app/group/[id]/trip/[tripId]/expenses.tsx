@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { format } from 'date-fns';
 import { useExpenses } from '../../../../../hooks/useBudget';
 import type { Expense } from '../../../../../types';
+import { useTheme } from '../../../../../hooks/useTheme';
 
 const CATEGORY_ICONS: Record<string, string> = {
   food: 'restaurant-outline',
@@ -28,26 +29,27 @@ export default function ExpensesScreen() {
   const { id: groupId, tripId } = useLocalSearchParams<{ id: string; tripId: string }>();
   const router = useRouter();
   const { data: expenses } = useExpenses(tripId);
+  const { isDark } = useTheme();
 
   const total = expenses?.reduce((sum, e) => sum + e.amount, 0) ?? 0;
 
   function renderExpense({ item }: { item: Expense }) {
     const color = CATEGORY_COLOR[item.category] ?? '#94A3B8';
     return (
-      <View className="mb-3 rounded-2xl bg-white p-4 shadow-sm dark:bg-gray-800" style={{ shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 }}>
-        <View className="flex-row items-center gap-3">
-          <View className="h-10 w-10 items-center justify-center rounded-xl" style={{ backgroundColor: `${color}20` }}>
-            <Ionicons name={CATEGORY_ICONS[item.category] as any} size={18} color={color} />
+      <View className="mb-4 rounded-xl border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800/80 dark:bg-slate-900">
+        <View className="flex-row items-center gap-4">
+          <View className="h-11 w-11 items-center justify-center rounded-xl" style={{ backgroundColor: `${color}15` }}>
+            <Ionicons name={CATEGORY_ICONS[item.category] as any} size={20} color={color} />
           </View>
           <View className="flex-1">
-            <Text className="font-semibold text-gray-800 dark:text-white">{item.description}</Text>
-            <Text className="text-xs capitalize text-gray-400">
+            <Text className="font-bold text-slate-900 dark:text-slate-100 text-base">{item.description}</Text>
+            <Text className="text-slate-400 text-xs font-semibold tracking-wider uppercase mt-1">
               {item.category} · {(item.payer as any)?.full_name?.split(' ')[0] ?? 'Someone'} paid · {format(new Date(item.created_at), 'MMM d')}
             </Text>
           </View>
-          <View className="items-end">
-            <Text className="font-bold text-gray-900 dark:text-white">${item.amount.toFixed(2)}</Text>
-            {item.receipt_url && <Ionicons name="receipt-outline" size={12} color="#94A3B8" />}
+          <View className="items-end gap-1">
+            <Text className="font-bold text-slate-900 dark:text-slate-100 text-base">${item.amount.toFixed(2)}</Text>
+            {item.receipt_url && <Ionicons name="receipt-outline" size={14} color="#94A3B8" />}
           </View>
         </View>
       </View>
@@ -55,12 +57,14 @@ export default function ExpensesScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50 dark:bg-gray-950" edges={['bottom']}>
+    <SafeAreaView className="flex-1 bg-slate-50/60 dark:bg-slate-950/60" edges={['bottom']}>
       <Stack.Screen options={{ title: 'Expenses' }} />
-      <View className="mx-5 mb-4 rounded-2xl bg-primary p-4">
-        <Text className="text-sm text-blue-200">Total Spent</Text>
-        <Text className="text-3xl font-bold text-white">${total.toFixed(2)}</Text>
-        <Text className="text-sm text-blue-200">{expenses?.length ?? 0} expenses</Text>
+      
+      {/* Total Spent Premium Card */}
+      <View className="mx-5 my-6 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-800/80 dark:bg-slate-900">
+        <Text className="text-slate-400 text-xs font-semibold tracking-wider uppercase">Total Spent</Text>
+        <Text className="text-slate-900 text-4xl font-bold dark:text-white mt-2">${total.toFixed(2)}</Text>
+        <Text className="text-slate-500 text-sm mt-1">{expenses?.length ?? 0} expenses logged</Text>
       </View>
 
       <FlatList
@@ -71,8 +75,8 @@ export default function ExpensesScreen() {
         ListEmptyComponent={
           <View className="items-center py-16">
             <Ionicons name="receipt-outline" size={56} color="#CBD5E1" />
-            <Text className="mt-3 font-semibold text-gray-600 dark:text-gray-300">No expenses yet</Text>
-            <Text className="mt-1 text-sm text-gray-400">Tap "Add Expense" to log your first one.</Text>
+            <Text className="mt-3 text-lg font-bold text-slate-900 dark:text-white">No expenses yet</Text>
+            <Text className="mt-1 text-sm text-slate-500">Tap "Add Expense" to log your first one.</Text>
           </View>
         }
       />
@@ -80,13 +84,14 @@ export default function ExpensesScreen() {
       <View className="absolute bottom-6 right-5">
         <TouchableOpacity
           onPress={() => router.push(`/group/${groupId}/trip/${tripId}/add-expense`)}
-          className="flex-row items-center gap-2 rounded-2xl bg-primary px-5 py-3 shadow-lg"
-          style={{ shadowColor: '#2563EB', shadowOpacity: 0.4, shadowRadius: 12, elevation: 6 }}
+          activeOpacity={0.9}
+          className="flex-row items-center gap-2 rounded-full bg-slate-900 px-6 py-4 shadow-md transition-all duration-200 active:scale-95 dark:bg-white"
         >
-          <Ionicons name="add" size={20} color="white" />
-          <Text className="font-bold text-white">Add Expense</Text>
+          <Ionicons name="add" size={20} color={isDark ? '#0f172a' : 'white'} />
+          <Text className="font-bold text-white dark:text-slate-900">Add Expense</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
 }
+

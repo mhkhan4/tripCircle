@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Calendar } from 'react-native-calendars';
 import { format } from 'date-fns';
 import { useCreateTrip } from '../../../../../hooks/useTrip';
+import { useTheme } from '../../../../../hooks/useTheme';
 
 type CalendarTarget = 'start' | 'end' | null;
 
@@ -18,6 +19,7 @@ export default function NewTripScreen() {
   const { id: groupId } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const createTrip = useCreateTrip();
+  const { isDark } = useTheme();
 
   const [title, setTitle] = useState('');
   const [destination, setDestination] = useState('');
@@ -48,10 +50,10 @@ export default function NewTripScreen() {
   function getMarkedDates() {
     const marks: Record<string, any> = {};
     if (calendarTarget === 'start' && startDate) {
-      marks[startDate] = { selected: true, selectedColor: '#2563EB' };
+      marks[startDate] = { selected: true, selectedColor: isDark ? '#ffffff' : '#0f172a', selectedTextColor: isDark ? '#0f172a' : '#ffffff' };
     } else if (calendarTarget === 'end') {
-      if (startDate) marks[startDate] = { selected: true, selectedColor: '#2563EB', selectedTextColor: 'white' };
-      if (endDate) marks[endDate] = { selected: true, selectedColor: '#2563EB' };
+      if (startDate) marks[startDate] = { selected: true, selectedColor: isDark ? '#ffffff' : '#0f172a', selectedTextColor: isDark ? '#0f172a' : '#ffffff' };
+      if (endDate) marks[endDate] = { selected: true, selectedColor: isDark ? '#ffffff' : '#0f172a', selectedTextColor: isDark ? '#0f172a' : '#ffffff' };
       if (startDate && endDate) {
         const start = new Date(startDate);
         const end = new Date(endDate);
@@ -59,7 +61,7 @@ export default function NewTripScreen() {
         cur.setDate(cur.getDate() + 1);
         while (cur < end) {
           const key = cur.toISOString().split('T')[0];
-          marks[key] = { color: '#DBEAFE', textColor: '#1D4ED8' };
+          marks[key] = { color: isDark ? '#1e293b' : '#f1f5f9', textColor: isDark ? '#cbd5e1' : '#475569' };
           cur.setDate(cur.getDate() + 1);
         }
       }
@@ -75,6 +77,7 @@ export default function NewTripScreen() {
     try {
       const trip = await createTrip.mutateAsync({
         group_id: groupId,
+        user_id: null, // Resolves TS2345 type error: user_id is required but nullable
         title: title.trim(),
         destination: destination.trim(),
         description: description.trim() || null,
@@ -90,79 +93,90 @@ export default function NewTripScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50 dark:bg-gray-950" edges={['bottom']}>
+    <SafeAreaView className="flex-1 bg-slate-50/60 dark:bg-slate-950/60" edges={['bottom']}>
       <Stack.Screen options={{ title: 'Plan a Trip' }} />
-      <ScrollView className="flex-1 px-5 pt-4" keyboardShouldPersistTaps="handled">
-        <Text className="mb-1 text-2xl font-bold text-gray-900 dark:text-white">Plan a Trip</Text>
-        <Text className="mb-6 text-sm text-gray-500 dark:text-gray-400">Fill in the details. Budget comes later.</Text>
+      <ScrollView className="flex-1 px-5 pt-6" keyboardShouldPersistTaps="handled">
+        <Text className="text-slate-900 text-2xl font-bold dark:text-white">Plan a Trip</Text>
+        <Text className="mb-8 text-sm text-slate-500">Fill in the details. Budget comes later.</Text>
 
-        {[
-          { label: 'Trip Name *', value: title, set: setTitle, placeholder: 'e.g. Beach Weekend, Mountain Hike' },
-          { label: 'Destination *', value: destination, set: setDestination, placeholder: 'e.g. Bali, Indonesia' },
-        ].map(({ label, value, set, placeholder }) => (
-          <View key={label} className="mb-4">
-            <Text className="mb-1 text-sm font-semibold text-gray-700 dark:text-gray-300">{label}</Text>
-            <TextInput
-              value={value}
-              onChangeText={set}
-              placeholder={placeholder}
-              placeholderTextColor="#94A3B8"
-              className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-base text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-            />
-          </View>
-        ))}
+        <View className="mb-6">
+          <Text className="mb-2 text-slate-400 text-xs font-semibold tracking-wider uppercase">Trip Name *</Text>
+          <TextInput
+            value={title}
+            onChangeText={setTitle}
+            placeholder="e.g. Beach Weekend, Mountain Hike"
+            placeholderTextColor="#94A3B8"
+            className="rounded-xl border border-slate-200 bg-white px-4 py-4 text-base text-slate-900 dark:border-slate-800 dark:bg-slate-900 dark:text-white"
+          />
+        </View>
 
-        <View className="mb-4 flex-row gap-3">
+        <View className="mb-6">
+          <Text className="mb-2 text-slate-400 text-xs font-semibold tracking-wider uppercase">Destination *</Text>
+          <TextInput
+            value={destination}
+            onChangeText={setDestination}
+            placeholder="e.g. Bali, Indonesia"
+            placeholderTextColor="#94A3B8"
+            className="rounded-xl border border-slate-200 bg-white px-4 py-4 text-base text-slate-900 dark:border-slate-800 dark:bg-slate-900 dark:text-white"
+          />
+        </View>
+
+        <View className="mb-6 flex-row gap-4">
           <View className="flex-1">
-            <Text className="mb-1 text-sm font-semibold text-gray-700 dark:text-gray-300">Start Date *</Text>
+            <Text className="mb-2 text-slate-400 text-xs font-semibold tracking-wider uppercase">Start Date *</Text>
             <TouchableOpacity
               onPress={() => openCalendar('start')}
-              className="flex-row items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 dark:border-gray-700 dark:bg-gray-800"
+              activeOpacity={0.9}
+              className="flex-row items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-4 dark:border-slate-800 dark:bg-slate-900 transition-all duration-200 active:scale-95 shadow-sm"
             >
-              <Ionicons name="calendar-outline" size={16} color="#94A3B8" />
-              <Text className={startDate ? 'text-base text-gray-900 dark:text-white' : 'text-base text-gray-400'}>
+              <Ionicons name="calendar-outline" size={16} color="#64748b" />
+              <Text className={startDate ? 'text-base font-semibold text-slate-900 dark:text-white' : 'text-base text-slate-400'}>
                 {startDate ? formatDisplay(startDate) : 'Pick date'}
               </Text>
             </TouchableOpacity>
           </View>
           <View className="flex-1">
-            <Text className="mb-1 text-sm font-semibold text-gray-700 dark:text-gray-300">End Date *</Text>
+            <Text className="mb-2 text-slate-400 text-xs font-semibold tracking-wider uppercase">End Date *</Text>
             <TouchableOpacity
               onPress={() => openCalendar('end')}
-              className="flex-row items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 dark:border-gray-700 dark:bg-gray-800"
+              activeOpacity={0.9}
+              className="flex-row items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-4 dark:border-slate-800 dark:bg-slate-900 transition-all duration-200 active:scale-95 shadow-sm"
             >
-              <Ionicons name="calendar-outline" size={16} color="#94A3B8" />
-              <Text className={endDate ? 'text-base text-gray-900 dark:text-white' : 'text-base text-gray-400'}>
+              <Ionicons name="calendar-outline" size={16} color="#64748b" />
+              <Text className={endDate ? 'text-base font-semibold text-slate-900 dark:text-white' : 'text-base text-slate-400'}>
                 {endDate ? formatDisplay(endDate) : 'Pick date'}
               </Text>
             </TouchableOpacity>
           </View>
         </View>
 
-        <Text className="mb-1 text-sm font-semibold text-gray-700 dark:text-gray-300">Description (optional)</Text>
-        <TextInput
-          value={description}
-          onChangeText={setDescription}
-          placeholder="What are you planning to do?"
-          placeholderTextColor="#94A3B8"
-          className="mb-8 rounded-xl border border-gray-200 bg-white px-4 py-3 text-base text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-          multiline
-          numberOfLines={3}
-          textAlignVertical="top"
-          style={{ height: 80 }}
-        />
+        <View className="mb-8">
+          <Text className="mb-2 text-slate-400 text-xs font-semibold tracking-wider uppercase">Description (optional)</Text>
+          <TextInput
+            value={description}
+            onChangeText={setDescription}
+            placeholder="What are you planning to do?"
+            placeholderTextColor="#94A3B8"
+            className="rounded-xl border border-slate-200 bg-white px-4 py-4 text-base text-slate-900 dark:border-slate-800 dark:bg-slate-900 dark:text-white"
+            multiline
+            numberOfLines={3}
+            textAlignVertical="top"
+            style={{ height: 90 }}
+          />
+        </View>
       </ScrollView>
 
       <View className="px-5 pb-6">
         <TouchableOpacity
           onPress={handleCreate}
           disabled={createTrip.isPending}
-          className="items-center rounded-2xl bg-primary py-4"
+          activeOpacity={0.9}
+          className="items-center justify-center rounded-xl bg-slate-900 py-4 shadow-sm transition-all duration-200 active:scale-95 dark:bg-white"
         >
           {createTrip.isPending ? (
-            <ActivityIndicator color="white" />
+            <ActivityIndicator color={isDark ? '#0f172a' : 'white'} />
           ) : (
-            <Text className="text-base font-bold text-white">Create Trip</Text>
+            <Text className="text-base font-bold text-white dark:text-slate-900">Create Trip</Text>
           )}
         </TouchableOpacity>
       </View>
@@ -174,24 +188,29 @@ export default function NewTripScreen() {
         onRequestClose={() => setCalendarTarget(null)}
       >
         <View className="flex-1 justify-end bg-black/40">
-          <View className="rounded-t-3xl bg-white dark:bg-gray-900">
-            <View className="flex-row items-center justify-between px-5 pt-4 pb-2">
-              <Text className="text-base font-bold text-gray-900 dark:text-white">
+          <View className="rounded-t-3xl bg-white dark:bg-slate-900">
+            <View className="flex-row items-center justify-between px-5 pt-5 pb-3">
+              <Text className="text-base font-bold text-slate-900 dark:text-white">
                 {calendarTarget === 'start' ? 'Select Start Date' : 'Select End Date'}
               </Text>
               <TouchableOpacity onPress={() => setCalendarTarget(null)}>
-                <Ionicons name="close" size={22} color="#64748B" />
+                <Ionicons name="close" size={24} color="#64748B" />
               </TouchableOpacity>
             </View>
             <Calendar
               onDayPress={handleDayPress}
               markedDates={getMarkedDates()}
-              markingType={calendarTarget === 'end' && startDate && endDate ? 'period' : 'simple'}
+              markingType={calendarTarget === 'end' && startDate && endDate ? 'period' : undefined} // Resolves TS2322: replaced 'simple' with undefined
               minDate={calendarTarget === 'end' ? startDate : undefined}
               theme={{
-                selectedDayBackgroundColor: '#2563EB',
+                selectedDayBackgroundColor: isDark ? '#ffffff' : '#0f172a',
+                selectedDayTextColor: isDark ? '#0f172a' : '#ffffff',
                 todayTextColor: '#2563EB',
-                arrowColor: '#2563EB',
+                arrowColor: isDark ? '#ffffff' : '#0f172a',
+                calendarBackground: isDark ? '#0f172a' : '#ffffff',
+                textSectionTitleColor: isDark ? '#94a3b8' : '#475569',
+                dayTextColor: isDark ? '#cbd5e1' : '#1e293b',
+                monthTextColor: isDark ? '#ffffff' : '#0f172a',
               }}
             />
             <View className="h-6" />
