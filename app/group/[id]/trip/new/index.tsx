@@ -61,7 +61,7 @@ export default function NewTripScreen() {
         cur.setDate(cur.getDate() + 1);
         while (cur < end) {
           const key = cur.toISOString().split('T')[0];
-          marks[key] = { color: isDark ? '#1e293b' : '#f1f5f9', textColor: isDark ? '#cbd5e1' : '#475569' };
+          marks[key] = { color: isDark ? '#1F2937' : '#f1f5f9', textColor: isDark ? '#cbd5e1' : '#475569' };
           cur.setDate(cur.getDate() + 1);
         }
       }
@@ -93,7 +93,7 @@ export default function NewTripScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50/60 dark:bg-slate-950/60" edges={['bottom']}>
+    <SafeAreaView className="flex-1 bg-slate-50/60 dark:bg-gray-950" edges={['bottom']}>
       <Stack.Screen options={{ title: 'Plan a Trip' }} />
       <ScrollView className="flex-1 px-5 pt-6" keyboardShouldPersistTaps="handled">
         <Text className="text-slate-900 text-2xl font-bold dark:text-white">Plan a Trip</Text>
@@ -106,7 +106,7 @@ export default function NewTripScreen() {
             onChangeText={setTitle}
             placeholder="e.g. Beach Weekend, Mountain Hike"
             placeholderTextColor="#94A3B8"
-            className="rounded-xl border border-slate-200 bg-white px-4 py-4 text-base text-slate-900 dark:border-slate-800 dark:bg-slate-900 dark:text-white"
+            className="rounded-xl border border-slate-200 bg-white px-4 py-4 text-base text-slate-900 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
           />
         </View>
 
@@ -117,7 +117,7 @@ export default function NewTripScreen() {
             onChangeText={setDestination}
             placeholder="e.g. Bali, Indonesia"
             placeholderTextColor="#94A3B8"
-            className="rounded-xl border border-slate-200 bg-white px-4 py-4 text-base text-slate-900 dark:border-slate-800 dark:bg-slate-900 dark:text-white"
+            className="rounded-xl border border-slate-200 bg-white px-4 py-4 text-base text-slate-900 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
           />
         </View>
 
@@ -127,7 +127,7 @@ export default function NewTripScreen() {
             <TouchableOpacity
               onPress={() => openCalendar('start')}
               activeOpacity={0.9}
-              className="flex-row items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-4 dark:border-slate-800 dark:bg-slate-900 transition-all duration-200 active:scale-95 shadow-sm"
+              className="flex-row items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-4 dark:border-gray-700 dark:bg-gray-900 transition-all duration-200 active:scale-95 shadow-sm"
             >
               <Ionicons name="calendar-outline" size={16} color="#64748b" />
               <Text className={startDate ? 'text-base font-semibold text-slate-900 dark:text-white' : 'text-base text-slate-400'}>
@@ -140,7 +140,7 @@ export default function NewTripScreen() {
             <TouchableOpacity
               onPress={() => openCalendar('end')}
               activeOpacity={0.9}
-              className="flex-row items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-4 dark:border-slate-800 dark:bg-slate-900 transition-all duration-200 active:scale-95 shadow-sm"
+              className="flex-row items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-4 dark:border-gray-700 dark:bg-gray-900 transition-all duration-200 active:scale-95 shadow-sm"
             >
               <Ionicons name="calendar-outline" size={16} color="#64748b" />
               <Text className={endDate ? 'text-base font-semibold text-slate-900 dark:text-white' : 'text-base text-slate-400'}>
@@ -157,7 +157,7 @@ export default function NewTripScreen() {
             onChangeText={setDescription}
             placeholder="What are you planning to do?"
             placeholderTextColor="#94A3B8"
-            className="rounded-xl border border-slate-200 bg-white px-4 py-4 text-base text-slate-900 dark:border-slate-800 dark:bg-slate-900 dark:text-white"
+            className="rounded-xl border border-slate-200 bg-white px-4 py-4 text-base text-slate-900 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
             multiline
             numberOfLines={3}
             textAlignVertical="top"
@@ -188,7 +188,7 @@ export default function NewTripScreen() {
         onRequestClose={() => setCalendarTarget(null)}
       >
         <View className="flex-1 justify-end bg-black/40">
-          <View className="rounded-t-3xl bg-white dark:bg-slate-900">
+          <View className="rounded-t-3xl bg-white dark:bg-gray-900">
             <View className="flex-row items-center justify-between px-5 pt-5 pb-3">
               <Text className="text-base font-bold text-slate-900 dark:text-white">
                 {calendarTarget === 'start' ? 'Select Start Date' : 'Select End Date'}

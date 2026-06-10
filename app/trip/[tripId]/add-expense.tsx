@@ -110,7 +110,7 @@ export default function SoloAddExpenseScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50/60 dark:bg-slate-950/60" edges={['bottom']}>
+    <SafeAreaView className="flex-1 bg-slate-50/60 dark:bg-gray-950" edges={['bottom']}>
       <Stack.Screen options={{ title: 'Add Expense' }} />
       <ScrollView className="flex-1 px-5 pt-6" keyboardShouldPersistTaps="handled">
         <Text className="text-slate-900 text-2xl font-bold dark:text-white">Add Expense</Text>
@@ -120,7 +120,7 @@ export default function SoloAddExpenseScreen() {
           onPress={pickReceipt}
           disabled={scanning || uploading}
           activeOpacity={0.8}
-          className="mb-8 flex-row items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-200 bg-white py-6 shadow-sm transition-all duration-200 active:scale-98 dark:border-slate-800 dark:bg-slate-900"
+          className="mb-8 flex-row items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-200 bg-white py-6 shadow-sm transition-all duration-200 active:scale-98 dark:border-gray-700 dark:bg-gray-900"
         >
           {scanning ? (
             <>
@@ -152,7 +152,7 @@ export default function SoloAddExpenseScreen() {
           placeholder="0.00"
           placeholderTextColor="#94A3B8"
           keyboardType="decimal-pad"
-          className="mb-6 rounded-xl border border-slate-200 bg-white px-4 py-4 text-3xl font-extrabold text-slate-900 dark:border-slate-800 dark:bg-slate-900 dark:text-white"
+          className="mb-6 rounded-xl border border-slate-200 bg-white px-4 py-4 text-3xl font-extrabold text-slate-900 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
         />
 
         <Text className="mb-2 text-slate-400 text-xs font-semibold tracking-wider uppercase">Description *</Text>
@@ -161,7 +161,7 @@ export default function SoloAddExpenseScreen() {
           onChangeText={setDescription}
           placeholder="e.g. Dinner at beach restaurant"
           placeholderTextColor="#94A3B8"
-          className="mb-6 rounded-xl border border-slate-200 bg-white px-4 py-4 text-base text-slate-900 dark:border-slate-800 dark:bg-slate-900 dark:text-white"
+          className="mb-6 rounded-xl border border-slate-200 bg-white px-4 py-4 text-base text-slate-900 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
         />
 
         <Text className="mb-3 text-slate-400 text-xs font-semibold tracking-wider uppercase">Category</Text>
@@ -173,7 +173,7 @@ export default function SoloAddExpenseScreen() {
               className="flex-row items-center gap-1.5 rounded-full border px-4 py-2.5 transition-all duration-150 active:scale-95"
               style={{
                 backgroundColor: category === cat ? (isDark ? 'white' : '#0f172a') : 'transparent',
-                borderColor: category === cat ? (isDark ? 'white' : '#0f172a') : (isDark ? '#334155' : '#e2e8f0'),
+                borderColor: category === cat ? (isDark ? 'white' : '#0f172a') : (isDark ? '#1F2937' : '#e2e8f0'),
               }}
             >
               <Ionicons

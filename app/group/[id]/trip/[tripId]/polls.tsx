@@ -127,7 +127,7 @@ export default function PollsScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50/60 dark:bg-slate-950/60" edges={['bottom']}>
+    <SafeAreaView className="flex-1 bg-slate-50/60 dark:bg-gray-950" edges={['bottom']}>
       <Stack.Screen options={{ title: 'Polls' }} />
 
       {isLoading ? (
@@ -151,16 +151,16 @@ export default function PollsScreen() {
               const winner = closed ? winningOptionId(poll) : null;
 
               return (
-                <View key={poll.id} className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-800/80 dark:bg-slate-900">
+                <View key={poll.id} className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-900">
                   <View className="mb-4 flex-row items-start justify-between">
                     <View className="flex-1">
                       <View className="mb-2 flex-row items-center gap-2">
-                        <View className={`rounded-full px-2.5 py-0.5 ${closed ? 'bg-slate-100 dark:bg-slate-800' : 'bg-blue-50 dark:bg-blue-950/40 border border-blue-100/50 dark:border-blue-900/30'}`}>
+                        <View className={`rounded-full px-2.5 py-0.5 ${closed ? 'bg-slate-100 dark:bg-gray-800' : 'bg-blue-50 dark:bg-blue-950/40 border border-blue-100/50 dark:border-blue-900/30'}`}>
                           <Text className={`text-[10px] font-extrabold uppercase tracking-wider ${closed ? 'text-slate-550' : 'text-blue-600 dark:text-blue-400'}`}>
                             {closed ? 'Closed' : countdown(poll.closes_at)}
                           </Text>
                         </View>
-                        <Text className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">{poll.poll_type}</Text>
+                        <Text className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-gray-500">{poll.poll_type}</Text>
                       </View>
                       <Text className="text-lg font-bold text-slate-900 dark:text-white mt-1 leading-snug">{poll.question}</Text>
                     </View>
@@ -185,7 +185,7 @@ export default function PollsScreen() {
                             key={opt.id}
                             onPress={() => handleVote(poll, opt.id)}
                             disabled={vote.isPending}
-                            className="rounded-xl border border-slate-100 bg-slate-50/50 px-4 py-3.5 transition-all duration-200 active:scale-98 dark:border-slate-800/80 dark:bg-slate-900/50"
+                            className="rounded-xl border border-slate-100 bg-slate-50/50 px-4 py-3.5 transition-all duration-200 active:scale-98 dark:border-gray-700 dark:bg-gray-900/50"
                           >
                             <Text className="font-semibold text-slate-850 dark:text-slate-200">{opt.label}</Text>
                           </TouchableOpacity>
@@ -197,11 +197,11 @@ export default function PollsScreen() {
                           key={opt.id}
                           onPress={() => !closed && handleVote(poll, opt.id)}
                           disabled={closed || vote.isPending}
-                          className={`overflow-hidden rounded-xl border transition-all duration-200 active:scale-98 ${isWinner ? 'border-emerald-500 dark:border-emerald-500/80' : isMyVote ? 'border-slate-900 dark:border-white' : 'border-slate-100 dark:border-slate-800/80'}`}
+                          className={`overflow-hidden rounded-xl border transition-all duration-200 active:scale-98 ${isWinner ? 'border-emerald-500 dark:border-emerald-500/80' : isMyVote ? 'border-slate-900 dark:border-white' : 'border-slate-100 dark:border-gray-700'}`}
                         >
                           <View className="relative px-4 py-3.5">
                             <View
-                              className={`absolute inset-y-0 left-0 ${isWinner ? 'bg-emerald-50/80 dark:bg-emerald-950/20' : isMyVote ? 'bg-slate-100 dark:bg-slate-800' : 'bg-slate-50/50 dark:bg-slate-900/50'}`}
+                              className={`absolute inset-y-0 left-0 ${isWinner ? 'bg-emerald-50/80 dark:bg-emerald-950/20' : isMyVote ? 'bg-slate-100 dark:bg-gray-800' : 'bg-slate-50/50 dark:bg-gray-900/50'}`}
                               style={{ width: `${pct}%` }}
                             />
                             <View className="relative flex-row items-center justify-between">
@@ -210,7 +210,7 @@ export default function PollsScreen() {
                                 {isMyVote && !isWinner && <Ionicons name="checkmark-circle" size={14} color={isDark ? '#ffffff' : '#0f172a'} />}
                                 <Text className={`font-semibold ${isWinner ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-800 dark:text-slate-200'}`}>{opt.label}</Text>
                               </View>
-                              <Text className="text-xs font-extrabold text-slate-500 dark:text-slate-400">{pct}%</Text>
+                              <Text className="text-xs font-extrabold text-slate-500 dark:text-gray-400">{pct}%</Text>
                             </View>
                           </View>
                         </TouchableOpacity>
@@ -218,7 +218,7 @@ export default function PollsScreen() {
                     })}
                   </View>
 
-                  <Text className="mt-4 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                  <Text className="mt-4 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-gray-500">
                     {totalVotes} vote{totalVotes !== 1 ? 's' : ''}
                     {!closed && ` · closes ${format(new Date(poll.closes_at), 'MMM d')}`}
                   </Text>
@@ -242,15 +242,15 @@ export default function PollsScreen() {
       {/* Delete confirmation modal */}
       <Modal visible={!!confirmDeleteId} animationType="fade" transparent>
         <View className="flex-1 items-center justify-center bg-black/50 px-6">
-          <View className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80">
+          <View className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-900 border border-slate-100 dark:border-gray-700">
             <Text className="mb-2 text-lg font-bold text-slate-900 dark:text-white">Delete Poll?</Text>
-            <Text className="mb-6 text-sm text-slate-500 dark:text-slate-400">This will remove the poll and all votes. This cannot be undone.</Text>
+            <Text className="mb-6 text-sm text-slate-500 dark:text-gray-400">This will remove the poll and all votes. This cannot be undone.</Text>
             <View className="flex-row gap-3">
               <TouchableOpacity
                 onPress={() => setConfirmDeleteId(null)}
-                className="flex-1 items-center rounded-xl border border-slate-100 bg-white py-3 transition-all duration-200 active:scale-95 dark:border-slate-800/80 dark:bg-slate-900"
+                className="flex-1 items-center rounded-xl border border-slate-100 bg-white py-3 transition-all duration-200 active:scale-95 dark:border-gray-700 dark:bg-gray-900"
               >
-                <Text className="font-semibold text-slate-500 dark:text-slate-400">Cancel</Text>
+                <Text className="font-semibold text-slate-500 dark:text-gray-400">Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={confirmDelete}
@@ -272,7 +272,7 @@ export default function PollsScreen() {
       <Modal visible={showCreate} animationType="slide" transparent>
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} className="flex-1">
           <View className="flex-1 justify-end bg-black/50">
-            <View className="rounded-t-3xl bg-white px-6 pb-12 pt-6 dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800/80" style={{ maxHeight: '90%' }}>
+            <View className="rounded-t-3xl bg-white px-6 pb-12 pt-6 dark:bg-gray-900 border-t border-slate-100 dark:border-gray-700" style={{ maxHeight: '90%' }}>
               <View className="mb-6 flex-row items-center justify-between">
                 <Text className="text-lg font-bold text-slate-900 dark:text-white">New Poll</Text>
                 <TouchableOpacity onPress={() => { setShowCreate(false); resetForm(); }}>
@@ -287,7 +287,7 @@ export default function PollsScreen() {
                   onChangeText={(v) => { setQuestion(v); if (errors.question) setErrors((e) => ({ ...e, question: undefined })); }}
                   placeholder="Where should we go?"
                   placeholderTextColor="#94A3B8"
-                  className={`rounded-xl border bg-white px-4 py-4 text-base text-slate-900 dark:bg-slate-900 dark:text-white ${errors.question ? 'mb-1 border-red-500' : 'mb-4 border-slate-100 dark:border-slate-800/80'}`}
+                  className={`rounded-xl border bg-white px-4 py-4 text-base text-slate-900 dark:bg-gray-900 dark:text-white ${errors.question ? 'mb-1 border-red-500' : 'mb-4 border-slate-100 dark:border-gray-700'}`}
                 />
                 {!!errors.question && <Text className="mb-3 text-xs font-medium text-red-500">{errors.question}</Text>}
 
@@ -299,10 +299,10 @@ export default function PollsScreen() {
                       <TouchableOpacity
                         key={t.value}
                         onPress={() => setPollType(t.value)}
-                        className={`flex-row items-center gap-1.5 rounded-full px-4 py-2 transition-all duration-200 active:scale-95 ${isSelected ? 'bg-slate-900 dark:bg-white' : 'bg-slate-100 dark:bg-slate-800'}`}
+                        className={`flex-row items-center gap-1.5 rounded-full px-4 py-2 transition-all duration-200 active:scale-95 ${isSelected ? 'bg-slate-900 dark:bg-white' : 'bg-slate-100 dark:bg-gray-800'}`}
                       >
                         <Ionicons name={t.icon as any} size={14} color={isSelected ? (isDark ? '#0f172a' : 'white') : '#64748B'} />
-                        <Text className={`text-xs font-bold uppercase tracking-wider ${isSelected ? 'text-white dark:text-slate-900' : 'text-slate-500 dark:text-slate-400'}`}>{t.label}</Text>
+                        <Text className={`text-xs font-bold uppercase tracking-wider ${isSelected ? 'text-white dark:text-slate-900' : 'text-slate-500 dark:text-gray-400'}`}>{t.label}</Text>
                       </TouchableOpacity>
                     );
                   })}
@@ -319,7 +319,7 @@ export default function PollsScreen() {
                     }}
                     placeholder={`Option ${i + 1}`}
                     placeholderTextColor="#94A3B8"
-                    className={`mb-3 rounded-xl border bg-white px-4 py-4 text-base text-slate-900 dark:bg-slate-900 dark:text-white ${errors.options && !opt.trim() ? 'border-red-500' : 'border-slate-100 dark:border-slate-800/80'}`}
+                    className={`mb-3 rounded-xl border bg-white px-4 py-4 text-base text-slate-900 dark:bg-gray-900 dark:text-white ${errors.options && !opt.trim() ? 'border-red-500' : 'border-slate-100 dark:border-gray-700'}`}
                   />
                 ))}
                 {!!errors.options && <Text className="mb-2 text-xs font-medium text-red-500">{errors.options}</Text>}
@@ -333,7 +333,7 @@ export default function PollsScreen() {
                 <Text className="mb-2 text-slate-400 text-xs font-semibold tracking-wider uppercase">Deadline</Text>
                 <TouchableOpacity
                   onPress={() => { setShowCalendar(!showCalendar); if (errors.closesDate) setErrors((e) => ({ ...e, closesDate: undefined })); }}
-                  className={`mb-3 flex-row items-center gap-2 rounded-xl border bg-white px-4 py-4 dark:bg-slate-900 ${errors.closesDate ? 'border-red-500' : 'border-slate-100 dark:border-slate-800/80'}`}
+                  className={`mb-3 flex-row items-center gap-2 rounded-xl border bg-white px-4 py-4 dark:bg-gray-900 ${errors.closesDate ? 'border-red-500' : 'border-slate-100 dark:border-gray-700'}`}
                 >
                   <Ionicons name="calendar-outline" size={18} color="#2563EB" />
                   <Text className={closesDate ? 'font-semibold text-slate-900 dark:text-white' : 'text-slate-400'}>
@@ -344,7 +344,7 @@ export default function PollsScreen() {
                 {!!errors.closesDate && <Text className="mb-2 text-xs font-medium text-red-500">{errors.closesDate}</Text>}
 
                 {showCalendar && (
-                  <View className="mb-5 overflow-hidden rounded-xl border border-slate-100 dark:border-slate-800/80">
+                  <View className="mb-5 overflow-hidden rounded-xl border border-slate-100 dark:border-gray-700">
                     <Calendar
                       theme={{
                         calendarBackground: isDark ? '#0f172a' : '#ffffff',
@@ -389,9 +389,9 @@ export default function PollsScreen() {
       {/* Custom Alert Modal */}
       <Modal visible={!!alertInfo} animationType="fade" transparent>
         <View className="flex-1 items-center justify-center bg-black/50 px-6">
-          <View className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80">
+          <View className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-900 border border-slate-100 dark:border-gray-700">
             <Text className="mb-2 text-lg font-bold text-slate-900 dark:text-white">{alertInfo?.title}</Text>
-            <Text className="mb-6 text-sm text-slate-500 dark:text-slate-400">{alertInfo?.message}</Text>
+            <Text className="mb-6 text-sm text-slate-500 dark:text-gray-400">{alertInfo?.message}</Text>
             <TouchableOpacity
               onPress={() => setAlertInfo(null)}
               className="w-full items-center rounded-xl bg-slate-900 py-3 transition-all duration-200 active:scale-95 dark:bg-white"

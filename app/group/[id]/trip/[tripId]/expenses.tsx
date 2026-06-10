@@ -36,19 +36,19 @@ export default function ExpensesScreen() {
   function renderExpense({ item }: { item: Expense }) {
     const color = CATEGORY_COLOR[item.category] ?? '#94A3B8';
     return (
-      <View className="mb-4 rounded-xl border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800/80 dark:bg-slate-900">
+      <View className="mb-4 rounded-xl border border-slate-100 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-900">
         <View className="flex-row items-center gap-4">
           <View className="h-11 w-11 items-center justify-center rounded-xl" style={{ backgroundColor: `${color}15` }}>
             <Ionicons name={CATEGORY_ICONS[item.category] as any} size={20} color={color} />
           </View>
           <View className="flex-1">
-            <Text className="font-bold text-slate-900 dark:text-slate-100 text-base">{item.description}</Text>
+            <Text className="font-bold text-slate-900 dark:text-white text-base">{item.description}</Text>
             <Text className="text-slate-400 text-xs font-semibold tracking-wider uppercase mt-1">
               {item.category} · {(item.payer as any)?.full_name?.split(' ')[0] ?? 'Someone'} paid · {format(new Date(item.created_at), 'MMM d')}
             </Text>
           </View>
           <View className="items-end gap-1">
-            <Text className="font-bold text-slate-900 dark:text-slate-100 text-base">${item.amount.toFixed(2)}</Text>
+            <Text className="font-bold text-slate-900 dark:text-white text-base">${item.amount.toFixed(2)}</Text>
             {item.receipt_url && <Ionicons name="receipt-outline" size={14} color="#94A3B8" />}
           </View>
         </View>
@@ -57,11 +57,11 @@ export default function ExpensesScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50/60 dark:bg-slate-950/60" edges={['bottom']}>
+    <SafeAreaView className="flex-1 bg-slate-50/60 dark:bg-gray-950" edges={['bottom']}>
       <Stack.Screen options={{ title: 'Expenses' }} />
       
       {/* Total Spent Premium Card */}
-      <View className="mx-5 my-6 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-800/80 dark:bg-slate-900">
+      <View className="mx-5 my-6 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-900">
         <Text className="text-slate-400 text-xs font-semibold tracking-wider uppercase">Total Spent</Text>
         <Text className="text-slate-900 text-4xl font-bold dark:text-white mt-2">${total.toFixed(2)}</Text>
         <Text className="text-slate-500 text-sm mt-1">{expenses?.length ?? 0} expenses logged</Text>

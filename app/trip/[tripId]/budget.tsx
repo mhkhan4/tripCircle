@@ -29,13 +29,13 @@ export default function SoloBudgetScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50/60 dark:bg-slate-950/60" edges={['bottom']}>
+    <SafeAreaView className="flex-1 bg-slate-50/60 dark:bg-gray-950" edges={['bottom']}>
       <Stack.Screen options={{ title: 'Budget' }} />
       <ScrollView contentContainerStyle={{ padding: 24 }}>
         {!budget ? (
-          <View className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-800/80 dark:bg-slate-900">
+          <View className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-900">
             <Text className="mb-1 text-slate-900 text-lg font-bold dark:text-white">Set Your Budget</Text>
-            <Text className="mb-6 text-sm text-slate-500 dark:text-slate-400">How much do you want to spend on this trip?</Text>
+            <Text className="mb-6 text-sm text-slate-500 dark:text-gray-400">How much do you want to spend on this trip?</Text>
             <Text className="mb-2 text-slate-400 text-xs font-semibold tracking-wider uppercase">Total Budget (USD)</Text>
             <TextInput
               value={amount}
@@ -43,7 +43,7 @@ export default function SoloBudgetScreen() {
               placeholder="0.00"
               placeholderTextColor="#94A3B8"
               keyboardType="decimal-pad"
-              className="mb-6 rounded-xl border border-slate-100 bg-white px-4 py-4 text-3xl font-extrabold text-slate-900 dark:border-slate-800/80 dark:bg-slate-900 dark:text-white"
+              className="mb-6 rounded-xl border border-slate-100 bg-white px-4 py-4 text-3xl font-extrabold text-slate-900 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
             />
             <TouchableOpacity
               onPress={handleSetBudget}
@@ -58,7 +58,7 @@ export default function SoloBudgetScreen() {
             </TouchableOpacity>
           </View>
         ) : (
-          <View className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-800/80 dark:bg-slate-900">
+          <View className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-900">
             <Text className="mb-1 text-slate-400 text-xs font-semibold tracking-wider uppercase">Budget Overview</Text>
             
             <View className="my-4 h-2.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-850">
@@ -71,7 +71,7 @@ export default function SoloBudgetScreen() {
               />
             </View>
             
-            <View className="flex-row justify-between pt-2 border-t border-slate-50 dark:border-slate-800/50">
+            <View className="flex-row justify-between pt-2 border-t border-slate-50 dark:border-gray-700/50">
               {[
                 { label: 'Total Budget', value: `$${totalBudget.toFixed(2)}`, color: 'text-slate-900 dark:text-white' },
                 { label: 'Spent', value: `$${totalSpent.toFixed(2)}`, color: 'text-slate-900 dark:text-white' },
@@ -90,9 +90,9 @@ export default function SoloBudgetScreen() {
       {/* Custom Alert Modal */}
       <Modal visible={!!alertInfo} animationType="fade" transparent>
         <View className="flex-1 items-center justify-center bg-black/50 px-6">
-          <View className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80">
+          <View className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-900 border border-slate-100 dark:border-gray-700">
             <Text className="mb-2 text-lg font-bold text-slate-900 dark:text-white">{alertInfo?.title}</Text>
-            <Text className="mb-6 text-sm text-slate-500 dark:text-slate-400">{alertInfo?.message}</Text>
+            <Text className="mb-6 text-sm text-slate-500 dark:text-gray-400">{alertInfo?.message}</Text>
             <TouchableOpacity
               onPress={() => setAlertInfo(null)}
               className="w-full items-center rounded-xl bg-slate-900 py-3 transition-all duration-200 active:scale-95 dark:bg-white"

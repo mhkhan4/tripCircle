@@ -110,8 +110,8 @@ export default function SoloTasksScreen() {
       <View
         className={`mb-3 flex-row items-center gap-3 rounded-2xl border px-4 py-4 transition-all duration-200 ${
           isComplete
-            ? 'border-slate-50 bg-slate-55/40 dark:border-slate-900/50 dark:bg-slate-900/20'
-            : 'border-slate-100 bg-white shadow-sm dark:border-slate-800/80 dark:bg-slate-900'
+            ? 'border-slate-50 bg-slate-55/40 dark:border-slate-900/50 dark:bg-gray-900/20'
+            : 'border-slate-100 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900'
         }`}
       >
         <TouchableOpacity
@@ -131,7 +131,7 @@ export default function SoloTasksScreen() {
         </View>
 
         <View className="flex-1">
-          <Text className={`font-semibold text-sm ${isComplete ? 'text-slate-400 line-through dark:text-slate-500' : 'text-slate-900 dark:text-white'}`}>{task.title}</Text>
+          <Text className={`font-semibold text-sm ${isComplete ? 'text-slate-400 line-through dark:text-gray-500' : 'text-slate-900 dark:text-white'}`}>{task.title}</Text>
           {task.due_date && (
             <Text className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-550 mt-1">Due {format(new Date(task.due_date + 'T12:00:00'), 'MMM d')}</Text>
           )}
@@ -147,7 +147,7 @@ export default function SoloTasksScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50/60 dark:bg-slate-950/60" edges={['bottom']}>
+    <SafeAreaView className="flex-1 bg-slate-50/60 dark:bg-gray-950" edges={['bottom']}>
       <Stack.Screen options={{ title: 'Tasks' }} />
 
       {isLoading ? (
@@ -165,7 +165,7 @@ export default function SoloTasksScreen() {
           )}
 
           {(tasks?.length ?? 0) > 0 && (
-            <View className="mb-6 rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800/80 dark:bg-slate-900">
+            <View className="mb-6 rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-900">
               <View className="mb-2 flex-row items-center justify-between">
                 <Text className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-550">Progress</Text>
                 <Text className="text-sm font-extrabold text-slate-900 dark:text-white">{done.length}/{tasks?.length} done</Text>
@@ -208,15 +208,15 @@ export default function SoloTasksScreen() {
       {/* Delete confirmation modal */}
       <Modal visible={!!confirmDeleteId} animationType="fade" transparent>
         <View className="flex-1 items-center justify-center bg-black/50 px-6">
-          <View className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80">
+          <View className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-900 border border-slate-100 dark:border-gray-700">
             <Text className="mb-2 text-lg font-bold text-slate-900 dark:text-white">Delete Task?</Text>
-            <Text className="mb-6 text-sm text-slate-500 dark:text-slate-400">This task will be permanently removed.</Text>
+            <Text className="mb-6 text-sm text-slate-500 dark:text-gray-400">This task will be permanently removed.</Text>
             <View className="flex-row gap-3">
               <TouchableOpacity
                 onPress={() => setConfirmDeleteId(null)}
-                className="flex-1 items-center rounded-xl border border-slate-100 bg-white py-3 transition-all duration-200 active:scale-95 dark:border-slate-800/80 dark:bg-slate-900"
+                className="flex-1 items-center rounded-xl border border-slate-100 bg-white py-3 transition-all duration-200 active:scale-95 dark:border-gray-700 dark:bg-gray-900"
               >
-                <Text className="font-semibold text-slate-500 dark:text-slate-400">Cancel</Text>
+                <Text className="font-semibold text-slate-500 dark:text-gray-400">Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={confirmDelete}
@@ -238,7 +238,7 @@ export default function SoloTasksScreen() {
       <Modal visible={showCreate} animationType="slide" transparent>
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} className="flex-1">
           <View className="flex-1 justify-end bg-black/50">
-            <View className="rounded-t-3xl bg-white px-6 pb-12 pt-6 dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800/80" style={{ maxHeight: '90%' }}>
+            <View className="rounded-t-3xl bg-white px-6 pb-12 pt-6 dark:bg-gray-900 border-t border-slate-100 dark:border-gray-700" style={{ maxHeight: '90%' }}>
               <View className="mb-6 flex-row items-center justify-between">
                 <Text className="text-lg font-bold text-slate-900 dark:text-white">New Task</Text>
                 <TouchableOpacity onPress={() => { setShowCreate(false); resetForm(); }}>
@@ -253,7 +253,7 @@ export default function SoloTasksScreen() {
                   onChangeText={(v) => { setTitle(v); if (errors.title) setErrors((e) => ({ ...e, title: undefined })); }}
                   placeholder="Task title"
                   placeholderTextColor="#94A3B8"
-                  className={`rounded-xl border bg-white px-4 py-4 text-base text-slate-900 dark:bg-slate-900 dark:text-white ${errors.title ? 'mb-1 border-red-500' : 'mb-4 border-slate-100 dark:border-slate-800/80'}`}
+                  className={`rounded-xl border bg-white px-4 py-4 text-base text-slate-900 dark:bg-gray-900 dark:text-white ${errors.title ? 'mb-1 border-red-500' : 'mb-4 border-slate-100 dark:border-gray-700'}`}
                 />
                 {!!errors.title && <Text className="mb-3 text-xs font-medium text-red-500">{errors.title}</Text>}
 
@@ -268,7 +268,7 @@ export default function SoloTasksScreen() {
                         className={`flex-row items-center gap-1.5 rounded-full px-4 py-2 transition-all duration-200 active:scale-95 ${isSelected ? 'bg-slate-900 dark:bg-white' : 'bg-slate-100 dark:bg-slate-850'}`}
                       >
                         <Ionicons name={c.icon as any} size={14} color={isSelected ? (isDark ? '#0f172a' : 'white') : '#64748B'} />
-                        <Text className={`text-xs font-bold uppercase tracking-wider ${isSelected ? 'text-white dark:text-slate-900' : 'text-slate-500 dark:text-slate-400'}`}>{c.label}</Text>
+                        <Text className={`text-xs font-bold uppercase tracking-wider ${isSelected ? 'text-white dark:text-slate-900' : 'text-slate-500 dark:text-gray-400'}`}>{c.label}</Text>
                       </TouchableOpacity>
                     );
                   })}
@@ -277,7 +277,7 @@ export default function SoloTasksScreen() {
                 <Text className="mb-2 text-slate-450 text-xs font-semibold tracking-wider uppercase">Due date (optional)</Text>
                 <TouchableOpacity
                   onPress={() => setShowCalendar(!showCalendar)}
-                  className="mb-3 flex-row items-center gap-2 rounded-xl border border-slate-100 bg-white px-4 py-4 dark:border-slate-800/80 dark:bg-slate-900"
+                  className="mb-3 flex-row items-center gap-2 rounded-xl border border-slate-100 bg-white px-4 py-4 dark:border-gray-700 dark:bg-gray-900"
                 >
                   <Ionicons name="calendar-outline" size={18} color="#2563EB" />
                   <Text className={dueDate ? 'font-semibold text-slate-900 dark:text-white' : 'text-slate-400'}>
@@ -291,7 +291,7 @@ export default function SoloTasksScreen() {
                 </TouchableOpacity>
 
                 {showCalendar && (
-                  <View className="mb-5 overflow-hidden rounded-xl border border-slate-100 dark:border-slate-800/80">
+                  <View className="mb-5 overflow-hidden rounded-xl border border-slate-100 dark:border-gray-700">
                     <Calendar
                       theme={{
                         calendarBackground: isDark ? '#0f172a' : '#ffffff',
@@ -337,9 +337,9 @@ export default function SoloTasksScreen() {
       {/* Custom Alert Modal */}
       <Modal visible={!!alertInfo} animationType="fade" transparent>
         <View className="flex-1 items-center justify-center bg-black/50 px-6">
-          <View className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80">
+          <View className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-900 border border-slate-100 dark:border-gray-700">
             <Text className="mb-2 text-lg font-bold text-slate-900 dark:text-white">{alertInfo?.title}</Text>
-            <Text className="mb-6 text-sm text-slate-500 dark:text-slate-400">{alertInfo?.message}</Text>
+            <Text className="mb-6 text-sm text-slate-500 dark:text-gray-400">{alertInfo?.message}</Text>
             <TouchableOpacity
               onPress={() => setAlertInfo(null)}
               className="w-full items-center rounded-xl bg-slate-900 py-3 transition-all duration-200 active:scale-95 dark:bg-white"

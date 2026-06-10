@@ -44,18 +44,22 @@ export default function NewSoloTripScreen() {
 
   function getMarkedDates() {
     const marks: Record<string, any> = {};
+    const selectedColor = isDark ? '#2563EB' : '#0f172a';
+    const selectedTextColor = 'white';
     if (calendarTarget === 'start' && startDate) {
-      marks[startDate] = { selected: true, selectedColor: isDark ? '#ffffff' : '#0f172a', selectedTextColor: isDark ? '#0f172a' : '#ffffff' };
+      marks[startDate] = { selected: true, selectedColor, selectedTextColor };
     } else if (calendarTarget === 'end') {
-      if (startDate) marks[startDate] = { selected: true, selectedColor: isDark ? '#ffffff' : '#0f172a', selectedTextColor: isDark ? '#0f172a' : '#ffffff' };
-      if (endDate) marks[endDate] = { selected: true, selectedColor: isDark ? '#ffffff' : '#0f172a', selectedTextColor: isDark ? '#0f172a' : '#ffffff' };
+      if (startDate) marks[startDate] = { selected: true, selectedColor, selectedTextColor };
+      if (endDate) marks[endDate] = { selected: true, selectedColor, selectedTextColor };
       if (startDate && endDate) {
         const cur = new Date(startDate);
         cur.setDate(cur.getDate() + 1);
         const end = new Date(endDate);
         while (cur < end) {
           const key = cur.toISOString().split('T')[0];
-          marks[key] = { color: isDark ? '#1e293b' : '#f1f5f9', textColor: isDark ? '#cbd5e1' : '#475569' };
+          marks[key] = isDark
+            ? { color: '#DBEAFE', textColor: '#1D4ED8' }
+            : { color: '#f1f5f9', textColor: '#475569' };
           cur.setDate(cur.getDate() + 1);
         }
       }
@@ -85,44 +89,44 @@ export default function NewSoloTripScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50/60 dark:bg-slate-950/60" edges={['bottom']}>
+    <SafeAreaView className="flex-1 bg-slate-50/60 dark:bg-gray-950" edges={['bottom']}>
       <Stack.Screen options={{ title: 'Plan a Solo Trip' }} />
       <ScrollView className="flex-1 px-5 pt-6" keyboardShouldPersistTaps="handled">
         <Text className="text-slate-900 text-2xl font-bold dark:text-white">Solo Trip</Text>
-        <Text className="mb-8 text-sm text-slate-500">Just you. Fill in the details.</Text>
+        <Text className="mb-8 text-sm text-slate-500 dark:text-gray-400">Just you. Fill in the details.</Text>
 
         <View className="mb-6">
-          <Text className="mb-2 text-slate-400 text-xs font-semibold tracking-wider uppercase">Trip Name *</Text>
+          <Text className="mb-2 text-slate-400 dark:text-gray-300 text-xs font-semibold tracking-wider uppercase">Trip Name *</Text>
           <TextInput
             value={title}
             onChangeText={setTitle}
             placeholder="e.g. Beach Weekend, Mountain Hike"
             placeholderTextColor="#94A3B8"
-            className="rounded-xl border border-slate-200 bg-white px-4 py-4 text-base text-slate-900 dark:border-slate-800 dark:bg-slate-900 dark:text-white"
+            className="rounded-xl border border-slate-200 bg-white px-4 py-4 text-base text-slate-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
           />
         </View>
 
         <View className="mb-6">
-          <Text className="mb-2 text-slate-400 text-xs font-semibold tracking-wider uppercase">Destination *</Text>
+          <Text className="mb-2 text-slate-400 dark:text-gray-300 text-xs font-semibold tracking-wider uppercase">Destination *</Text>
           <TextInput
             value={destination}
             onChangeText={setDestination}
             placeholder="e.g. Bali, Indonesia"
             placeholderTextColor="#94A3B8"
-            className="rounded-xl border border-slate-200 bg-white px-4 py-4 text-base text-slate-900 dark:border-slate-800 dark:bg-slate-900 dark:text-white"
+            className="rounded-xl border border-slate-200 bg-white px-4 py-4 text-base text-slate-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
           />
         </View>
 
         <View className="mb-6 flex-row gap-4">
           {(['start', 'end'] as const).map((target) => (
             <View key={target} className="flex-1">
-              <Text className="mb-2 text-slate-400 text-xs font-semibold tracking-wider uppercase">
+              <Text className="mb-2 text-slate-400 dark:text-gray-300 text-xs font-semibold tracking-wider uppercase">
                 {target === 'start' ? 'Start Date *' : 'End Date *'}
               </Text>
               <TouchableOpacity
                 onPress={() => setCalendarTarget(target)}
                 activeOpacity={0.9}
-                className="flex-row items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-4 dark:border-slate-800 dark:bg-slate-900 transition-all duration-200 active:scale-95 shadow-sm"
+                className="flex-row items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-4 dark:border-gray-700 dark:bg-gray-800 shadow-sm"
               >
                 <Ionicons name="calendar-outline" size={16} color="#64748b" />
                 <Text className={target === 'start' ? (startDate ? 'text-base font-semibold text-slate-900 dark:text-white' : 'text-base text-gray-400') : (endDate ? 'text-base font-semibold text-slate-900 dark:text-white' : 'text-base text-gray-400')}>
@@ -134,13 +138,13 @@ export default function NewSoloTripScreen() {
         </View>
 
         <View className="mb-8">
-          <Text className="mb-2 text-slate-400 text-xs font-semibold tracking-wider uppercase">Description (optional)</Text>
+          <Text className="mb-2 text-slate-400 dark:text-gray-300 text-xs font-semibold tracking-wider uppercase">Description (optional)</Text>
           <TextInput
             value={description}
             onChangeText={setDescription}
             placeholder="What are you planning to do?"
             placeholderTextColor="#94A3B8"
-            className="rounded-xl border border-slate-200 bg-white px-4 py-4 text-base text-slate-900 dark:border-slate-800 dark:bg-slate-900 dark:text-white"
+            className="rounded-xl border border-slate-200 bg-white px-4 py-4 text-base text-slate-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
             multiline
             numberOfLines={3}
             textAlignVertical="top"
@@ -154,12 +158,23 @@ export default function NewSoloTripScreen() {
           onPress={handleCreate}
           disabled={createTrip.isPending}
           activeOpacity={0.9}
-          className="items-center justify-center rounded-xl bg-slate-900 py-4 shadow-sm transition-all duration-200 active:scale-95 dark:bg-white"
+          style={{
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 12,
+            paddingVertical: 16,
+            backgroundColor: '#2563eb',
+            shadowColor: '#2563eb',
+            shadowOpacity: 0.45,
+            shadowOffset: { width: 0, height: 6 },
+            shadowRadius: 16,
+            elevation: 7,
+          }}
         >
           {createTrip.isPending ? (
-            <ActivityIndicator color={isDark ? '#0f172a' : 'white'} />
+            <ActivityIndicator color="white" />
           ) : (
-            <Text className="text-base font-bold text-white dark:text-slate-900">Create Trip</Text>
+            <Text style={{ fontSize: 15, fontWeight: '700', color: 'white', letterSpacing: 0.2 }}>Create Trip</Text>
           )}
         </TouchableOpacity>
       </View>
@@ -171,7 +186,7 @@ export default function NewSoloTripScreen() {
         onRequestClose={() => setCalendarTarget(null)}
       >
         <View className="flex-1 justify-end bg-black/40">
-          <View className="rounded-t-3xl bg-white dark:bg-slate-900">
+          <View style={{ borderTopLeftRadius: 24, borderTopRightRadius: 24, backgroundColor: isDark ? '#111827' : '#ffffff' }}>
             <View className="flex-row items-center justify-between px-5 pt-5 pb-3">
               <Text className="text-base font-bold text-slate-900 dark:text-white">
                 {calendarTarget === 'start' ? 'Select Start Date' : 'Select End Date'}
@@ -183,16 +198,16 @@ export default function NewSoloTripScreen() {
             <Calendar
               onDayPress={handleDayPress}
               markedDates={getMarkedDates()}
-              markingType={calendarTarget === 'end' && startDate && endDate ? 'period' : undefined} // Resolves TS2322: replaced 'simple' with undefined
+              markingType={calendarTarget === 'end' && startDate && endDate ? 'period' : undefined}
               minDate={calendarTarget === 'end' ? startDate : undefined}
               theme={{
-                selectedDayBackgroundColor: isDark ? '#ffffff' : '#0f172a',
-                selectedDayTextColor: isDark ? '#0f172a' : '#ffffff',
+                selectedDayBackgroundColor: isDark ? '#2563EB' : '#0f172a',
+                selectedDayTextColor: 'white',
                 todayTextColor: '#2563EB',
-                arrowColor: isDark ? '#ffffff' : '#0f172a',
-                calendarBackground: isDark ? '#0f172a' : '#ffffff',
-                textSectionTitleColor: isDark ? '#94a3b8' : '#475569',
-                dayTextColor: isDark ? '#cbd5e1' : '#1e293b',
+                arrowColor: isDark ? '#2563EB' : '#0f172a',
+                calendarBackground: isDark ? '#111827' : '#ffffff',
+                textSectionTitleColor: isDark ? '#9ca3af' : '#475569',
+                dayTextColor: isDark ? '#e5e7eb' : '#1e293b',
                 monthTextColor: isDark ? '#ffffff' : '#0f172a',
               }}
             />

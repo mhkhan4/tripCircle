@@ -124,13 +124,13 @@ export default function ItineraryScreen() {
     const canDelete = entry.created_by === user?.id || isTripAdmin;
 
     return (
-      <View className="mb-4 rounded-xl border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800/80 dark:bg-slate-900">
+      <View className="mb-4 rounded-xl border border-slate-100 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-900">
         <View className="flex-row items-start gap-4">
           <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: `${meta.color}12`, alignItems: 'center', justifyContent: 'center' }}>
             <Ionicons name={meta.icon as any} size={18} color={meta.color} />
           </View>
           <View className="flex-1">
-            <Text className="font-bold text-slate-900 dark:text-slate-100 text-base">{entry.title}</Text>
+            <Text className="font-bold text-slate-900 dark:text-white text-base">{entry.title}</Text>
             {entry.starts_at && (
               <Text className="text-slate-400 text-xs font-semibold tracking-wider uppercase mt-1">
                 {format(new Date(entry.starts_at), 'h:mm a')}
@@ -167,7 +167,7 @@ export default function ItineraryScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50/60 dark:bg-slate-950/60" edges={['bottom']}>
+    <SafeAreaView className="flex-1 bg-slate-50/60 dark:bg-gray-950" edges={['bottom']}>
       <Stack.Screen options={{ title: 'Itinerary' }} />
 
       {isLoading ? (
@@ -227,7 +227,7 @@ export default function ItineraryScreen() {
               <TouchableOpacity
                 onPress={() => setConfirmDeleteId(null)}
                 activeOpacity={0.9}
-                className="flex-1 rounded-xl border border-gray-200 py-3 items-center dark:border-gray-700 bg-white dark:bg-slate-900 transition-all duration-200 active:scale-95"
+                className="flex-1 rounded-xl border border-gray-200 py-3 items-center dark:border-gray-700 bg-white dark:bg-gray-900 transition-all duration-200 active:scale-95"
               >
                 <Text className="font-semibold text-gray-700 dark:text-gray-300">Cancel</Text>
               </TouchableOpacity>
@@ -250,7 +250,7 @@ export default function ItineraryScreen() {
       <Modal visible={showCreate} animationType="slide" transparent>
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} className="flex-1">
           <View className="flex-1 justify-end bg-black/40">
-            <View className="rounded-t-3xl bg-white px-5 pb-10 pt-6 dark:bg-slate-900" style={{ maxHeight: '90%' }}>
+            <View className="rounded-t-3xl bg-white px-5 pb-10 pt-6 dark:bg-gray-900" style={{ maxHeight: '90%' }}>
               <View className="mb-5 flex-row items-center justify-between">
                 <Text className="text-xl font-bold text-slate-900 dark:text-white">Add to Itinerary</Text>
                 <TouchableOpacity onPress={() => { setShowCreate(false); resetForm(); }} className="transition-all duration-200 active:scale-95">
@@ -269,7 +269,7 @@ export default function ItineraryScreen() {
                         className="flex-row items-center gap-1.5 rounded-full border px-4 py-2.5 transition-all duration-150 active:scale-95"
                         style={{
                           backgroundColor: entryType === t.value ? (isDark ? 'white' : '#0f172a') : 'transparent',
-                          borderColor: entryType === t.value ? (isDark ? 'white' : '#0f172a') : (isDark ? '#334155' : '#e2e8f0'),
+                          borderColor: entryType === t.value ? (isDark ? 'white' : '#0f172a') : (isDark ? '#1F2937' : '#e2e8f0'),
                         }}
                       >
                         <Ionicons name={t.icon as any} size={14} color={entryType === t.value ? (isDark ? '#0f172a' : 'white') : '#64748B'} />
@@ -292,7 +292,7 @@ export default function ItineraryScreen() {
                   onChangeText={(v) => { setTitle(v); if (errors.title) setErrors((e) => ({ ...e, title: undefined })); }}
                   placeholder="e.g. United Airlines UA1234"
                   placeholderTextColor="#94A3B8"
-                  className={`rounded-xl border bg-white px-4 py-4 text-base text-slate-900 dark:bg-slate-900 dark:text-white ${errors.title ? 'mb-1 border-red-500' : 'mb-6 border-slate-200 dark:border-slate-800'}`}
+                  className={`rounded-xl border bg-white px-4 py-4 text-base text-slate-900 dark:bg-gray-900 dark:text-white ${errors.title ? 'mb-1 border-red-500' : 'mb-6 border-slate-200 dark:border-gray-700'}`}
                 />
                 {!!errors.title && <Text className="mb-3 text-xs text-red-500 font-semibold">{errors.title}</Text>}
 
@@ -300,7 +300,7 @@ export default function ItineraryScreen() {
                 <TouchableOpacity
                   onPress={() => setShowCalendar(!showCalendar)}
                   activeOpacity={0.9}
-                  className="mb-6 flex-row items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-4 dark:border-slate-800 dark:bg-slate-900 transition-all duration-200 active:scale-95 shadow-sm"
+                  className="mb-6 flex-row items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-4 dark:border-gray-700 dark:bg-gray-900 transition-all duration-200 active:scale-95 shadow-sm"
                 >
                   <Ionicons name="calendar-outline" size={18} color="#64748b" />
                   <Text className={date ? 'font-bold text-slate-900 dark:text-white' : 'text-slate-450'}>
@@ -314,7 +314,7 @@ export default function ItineraryScreen() {
                 </TouchableOpacity>
 
                 {showCalendar && (
-                  <View className="mb-6 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+                  <View className="mb-6 overflow-hidden rounded-xl border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-900">
                     <Calendar
                       onDayPress={(day: { dateString: string }) => { setDate(day.dateString); setShowCalendar(false); }}
                       markedDates={date ? { [date]: { selected: true, selectedColor: isDark ? '#ffffff' : '#0f172a', selectedTextColor: isDark ? '#0f172a' : '#ffffff' } } : {}}
@@ -339,7 +339,7 @@ export default function ItineraryScreen() {
                       placeholder="HH:MM"
                       placeholderTextColor="#94A3B8"
                       keyboardType="numbers-and-punctuation"
-                      className="mb-6 rounded-xl border border-slate-200 bg-white px-4 py-4 text-base text-slate-900 dark:border-slate-800 dark:bg-slate-900 dark:text-white"
+                      className="mb-6 rounded-xl border border-slate-200 bg-white px-4 py-4 text-base text-slate-900 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
                     />
                   </>
                 )}
@@ -351,7 +351,7 @@ export default function ItineraryScreen() {
                   placeholder="e.g. ABC123"
                   placeholderTextColor="#94A3B8"
                   autoCapitalize="characters"
-                  className="mb-6 rounded-xl border border-slate-200 bg-white px-4 py-4 text-base text-slate-900 dark:border-slate-800 dark:bg-slate-900 dark:text-white"
+                  className="mb-6 rounded-xl border border-slate-200 bg-white px-4 py-4 text-base text-slate-900 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
                 />
 
                 <Text className="mb-2 text-slate-400 text-xs font-semibold tracking-wider uppercase">Link (optional)</Text>
@@ -362,7 +362,7 @@ export default function ItineraryScreen() {
                   placeholderTextColor="#94A3B8"
                   autoCapitalize="none"
                   keyboardType="url"
-                  className="mb-6 rounded-xl border border-slate-200 bg-white px-4 py-4 text-base text-slate-900 dark:border-slate-800 dark:bg-slate-900 dark:text-white"
+                  className="mb-6 rounded-xl border border-slate-200 bg-white px-4 py-4 text-base text-slate-900 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
                 />
 
                 <Text className="mb-2 text-slate-400 text-xs font-semibold tracking-wider uppercase">Notes (optional)</Text>
@@ -373,7 +373,7 @@ export default function ItineraryScreen() {
                   placeholderTextColor="#94A3B8"
                   multiline
                   numberOfLines={3}
-                  className="mb-6 rounded-xl border border-slate-200 bg-white px-4 py-4 text-base text-slate-900 dark:border-slate-800 dark:bg-slate-900 dark:text-white"
+                  className="mb-6 rounded-xl border border-slate-200 bg-white px-4 py-4 text-base text-slate-900 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
                 />
 
               </ScrollView>

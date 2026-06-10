@@ -37,11 +37,11 @@ function TripCard({ item, groupId }: { item: Trip; groupId: string }) {
   return (
     <PressableCard
       onPress={() => router.push(`/group/${groupId}/trip/${item.id}`)}
-      className="mb-4 rounded-xl border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800/80 dark:bg-slate-900/50"
+      className="mb-4 rounded-xl border border-slate-100 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-900/50"
     >
       <View className="flex-row items-start justify-between gap-4">
         <View className="flex-1">
-          <Text className="text-base font-bold text-slate-900 dark:text-slate-100">{item.title}</Text>
+          <Text className="text-base font-bold text-slate-900 dark:text-white">{item.title}</Text>
           <View className="mt-2 flex-row items-center gap-1.5">
             <Ionicons name="location-outline" size={13} color="#94A3B8" />
             <Text className="text-xs font-semibold tracking-wider uppercase text-slate-400">{item.destination}</Text>
@@ -94,18 +94,18 @@ export default function GroupScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50/60 dark:bg-slate-950/60" edges={['bottom']}>
+    <SafeAreaView className="flex-1 bg-slate-50/60 dark:bg-gray-950" edges={['bottom']}>
       <Stack.Screen options={{ title: group?.name ?? 'Group' }} />
 
       {/* Group header card */}
-      <View className="mx-5 mb-8 rounded-xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-800/80 dark:bg-slate-900">
+      <View className="mx-5 mb-8 rounded-xl border border-slate-100 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
         <View className="flex-row items-center gap-4">
           <View
             style={{
               width: 56,
               height: 56,
               borderRadius: 16,
-              backgroundColor: '#0f172a',
+              backgroundColor: '#2563EB',
               alignItems: 'center',
               justifyContent: 'center',
             }}
@@ -117,7 +117,7 @@ export default function GroupScreen() {
           <View className="flex-1">
             <Text className="text-xl font-bold text-slate-900 dark:text-white">{group?.name}</Text>
             {group?.description ? (
-              <Text className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">{group.description}</Text>
+              <Text className="text-sm text-slate-500 dark:text-gray-400 mt-0.5">{group.description}</Text>
             ) : null}
           </View>
         </View>
@@ -125,7 +125,7 @@ export default function GroupScreen() {
           <TouchableOpacity
             onPress={shareInvite}
             activeOpacity={0.9}
-            className="flex-1 flex-row items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-3 transition-all duration-200 active:scale-95 dark:border-slate-800 dark:bg-slate-900/50"
+            className="flex-1 flex-row items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-3 transition-all duration-200 active:scale-95 dark:border-gray-700 dark:bg-gray-900/50"
           >
             <Ionicons name="share-outline" size={16} color={isDark ? '#cbd5e1' : '#334155'} />
             <Text className="text-sm font-bold text-slate-700 dark:text-slate-300">Invite</Text>
@@ -133,7 +133,7 @@ export default function GroupScreen() {
           <TouchableOpacity
             onPress={() => router.push(`/group/${id}/members`)}
             activeOpacity={0.9}
-            className="flex-1 flex-row items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-3 transition-all duration-200 active:scale-95 dark:border-slate-800 dark:bg-slate-900/50"
+            className="flex-1 flex-row items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-3 transition-all duration-200 active:scale-95 dark:border-gray-700 dark:bg-gray-900/50"
           >
             <Ionicons name="people-outline" size={16} color={isDark ? '#cbd5e1' : '#334155'} />
             <Text className="text-sm font-bold text-slate-700 dark:text-slate-300">Members</Text>
@@ -157,7 +157,7 @@ export default function GroupScreen() {
         ListHeaderComponent={
           <View className="mb-4 flex-row items-center justify-between">
             <View className="flex-row items-center gap-1.5">
-              <View style={{ width: 3, height: 12, borderRadius: 2, backgroundColor: isDark ? '#ffffff' : '#0f172a' }} />
+              <View style={{ width: 3, height: 12, borderRadius: 2, backgroundColor: '#2563EB' }} />
               <Text className="text-slate-400 text-xs font-semibold tracking-wider uppercase">Trips</Text>
             </View>
             <TouchableOpacity
@@ -165,8 +165,8 @@ export default function GroupScreen() {
               activeOpacity={0.9}
               className="flex-row items-center gap-1 transition-all duration-200 active:scale-95"
             >
-              <Ionicons name="add-circle" size={18} color={isDark ? '#ffffff' : '#0f172a'} />
-              <Text className="text-sm font-bold text-slate-900 dark:text-white">New Trip</Text>
+              <Ionicons name="add-circle" size={18} color="#2563EB" />
+              <Text className="text-sm font-bold text-primary">New Trip</Text>
             </TouchableOpacity>
           </View>
         }
@@ -177,7 +177,7 @@ export default function GroupScreen() {
                 width: 72,
                 height: 72,
                 borderRadius: 22,
-                backgroundColor: isDark ? '#1e293b' : '#f1f5f9',
+                backgroundColor: isDark ? '#1F2937' : '#f1f5f9',
                 alignItems: 'center',
                 justifyContent: 'center',
                 marginBottom: 16,

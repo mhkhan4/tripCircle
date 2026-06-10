@@ -16,9 +16,10 @@ const FEATURES = [
   {
     icon: 'people' as const,
     color: '#0f172a',
-    darkBg: '#1e293b',
+    darkColor: '#3b82f6',
+    darkBg: '#1e3a8a22',
     lightBg: '#f8fafc',
-    darkBorder: '#334155',
+    darkBorder: '#1e3a8a',
     lightBorder: '#f1f5f9',
     title: 'Group Trips',
     desc: 'Create a group, invite friends, and plan together. Everyone stays in the loop.',
@@ -26,9 +27,10 @@ const FEATURES = [
   {
     icon: 'wallet' as const,
     color: '#0f172a',
-    darkBg: '#1e293b',
+    darkColor: '#f59e0b',
+    darkBg: '#78350f22',
     lightBg: '#f8fafc',
-    darkBorder: '#334155',
+    darkBorder: '#92400e',
     lightBorder: '#f1f5f9',
     title: 'Budget & Expenses',
     desc: 'Track shared costs, split bills fairly, and know exactly who owes what.',
@@ -36,9 +38,10 @@ const FEATURES = [
   {
     icon: 'compass' as const,
     color: '#0f172a',
-    darkBg: '#1e293b',
+    darkColor: '#10b981',
+    darkBg: '#064e3b22',
     lightBg: '#f8fafc',
-    darkBorder: '#334155',
+    darkBorder: '#065f46',
     lightBorder: '#f1f5f9',
     title: 'Solo Planning',
     desc: 'Build your own itinerary and keep everything organised in one place.',
@@ -47,7 +50,7 @@ const FEATURES = [
 
 function GroupCardSkeleton({ isDark }: { isDark: boolean }) {
   return (
-    <View className="mb-4 rounded-xl border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800/80 dark:bg-slate-900">
+    <View className="mb-4 rounded-xl border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-gray-900">
       <View className="flex-row items-center gap-4">
         <Skeleton width={44} height={44} borderRadius={12} />
         <View style={{ flex: 1, gap: 8 }}>
@@ -76,12 +79,14 @@ export default function HomeScreen() {
 
   function renderGroup({ item }: { item: Group }) {
     const letter = item.name[0]?.toUpperCase() ?? '?';
-    const hues = ['#0f172a', '#334155', '#475569', '#1e293b'];
+    const lightHues = ['#0f172a', '#334155', '#475569', '#1e293b'];
+    const darkHues = ['#2563eb', '#7c3aed', '#0891b2', '#059669', '#d97706', '#dc2626'];
+    const hues = isDark ? darkHues : lightHues;
     const color = hues[item.name.charCodeAt(0) % hues.length];
     return (
       <PressableCard
         onPress={() => router.push(`/group/${item.id}`)}
-        className="mb-4 rounded-xl border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800/80 dark:bg-slate-900/50"
+        className="mb-4 rounded-xl border border-slate-100 bg-white p-5 shadow-sm dark:border-[#1e293b] dark:bg-gray-900"
       >
         <View className="flex-row items-center gap-4">
           <View
@@ -104,8 +109,17 @@ export default function HomeScreen() {
               <Text className="mt-1 text-xs font-semibold tracking-wider uppercase text-slate-400 dark:text-slate-500">Tap to open</Text>
             )}
           </View>
-          <View className="h-8 w-8 items-center justify-center rounded-lg bg-slate-50 dark:bg-slate-800/60">
-            <Ionicons name="chevron-forward" size={15} color={isDark ? '#94a3b8' : '#64748b'} />
+          <View
+            style={{
+              width: 30,
+              height: 30,
+              borderRadius: 9,
+              backgroundColor: isDark ? '#1e293b' : '#f1f5f9',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Ionicons name="chevron-forward" size={15} color={isDark ? '#64748b' : '#94a3b8'} />
           </View>
         </View>
       </PressableCard>
@@ -119,11 +133,11 @@ export default function HomeScreen() {
   const firstName = user?.full_name?.split(' ')[0] ?? 'Traveler';
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50/60 dark:bg-slate-950/60">
+    <SafeAreaView className="flex-1 bg-slate-50/60 dark:bg-gray-950">
 
       {/* ── Header ── */}
       <View
-        className="border-b border-slate-100 dark:border-slate-900 px-5 py-4"
+        className="border-b border-slate-100 dark:border-slate-800 px-5 py-4"
         style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
       >
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
@@ -132,7 +146,7 @@ export default function HomeScreen() {
             style={{ width: 64, height: 44 }}
             resizeMode="contain"
           />
-          <View style={{ height: 24, width: 1, backgroundColor: isDark ? '#334155' : '#e2e8f0' }} />
+          <View style={{ height: 24, width: 1, backgroundColor: isDark ? '#1e293b' : '#e2e8f0' }} />
           <View>
             <Text className="text-slate-400 text-xs font-semibold tracking-wider uppercase">
               Welcome back
@@ -146,9 +160,21 @@ export default function HomeScreen() {
         <TouchableOpacity
           onPress={() => router.push('/group/new')}
           activeOpacity={0.9}
-          className="w-10 h-10 rounded-full bg-slate-900 dark:bg-white items-center justify-center transition-all duration-200 active:scale-95 shadow-sm"
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: 20,
+            backgroundColor: isDark ? '#2563eb' : '#0f172a',
+            alignItems: 'center',
+            justifyContent: 'center',
+            shadowColor: isDark ? '#2563eb' : '#000',
+            shadowOpacity: isDark ? 0.45 : 0.15,
+            shadowOffset: { width: 0, height: 4 },
+            shadowRadius: isDark ? 10 : 4,
+            elevation: isDark ? 5 : 2,
+          }}
         >
-          <Ionicons name="add" size={20} color={isDark ? '#0f172a' : 'white'} />
+          <Ionicons name="add" size={20} color="white" />
         </TouchableOpacity>
       </View>
 
@@ -166,8 +192,9 @@ export default function HomeScreen() {
           {/* Ambient glow blobs — dark mode only */}
           {isDark && (
             <>
-              <View style={{ position: 'absolute', top: 10, right: -70, width: 240, height: 240, borderRadius: 120, backgroundColor: '#0f172a', opacity: 0.1 }} />
-              <View style={{ position: 'absolute', top: 270, left: -80, width: 200, height: 200, borderRadius: 100, backgroundColor: '#1e293b', opacity: 0.08 }} />
+              <View style={{ position: 'absolute', top: 10, right: -70, width: 240, height: 240, borderRadius: 120, backgroundColor: '#2563eb', opacity: 0.08 }} />
+              <View style={{ position: 'absolute', top: 270, left: -80, width: 200, height: 200, borderRadius: 100, backgroundColor: '#7c3aed', opacity: 0.07 }} />
+              <View style={{ position: 'absolute', top: 560, right: -50, width: 180, height: 180, borderRadius: 90, backgroundColor: '#0891b2', opacity: 0.06 }} />
             </>
           )}
 
@@ -185,7 +212,7 @@ export default function HomeScreen() {
             <Text className="text-center text-2xl font-extrabold tracking-tight text-slate-900 dark:text-slate-50" style={{ lineHeight: 34 }}>
               Plan trips together,{'\n'}effortlessly.
             </Text>
-            <Text className="mt-3 text-center text-sm leading-relaxed text-slate-500">
+            <Text className="mt-3 text-center text-sm leading-relaxed text-slate-500 dark:text-slate-400">
               From idea to itinerary — group adventures{'\n'}and solo getaways, all in one place.
             </Text>
           </View>
@@ -193,7 +220,7 @@ export default function HomeScreen() {
           {/* Section divider */}
           <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 40, gap: 10 }}>
             <View className="flex-1" style={{ height: 1, backgroundColor: isDark ? '#1e293b' : '#e2e8f0' }} />
-            <Text className="text-slate-400 text-xs font-semibold tracking-wider uppercase">
+            <Text className="text-slate-400 dark:text-slate-600 text-xs font-semibold tracking-wider uppercase">
               Everything you need
             </Text>
             <View className="flex-1" style={{ height: 1, backgroundColor: isDark ? '#1e293b' : '#e2e8f0' }} />
@@ -204,7 +231,7 @@ export default function HomeScreen() {
             {FEATURES.map((f) => (
               <View
                 key={f.title}
-                className="flex-row items-center gap-4 rounded-xl border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/50"
+                className="flex-row items-center gap-4 rounded-xl border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-gray-900"
               >
                 <View
                   style={{
@@ -218,11 +245,11 @@ export default function HomeScreen() {
                     justifyContent: 'center',
                   }}
                 >
-                  <Ionicons name={f.icon} size={20} color={isDark ? '#cbd5e1' : f.color} />
+                  <Ionicons name={f.icon} size={20} color={isDark ? f.darkColor : f.color} />
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text className="text-sm font-bold text-slate-900 dark:text-slate-100">{f.title}</Text>
-                  <Text className="mt-1 text-xs leading-relaxed text-slate-500">{f.desc}</Text>
+                  <Text className="mt-1 text-xs leading-relaxed text-slate-500 dark:text-slate-400">{f.desc}</Text>
                 </View>
               </View>
             ))}
@@ -231,17 +258,26 @@ export default function HomeScreen() {
           {/* CTAs */}
           <PressableCard
             onPress={() => router.push('/group/new')}
-            className="mt-8 items-center justify-center rounded-xl bg-slate-900 py-4.5 shadow-sm transition-all duration-200 active:scale-95 dark:bg-white"
+            className="mt-8 items-center justify-center rounded-xl py-4.5 shadow-sm"
+            style={{
+              backgroundColor: isDark ? '#2563eb' : '#0f172a',
+              shadowColor: isDark ? '#2563eb' : '#000',
+              shadowOpacity: isDark ? 0.45 : 0.1,
+              shadowOffset: { width: 0, height: isDark ? 6 : 2 },
+              shadowRadius: isDark ? 16 : 6,
+              elevation: isDark ? 7 : 2,
+            }}
           >
-            <Text className="text-base font-bold text-white dark:text-slate-900">Create a Group</Text>
+            <Text style={{ fontSize: 15, fontWeight: '700', color: 'white', letterSpacing: 0.2 }}>Create a Group</Text>
           </PressableCard>
 
           <PressableCard
             onPress={() => router.push('/trip/new')}
-            className="mt-4 flex-row items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-4 shadow-sm transition-all duration-200 active:scale-95 dark:border-slate-850 dark:bg-slate-900/40"
+            className="mt-4 flex-row items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-4 shadow-sm"
+            style={isDark ? { borderColor: '#1e293b', backgroundColor: '#0d1829' } : {}}
           >
-            <Ionicons name="person-outline" size={16} color={isDark ? '#cbd5e1' : '#475569'} />
-            <Text className="text-sm font-semibold text-slate-600 dark:text-slate-300">Plan a Solo Trip</Text>
+            <Ionicons name="person-outline" size={16} color={isDark ? '#94a3b8' : '#475569'} />
+            <Text className="text-sm font-semibold text-slate-600 dark:text-slate-400">Plan a Solo Trip</Text>
           </PressableCard>
         </ScrollView>
       ) : (
@@ -254,8 +290,8 @@ export default function HomeScreen() {
           ListHeaderComponent={
             hasGroups ? (
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12, marginTop: 16 }}>
-                <View style={{ width: 3, height: 12, borderRadius: 2, backgroundColor: '#0f172a' }} />
-                <Text className="text-slate-400 text-xs font-semibold tracking-wider uppercase">
+                <View style={{ width: 3, height: 12, borderRadius: 2, backgroundColor: isDark ? '#2563eb' : '#0f172a' }} />
+                <Text className="text-slate-400 dark:text-slate-500 text-xs font-semibold tracking-wider uppercase">
                   Your Groups
                 </Text>
               </View>
@@ -266,8 +302,8 @@ export default function HomeScreen() {
               {hasSoloTrips && (
                 <View className="mt-8">
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 }}>
-                    <View style={{ width: 3, height: 12, borderRadius: 2, backgroundColor: '#475569' }} />
-                    <Text className="text-slate-400 text-xs font-semibold tracking-wider uppercase">
+                    <View style={{ width: 3, height: 12, borderRadius: 2, backgroundColor: isDark ? '#7c3aed' : '#475569' }} />
+                    <Text className="text-slate-400 dark:text-slate-500 text-xs font-semibold tracking-wider uppercase">
                       Solo Trips
                     </Text>
                   </View>
@@ -275,7 +311,7 @@ export default function HomeScreen() {
                     <PressableCard
                       key={trip.id}
                       onPress={() => router.push(`/trip/${trip.id}`)}
-                      className="mb-4 rounded-xl border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800/80 dark:bg-slate-900/50"
+                      className="mb-4 rounded-xl border border-slate-100 bg-white p-5 shadow-sm dark:border-[#1e293b] dark:bg-gray-900"
                     >
                       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
                         <View
@@ -283,21 +319,35 @@ export default function HomeScreen() {
                             width: 44,
                             height: 44,
                             borderRadius: 12,
-                            backgroundColor: '#475569',
+                            backgroundColor: isDark ? '#7c3aed' : '#475569',
                             alignItems: 'center',
                             justifyContent: 'center',
+                            shadowColor: isDark ? '#7c3aed' : undefined,
+                            shadowOpacity: isDark ? 0.4 : 0,
+                            shadowOffset: { width: 0, height: 3 },
+                            shadowRadius: 8,
+                            elevation: isDark ? 4 : 0,
                           }}
                         >
                           <Ionicons name="person" size={20} color="white" />
                         </View>
                         <View style={{ flex: 1 }}>
                           <Text className="text-base font-bold text-slate-900 dark:text-slate-100">{trip.title}</Text>
-                          <Text className="text-slate-400 text-xs font-semibold tracking-wider uppercase mt-1">
+                          <Text className="text-slate-400 dark:text-slate-500 text-xs font-semibold tracking-wider uppercase mt-1">
                             {trip.destination} · {format(new Date(trip.start_date + 'T12:00:00'), 'MMM d')}
                           </Text>
                         </View>
-                        <View className="h-8 w-8 items-center justify-center rounded-lg bg-slate-50 dark:bg-slate-800/60">
-                          <Ionicons name="chevron-forward" size={15} color="#94a3b8" />
+                        <View
+                          style={{
+                            width: 30,
+                            height: 30,
+                            borderRadius: 9,
+                            backgroundColor: isDark ? '#1e293b' : '#f1f5f9',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          <Ionicons name="chevron-forward" size={15} color={isDark ? '#64748b' : '#94a3b8'} />
                         </View>
                       </View>
                     </PressableCard>
@@ -308,10 +358,11 @@ export default function HomeScreen() {
               {/* Plan solo trip CTA */}
               <PressableCard
                 onPress={() => router.push('/trip/new')}
-                className="mt-6 flex-row items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-4 shadow-sm transition-all duration-200 active:scale-95 dark:border-slate-800 dark:bg-slate-900/40"
+                className="mt-6 flex-row items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-4 shadow-sm"
+                style={isDark ? { borderColor: '#1e293b', backgroundColor: '#0d1829' } : {}}
               >
                 <Ionicons name="add-circle-outline" size={18} color={isDark ? '#64748b' : '#94a3b8'} />
-                <Text className="text-sm font-semibold text-slate-600 dark:text-slate-350">Plan a Solo Trip</Text>
+                <Text className="text-sm font-semibold text-slate-600 dark:text-slate-400">Plan a Solo Trip</Text>
               </PressableCard>
             </View>
           }

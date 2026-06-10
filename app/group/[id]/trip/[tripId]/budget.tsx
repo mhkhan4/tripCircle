@@ -97,16 +97,16 @@ export default function BudgetScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50/60 dark:bg-slate-950/60" edges={['bottom']}>
+    <SafeAreaView className="flex-1 bg-slate-50/60 dark:bg-gray-950" edges={['bottom']}>
       <Stack.Screen options={{ title: 'Budget' }} />
       <ScrollView contentContainerStyle={{ padding: 24 }}>
         {!budget ? (
-          <View className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-800/80 dark:bg-slate-900">
+          <View className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-900">
             <Text className="mb-1 text-slate-900 text-lg font-bold dark:text-white">Set Trip Budget</Text>
-            <Text className="mb-6 text-sm text-slate-500 dark:text-slate-400">Set a total or per-person budget for this trip.</Text>
+            <Text className="mb-6 text-sm text-slate-500 dark:text-gray-400">Set a total or per-person budget for this trip.</Text>
 
             {/* Mode toggle */}
-            <View className="mb-6 flex-row rounded-xl border border-slate-100 bg-slate-100/50 p-1 dark:border-slate-800/80 dark:bg-slate-950/50">
+            <View className="mb-6 flex-row rounded-xl border border-slate-100 bg-slate-100/50 p-1 dark:border-gray-700 dark:bg-gray-900">
               {(['total', 'per_person'] as BudgetMode[]).map((m) => (
                 <TouchableOpacity
                   key={m}
@@ -133,7 +133,7 @@ export default function BudgetScreen() {
               placeholder="0.00"
               placeholderTextColor="#94A3B8"
               keyboardType="decimal-pad"
-              className="mb-4 rounded-xl border border-slate-100 bg-white px-4 py-4 text-3xl font-extrabold text-slate-900 dark:border-slate-800/80 dark:bg-slate-900 dark:text-white"
+              className="mb-4 rounded-xl border border-slate-100 bg-white px-4 py-4 text-3xl font-extrabold text-slate-900 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
             />
 
             {enteredNum > 0 && (
@@ -165,7 +165,7 @@ export default function BudgetScreen() {
           </View>
         ) : (
           <View className="gap-6">
-            <View className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-800/80 dark:bg-slate-900">
+            <View className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-900">
               <Text className="mb-1 text-slate-400 text-xs font-semibold tracking-wider uppercase">Budget Overview</Text>
 
               {budget.per_person_amount && (
@@ -185,7 +185,7 @@ export default function BudgetScreen() {
                   }}
                 />
               </View>
-              <View className="flex-row justify-between pt-2 border-t border-slate-50 dark:border-slate-800/50">
+              <View className="flex-row justify-between pt-2 border-t border-slate-50 dark:border-gray-700/50">
                 {[
                   { label: 'Total Budget', value: `$${totalBudget.toFixed(2)}`, color: 'text-slate-900 dark:text-white' },
                   { label: 'Spent', value: `$${totalSpent.toFixed(2)}`, color: 'text-slate-900 dark:text-white' },
@@ -199,7 +199,7 @@ export default function BudgetScreen() {
               </View>
             </View>
 
-            <View className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-800/80 dark:bg-slate-900">
+            <View className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-900">
               <View className="mb-6 flex-row items-center justify-between">
                 <Text className="text-slate-900 text-lg font-bold dark:text-white">Member Contributions</Text>
                 {isAdmin && (
@@ -229,16 +229,16 @@ export default function BudgetScreen() {
                   }
 
                   return (
-                    <View key={m.user_id} className="flex-row items-center justify-between border-b border-slate-50 py-3 last:border-b-0 dark:border-slate-800/50">
+                    <View key={m.user_id} className="flex-row items-center justify-between border-b border-slate-50 py-3 last:border-b-0 dark:border-gray-700/50">
                       <View className="flex-row items-center gap-3">
-                        <View className="h-10 w-10 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200/50 dark:border-slate-700/50">
+                        <View className="h-10 w-10 items-center justify-center rounded-full bg-slate-100 dark:bg-gray-800 border border-slate-200/50 dark:border-gray-700/50">
                           <Text className="text-sm font-bold text-slate-650 dark:text-slate-300">
                             {m.user?.full_name?.[0]?.toUpperCase() ?? m.user?.email?.[0]?.toUpperCase() ?? '?'}
                           </Text>
                         </View>
                         <View>
                           <Text className="font-semibold text-slate-900 dark:text-white">{m.user?.full_name ?? 'Member'}</Text>
-                          <Text className="text-xs text-slate-400 dark:text-slate-500 font-medium">Share: ${share.toFixed(2)}</Text>
+                          <Text className="text-xs text-slate-400 dark:text-gray-500 font-medium">Share: ${share.toFixed(2)}</Text>
                         </View>
                       </View>
                       {isPaid ? (
@@ -246,7 +246,7 @@ export default function BudgetScreen() {
                           <Ionicons name="checkmark-circle" size={15} color="#10B981" />
                           <Text className="font-bold text-xs text-emerald-600 dark:text-emerald-400">Paid ${contribution!.paid_amount.toFixed(2)}</Text>
                           {isAdmin && (
-                            <TouchableOpacity onPress={openMarkPaid} className="ml-1.5 p-1 transition-all duration-200 active:scale-95 bg-white dark:bg-slate-800 rounded-full shadow-sm">
+                            <TouchableOpacity onPress={openMarkPaid} className="ml-1.5 p-1 transition-all duration-200 active:scale-95 bg-white dark:bg-gray-800 rounded-full shadow-sm">
                               <Ionicons name="pencil" size={11} color="#64748B" />
                             </TouchableOpacity>
                           )}
@@ -275,23 +275,23 @@ export default function BudgetScreen() {
       {/* Mark Paid Modal */}
       <Modal visible={!!markPaidTarget} animationType="fade" transparent>
         <View className="flex-1 items-center justify-center bg-black/50 px-6">
-          <View className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80">
+          <View className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-900 border border-slate-100 dark:border-gray-700">
             <Text className="mb-1 text-lg font-bold text-slate-900 dark:text-white">Mark as Paid</Text>
-            <Text className="mb-4 text-sm text-slate-500 dark:text-slate-400">
+            <Text className="mb-4 text-sm text-slate-500 dark:text-gray-400">
               How much did {markPaidTarget?.name} pay? (share: ${markPaidTarget?.share.toFixed(2)})
             </Text>
             <TextInput
               value={markPaidInput}
               onChangeText={setMarkPaidInput}
               keyboardType="decimal-pad"
-              className="mb-6 rounded-xl border border-slate-100 bg-slate-50 px-4 py-4 text-2xl font-bold text-slate-900 dark:border-slate-800/80 dark:bg-slate-950 dark:text-white"
+              className="mb-6 rounded-xl border border-slate-100 bg-slate-50 px-4 py-4 text-2xl font-bold text-slate-900 dark:border-gray-700 dark:bg-gray-950 dark:text-white"
             />
             <View className="flex-row gap-3">
               <TouchableOpacity
                 onPress={() => setMarkPaidTarget(null)}
-                className="flex-1 items-center rounded-xl border border-slate-100 bg-white py-3 transition-all duration-200 active:scale-95 dark:border-slate-800/80 dark:bg-slate-900"
+                className="flex-1 items-center rounded-xl border border-slate-100 bg-white py-3 transition-all duration-200 active:scale-95 dark:border-gray-700 dark:bg-gray-900"
               >
-                <Text className="font-semibold text-slate-500 dark:text-slate-400">Cancel</Text>
+                <Text className="font-semibold text-slate-500 dark:text-gray-400">Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={confirmMarkPaid}
@@ -312,9 +312,9 @@ export default function BudgetScreen() {
       {/* Custom Alert Modal */}
       <Modal visible={!!alertInfo} animationType="fade" transparent>
         <View className="flex-1 items-center justify-center bg-black/50 px-6">
-          <View className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80">
+          <View className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-900 border border-slate-100 dark:border-gray-700">
             <Text className="mb-2 text-lg font-bold text-slate-900 dark:text-white">{alertInfo?.title}</Text>
-            <Text className="mb-6 text-sm text-slate-500 dark:text-slate-400">{alertInfo?.message}</Text>
+            <Text className="mb-6 text-sm text-slate-500 dark:text-gray-400">{alertInfo?.message}</Text>
             <TouchableOpacity
               onPress={() => setAlertInfo(null)}
               className="w-full items-center rounded-xl bg-slate-900 py-3 transition-all duration-200 active:scale-95 dark:bg-white"
