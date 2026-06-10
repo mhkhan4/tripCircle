@@ -37,7 +37,7 @@ function TripCard({ item, groupId }: { item: Trip; groupId: string }) {
   return (
     <PressableCard
       onPress={() => router.push(`/group/${groupId}/trip/${item.id}`)}
-      className="mb-4 rounded-xl border border-slate-100 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-900/50"
+      className="mb-4 rounded-xl border border-slate-100 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-900"
     >
       <View className="flex-row items-start justify-between gap-4">
         <View className="flex-1">
@@ -125,7 +125,7 @@ export default function GroupScreen() {
           <TouchableOpacity
             onPress={shareInvite}
             activeOpacity={0.9}
-            className="flex-1 flex-row items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-3 transition-all duration-200 active:scale-95 dark:border-gray-700 dark:bg-gray-900/50"
+            className="flex-1 flex-row items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-3 transition-all duration-200 active:scale-95 dark:border-gray-700 dark:bg-gray-900"
           >
             <Ionicons name="share-outline" size={16} color={isDark ? '#cbd5e1' : '#334155'} />
             <Text className="text-sm font-bold text-slate-700 dark:text-slate-300">Invite</Text>
@@ -133,7 +133,7 @@ export default function GroupScreen() {
           <TouchableOpacity
             onPress={() => router.push(`/group/${id}/members`)}
             activeOpacity={0.9}
-            className="flex-1 flex-row items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-3 transition-all duration-200 active:scale-95 dark:border-gray-700 dark:bg-gray-900/50"
+            className="flex-1 flex-row items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-3 transition-all duration-200 active:scale-95 dark:border-gray-700 dark:bg-gray-900"
           >
             <Ionicons name="people-outline" size={16} color={isDark ? '#cbd5e1' : '#334155'} />
             <Text className="text-sm font-bold text-slate-700 dark:text-slate-300">Members</Text>

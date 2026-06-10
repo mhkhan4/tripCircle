@@ -155,7 +155,7 @@ export default function PollsScreen() {
                   <View className="mb-4 flex-row items-start justify-between">
                     <View className="flex-1">
                       <View className="mb-2 flex-row items-center gap-2">
-                        <View className={`rounded-full px-2.5 py-0.5 ${closed ? 'bg-slate-100 dark:bg-gray-800' : 'bg-blue-50 dark:bg-blue-950/40 border border-blue-100/50 dark:border-blue-900/30'}`}>
+                        <View className={`rounded-full px-2.5 py-0.5 ${closed ? 'bg-slate-100 dark:bg-gray-800' : 'bg-blue-50 dark:bg-blue-950 border border-blue-100/50 dark:border-blue-900'}`}>
                           <Text className={`text-[10px] font-extrabold uppercase tracking-wider ${closed ? 'text-slate-550' : 'text-blue-600 dark:text-blue-400'}`}>
                             {closed ? 'Closed' : countdown(poll.closes_at)}
                           </Text>
@@ -185,7 +185,7 @@ export default function PollsScreen() {
                             key={opt.id}
                             onPress={() => handleVote(poll, opt.id)}
                             disabled={vote.isPending}
-                            className="rounded-xl border border-slate-100 bg-slate-50/50 px-4 py-3.5 transition-all duration-200 active:scale-98 dark:border-gray-700 dark:bg-gray-900/50"
+                            className="rounded-xl border border-slate-100 bg-slate-50/50 px-4 py-3.5 transition-all duration-200 active:scale-98 dark:border-gray-700 dark:bg-gray-900"
                           >
                             <Text className="font-semibold text-slate-850 dark:text-slate-200">{opt.label}</Text>
                           </TouchableOpacity>
@@ -197,11 +197,11 @@ export default function PollsScreen() {
                           key={opt.id}
                           onPress={() => !closed && handleVote(poll, opt.id)}
                           disabled={closed || vote.isPending}
-                          className={`overflow-hidden rounded-xl border transition-all duration-200 active:scale-98 ${isWinner ? 'border-emerald-500 dark:border-emerald-500/80' : isMyVote ? 'border-slate-900 dark:border-white' : 'border-slate-100 dark:border-gray-700'}`}
+                          className={`overflow-hidden rounded-xl border transition-all duration-200 active:scale-98 ${isWinner ? 'border-emerald-500 dark:border-emerald-500' : isMyVote ? 'border-slate-900 dark:border-white' : 'border-slate-100 dark:border-gray-700'}`}
                         >
                           <View className="relative px-4 py-3.5">
                             <View
-                              className={`absolute inset-y-0 left-0 ${isWinner ? 'bg-emerald-50/80 dark:bg-emerald-950/20' : isMyVote ? 'bg-slate-100 dark:bg-gray-800' : 'bg-slate-50/50 dark:bg-gray-900/50'}`}
+                              className={`absolute inset-y-0 left-0 ${isWinner ? 'bg-emerald-50/80 dark:bg-emerald-950' : isMyVote ? 'bg-slate-100 dark:bg-gray-800' : 'bg-slate-50/50 dark:bg-gray-900'}`}
                               style={{ width: `${pct}%` }}
                             />
                             <View className="relative flex-row items-center justify-between">

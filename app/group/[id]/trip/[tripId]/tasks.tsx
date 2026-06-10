@@ -115,7 +115,7 @@ export default function TasksScreen() {
       <View
         className={`mb-3 flex-row items-center gap-3 rounded-2xl border px-4 py-4 transition-all duration-200 ${
           isComplete
-            ? 'border-slate-50 bg-slate-55/40 dark:border-slate-900/50 dark:bg-gray-900/20'
+            ? 'border-slate-50 bg-slate-55/40 dark:border-slate-900 dark:bg-gray-900'
             : 'border-slate-100 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900'
         }`}
       >

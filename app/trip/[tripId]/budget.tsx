@@ -71,7 +71,7 @@ export default function SoloBudgetScreen() {
               />
             </View>
             
-            <View className="flex-row justify-between pt-2 border-t border-slate-50 dark:border-gray-700/50">
+            <View className="flex-row justify-between pt-2 border-t border-slate-50 dark:border-gray-700">
               {[
                 { label: 'Total Budget', value: `$${totalBudget.toFixed(2)}`, color: 'text-slate-900 dark:text-white' },
                 { label: 'Spent', value: `$${totalSpent.toFixed(2)}`, color: 'text-slate-900 dark:text-white' },

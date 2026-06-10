@@ -221,7 +221,7 @@ export default function AddExpenseScreen() {
           ))}
         </View>
 
-        <View className="mb-8 rounded-xl border border-blue-100 bg-blue-50/50 p-4 dark:border-blue-900/30 dark:bg-blue-950/20">
+        <View className="mb-8 rounded-xl border border-blue-100 bg-blue-50/50 p-4 dark:border-blue-900 dark:bg-blue-950">
           <Text className="text-sm font-semibold text-blue-700 dark:text-blue-300">
             Split equally among {members.length} trip {members.length === 1 ? 'member' : 'members'} (${(parseFloat(amount || '0') / Math.max(members.length, 1)).toFixed(2)} each)
           </Text>

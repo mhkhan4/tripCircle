@@ -64,13 +64,13 @@ export default function SoloTripScreen() {
           </View>
 
           <View className="flex-row gap-3">
-            <View className="flex-1 rounded-xl border border-slate-100 bg-slate-50/50 p-4 dark:border-gray-700/60 dark:bg-gray-900/20">
+            <View className="flex-1 rounded-xl border border-slate-100 bg-slate-50/50 p-4 dark:border-gray-700 dark:bg-gray-900">
               <Text className="text-slate-400 text-xs font-semibold tracking-wider uppercase">Start</Text>
               <Text className="mt-1 font-bold text-slate-800 dark:text-slate-200 text-sm">
                 {format(new Date(trip.start_date + 'T12:00:00'), 'MMM d, yyyy')}
               </Text>
             </View>
-            <View className="flex-1 rounded-xl border border-slate-100 bg-slate-50/50 p-4 dark:border-gray-700/60 dark:bg-gray-900/20">
+            <View className="flex-1 rounded-xl border border-slate-100 bg-slate-50/50 p-4 dark:border-gray-700 dark:bg-gray-900">
               <Text className="text-slate-400 text-xs font-semibold tracking-wider uppercase">End</Text>
               <Text className="mt-1 font-bold text-slate-800 dark:text-slate-200 text-sm">
                 {format(new Date(trip.end_date + 'T12:00:00'), 'MMM d, yyyy')}
@@ -132,10 +132,10 @@ export default function SoloTripScreen() {
         {/* Expenses */}
         <PressableCard
           onPress={() => router.push(`/trip/${tripId}/expenses`)}
-          className="mb-6 rounded-xl border border-slate-100 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-900/50"
+          className="mb-6 rounded-xl border border-slate-100 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-900"
         >
           <View className="flex-row items-center gap-4">
-            <View className="h-10 w-10 items-center justify-center rounded-xl bg-slate-50 dark:bg-gray-800/60">
+            <View className="h-10 w-10 items-center justify-center rounded-xl bg-slate-50 dark:bg-gray-800">
               <Ionicons name="receipt-outline" size={20} color={isDark ? '#ffffff' : '#0f172a'} />
             </View>
             <View className="flex-1">
@@ -150,10 +150,10 @@ export default function SoloTripScreen() {
         <View className="flex-row gap-4 mb-6">
           <PressableCard
             onPress={() => router.push(`/trip/${tripId}/tasks`)}
-            className="flex-1 rounded-xl border border-slate-100 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-900/50"
+            className="flex-1 rounded-xl border border-slate-100 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-900"
           >
             <View className="flex-row items-center justify-between">
-              <View className="h-10 w-10 items-center justify-center rounded-xl bg-slate-50 dark:bg-gray-800/60">
+              <View className="h-10 w-10 items-center justify-center rounded-xl bg-slate-50 dark:bg-gray-800">
                 <Ionicons name="checkbox-outline" size={20} color={isDark ? '#ffffff' : '#0f172a'} />
               </View>
               {pendingTaskCount > 0 && (
@@ -170,9 +170,9 @@ export default function SoloTripScreen() {
 
           <PressableCard
             onPress={() => router.push(`/trip/${tripId}/itinerary`)}
-            className="flex-1 rounded-xl border border-slate-100 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-900/50"
+            className="flex-1 rounded-xl border border-slate-100 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-900"
           >
-            <View className="h-10 w-10 items-center justify-center rounded-xl bg-slate-50 dark:bg-gray-800/60">
+            <View className="h-10 w-10 items-center justify-center rounded-xl bg-slate-50 dark:bg-gray-800">
               <Ionicons name="map-outline" size={20} color={isDark ? '#ffffff' : '#0f172a'} />
             </View>
             <Text className="mt-3 font-bold text-slate-900 dark:text-white text-sm">Itinerary</Text>
@@ -188,7 +188,7 @@ export default function SoloTripScreen() {
             <Text className="mb-4 text-slate-400 text-xs font-semibold tracking-wider uppercase">Spending by Category</Text>
             {Object.entries(byCategory).map(([cat, amount]) => (
               <View key={cat} style={{ marginBottom: 10, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                <View className="h-8 w-8 items-center justify-center rounded-lg bg-slate-50 dark:bg-gray-800/60">
+                <View className="h-8 w-8 items-center justify-center rounded-lg bg-slate-50 dark:bg-gray-800">
                   <Ionicons name={CATEGORY_ICONS[cat] as any ?? 'ellipsis-horizontal-outline'} size={15} color="#64748B" />
                 </View>
                 <Text className="flex-1 capitalize text-slate-700 dark:text-slate-350">{cat}</Text>

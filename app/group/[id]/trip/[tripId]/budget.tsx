@@ -137,7 +137,7 @@ export default function BudgetScreen() {
             />
 
             {enteredNum > 0 && (
-              <View className="mb-6 rounded-xl bg-blue-50/50 p-4 dark:bg-blue-900/10 border border-blue-100/50 dark:border-blue-900/20">
+              <View className="mb-6 rounded-xl bg-blue-50/50 p-4 dark:bg-blue-950 border border-blue-100/50 dark:border-blue-900">
                 {mode === 'per_person' ? (
                   <Text className="text-sm text-blue-700 dark:text-blue-300 leading-relaxed font-medium">
                     ${enteredNum.toFixed(2)}/person × {memberCount} members = <Text className="font-bold">${computedTotal.toFixed(2)} total</Text>
@@ -169,7 +169,7 @@ export default function BudgetScreen() {
               <Text className="mb-1 text-slate-400 text-xs font-semibold tracking-wider uppercase">Budget Overview</Text>
 
               {budget.per_person_amount && (
-                <View className="mb-4 mt-2 rounded-xl bg-blue-50/50 px-4 py-3 dark:bg-blue-900/10 border border-blue-100/50 dark:border-blue-900/20">
+                <View className="mb-4 mt-2 rounded-xl bg-blue-50/50 px-4 py-3 dark:bg-blue-950 border border-blue-100/50 dark:border-blue-900">
                   <Text className="text-xs text-blue-600 dark:text-blue-300 font-semibold leading-relaxed">
                     Per-person budget: ${budget.per_person_amount.toFixed(2)} × {memberCount} members — auto-scales when members join
                   </Text>
@@ -185,7 +185,7 @@ export default function BudgetScreen() {
                   }}
                 />
               </View>
-              <View className="flex-row justify-between pt-2 border-t border-slate-50 dark:border-gray-700/50">
+              <View className="flex-row justify-between pt-2 border-t border-slate-50 dark:border-gray-700">
                 {[
                   { label: 'Total Budget', value: `$${totalBudget.toFixed(2)}`, color: 'text-slate-900 dark:text-white' },
                   { label: 'Spent', value: `$${totalSpent.toFixed(2)}`, color: 'text-slate-900 dark:text-white' },
@@ -206,7 +206,7 @@ export default function BudgetScreen() {
                   <TouchableOpacity
                     onPress={handleSendReminder}
                     disabled={sendingReminder}
-                    className="flex-row items-center gap-1.5 rounded-full bg-amber-50 px-3.5 py-2 transition-all duration-200 active:scale-95 dark:bg-amber-900/20 border border-amber-100/50 dark:border-amber-900/30"
+                    className="flex-row items-center gap-1.5 rounded-full bg-amber-50 px-3.5 py-2 transition-all duration-200 active:scale-95 dark:bg-amber-900 border border-amber-100/50 dark:border-amber-900"
                   >
                     {sendingReminder ? (
                       <ActivityIndicator size="small" color="#D97706" />
@@ -229,9 +229,9 @@ export default function BudgetScreen() {
                   }
 
                   return (
-                    <View key={m.user_id} className="flex-row items-center justify-between border-b border-slate-50 py-3 last:border-b-0 dark:border-gray-700/50">
+                    <View key={m.user_id} className="flex-row items-center justify-between border-b border-slate-50 py-3 last:border-b-0 dark:border-gray-700">
                       <View className="flex-row items-center gap-3">
-                        <View className="h-10 w-10 items-center justify-center rounded-full bg-slate-100 dark:bg-gray-800 border border-slate-200/50 dark:border-gray-700/50">
+                        <View className="h-10 w-10 items-center justify-center rounded-full bg-slate-100 dark:bg-gray-800 border border-slate-200/50 dark:border-gray-700">
                           <Text className="text-sm font-bold text-slate-650 dark:text-slate-300">
                             {m.user?.full_name?.[0]?.toUpperCase() ?? m.user?.email?.[0]?.toUpperCase() ?? '?'}
                           </Text>
@@ -242,7 +242,7 @@ export default function BudgetScreen() {
                         </View>
                       </View>
                       {isPaid ? (
-                        <View className="flex-row items-center gap-1.5 bg-emerald-50/50 dark:bg-emerald-950/20 px-3 py-1.5 rounded-xl border border-emerald-100/50 dark:border-emerald-900/30">
+                        <View className="flex-row items-center gap-1.5 bg-emerald-50/50 dark:bg-emerald-950 px-3 py-1.5 rounded-xl border border-emerald-100/50 dark:border-emerald-900">
                           <Ionicons name="checkmark-circle" size={15} color="#10B981" />
                           <Text className="font-bold text-xs text-emerald-600 dark:text-emerald-400">Paid ${contribution!.paid_amount.toFixed(2)}</Text>
                           {isAdmin && (
@@ -253,7 +253,7 @@ export default function BudgetScreen() {
                         </View>
                       ) : (
                         <View className="flex-row items-center gap-2">
-                          <View className="rounded-xl border border-amber-100 bg-amber-50/50 px-3 py-1.5 dark:border-amber-900/30 dark:bg-amber-950/20">
+                          <View className="rounded-xl border border-amber-100 bg-amber-50/50 px-3 py-1.5 dark:border-amber-900 dark:bg-amber-950">
                             <Text className="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">Pending</Text>
                           </View>
                           {isAdmin && (
