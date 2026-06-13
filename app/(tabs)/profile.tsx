@@ -1,11 +1,13 @@
 import { View, Text, TouchableOpacity, Alert, Image, Platform, Switch } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import { useAuth } from '../../hooks/useAuth';
 import { useAppStore } from '../../store/useAppStore';
 import { useTheme } from '../../hooks/useTheme';
 
 export default function ProfileScreen() {
+  const router = useRouter();
   const { user: authUser, signOut } = useAuth();
   const { user } = useAppStore();
   const { isDark, toggleTheme } = useTheme();
@@ -24,8 +26,32 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50 dark:bg-gray-950">
-      <View className="px-5 py-4">
-        <Text className="text-2xl font-bold text-gray-900 dark:text-white">Profile</Text>
+      {/* Header */}
+      <View
+        className="border-b border-slate-100 dark:border-slate-800"
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          paddingHorizontal: 20,
+          paddingVertical: 14,
+          gap: 12,
+        }}
+      >
+        <TouchableOpacity
+          onPress={() => router.replace('/')}
+          className="rounded-xl bg-slate-100 dark:bg-gray-900"
+          style={{
+            width: 38,
+            height: 38,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Ionicons name="chevron-back" size={20} className="text-slate-900 dark:text-white" />
+        </TouchableOpacity>
+        <View style={{ flex: 1 }}>
+          <Text className="text-xl font-bold text-gray-900 dark:text-white">Profile</Text>
+        </View>
       </View>
 
       <View className="mx-5 rounded-2xl bg-white p-5 shadow-sm dark:bg-gray-800" style={{ shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 }}>

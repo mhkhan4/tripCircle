@@ -12,7 +12,7 @@ export function useGroups() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('group_members')
-        .select('group:groups(*)')
+        .select('group:groups(*, trips(*))')
         .eq('user_id', user!.id)
         .eq('group.is_solo', false);
       if (error) throw error;

@@ -57,9 +57,33 @@ export default function CalendarScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50 dark:bg-gray-950">
-      <View className="px-5 py-4">
-        <Text className="text-2xl font-bold text-gray-900 dark:text-white">Calendar</Text>
-        <Text className="text-sm text-gray-500 dark:text-gray-400">All your upcoming adventures</Text>
+      {/* Header */}
+      <View
+        className="border-b border-slate-100 dark:border-slate-800"
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          paddingHorizontal: 20,
+          paddingVertical: 14,
+          gap: 12,
+        }}
+      >
+        <TouchableOpacity
+          onPress={() => router.replace('/')}
+          className="rounded-xl bg-slate-100 dark:bg-gray-900"
+          style={{
+            width: 38,
+            height: 38,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Ionicons name="chevron-back" size={20} className="text-slate-900 dark:text-white" />
+        </TouchableOpacity>
+        <View style={{ flex: 1 }}>
+          <Text className="text-xl font-bold text-gray-900 dark:text-white">Calendar</Text>
+          <Text className="text-xs text-gray-500 dark:text-gray-400">All your upcoming adventures</Text>
+        </View>
       </View>
 
       {isLoading ? (
@@ -78,11 +102,17 @@ export default function CalendarScreen() {
         <FlatList
           data={[...upcoming, ...past]}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 20 }}
+          contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 20 }}
           renderItem={({ item }) => (
             <TripCard
               trip={item}
-              onPress={() => router.push(`/group/${item.group_id}/trip/${item.id}`)}
+              onPress={() => {
+                if (item.group_id) {
+                  router.push(`/group/${item.group_id}/trip/${item.id}`);
+                } else {
+                  router.push(`/trip/${item.id}`);
+                }
+              }}
             />
           )}
           ListHeaderComponent={
